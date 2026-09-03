@@ -1,0 +1,21 @@
+# Copy this file to config.yaml and fill in your own paths/credentials.
+# config.yaml is gitignored — it's personal to your machine.
+
+roots:
+  - path: "~/Comics"
+    type: comic
+  - path: "~/Manga"
+    type: manga
+
+# Optional — only needed for `comic-library enrich`.
+# Free account: https://metron.cloud/
+metron:
+  username: ""
+  password: ""
+
+# Optional — only needed for `comic-library enrich`.
+# Works without a key at low request volume; get one at
+# https://console.cloud.google.com/apis/library/books.googleapis.com
+# for higher rate limits.
+google_books:
+  api_key: ""

@@ -1,0 +1,29 @@
+[project]
+name = "comic-view-ui"
+version = "0.1.0"
+description = "Scans folders of CBR/CBZ comics and manga, extracts metadata, and builds a flattened JSON library."
+requires-python = ">=3.10"
+dependencies = [
+    "rarfile>=4.1",
+    "requests>=2.31",
+    "PyYAML>=6.0",
+    "click>=8.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+]
+
+[project.scripts]
+comic-library = "cli:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+py-modules = ["cli"]
+
+[tool.setuptools.packages.find]
+include = ["library*"]

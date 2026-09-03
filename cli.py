@@ -4,7 +4,7 @@ from __future__ import annotations
 import click
 
 from library.config import load_config
-from library.enrichment import enrich_all
+from library.enrichment import enrich_all, refetch_physical_covers
 from library.excel_importer import import_physical, load_rows
 from library.isbn_importer import import_isbn_csv, load_csv_rows
 from library.metadata_sources.google_books import GoogleBooksSource
@@ -66,6 +66,35 @@ def enrich(config_path: str, force: bool) -> None:
     updated = enrich_all(records, sources, covers_dir, force=force)
     save_library(library_path, records)
     click.echo(f"Enriched {updated} of {len(records)} record(s).")
+
+
+@main.command("fetch-covers")
+@click.option("--config", "config_path", default="config.yaml", help="Path to config.yaml")
+def fetch_covers_cmd(config_path: str) -> None:
+    """Re-fetch covers for every physical-only record, routed by kind: Metron
+    for single comic issues, Google Books for manga and TPBs/collected
+    editions. Overwrites existing physical-only covers; never touches
+    digital or digital+physical records."""
+    config = load_config(config_path)
+    library_path = config.data_dir / "library.json"
+    covers_dir = config.data_dir / "covers"
+
+    records = load_library(library_path)
+    if not records:
+        click.echo("No records found — run `scan` first.")
+        return
+
+    sources = []
+    if config.metron.is_configured:
+        sources.append(MetronSource(config.metron.username, config.metron.password))
+    else:
+        click.echo("Metron not configured (skipping) — fill in config.yaml to enable.")
+    sources.append(GoogleBooksSource(config.google_books.api_key))
+
+    updated = refetch_physical_covers(records, sources, covers_dir)
+    save_library(library_path, records)
+    physical_only = sum(1 for r in records.values() if r.formats == ["physical"])
+    click.echo(f"Fetched covers for {updated} of {physical_only} physical-only record(s).")
 
 
 @main.command("import-physical")

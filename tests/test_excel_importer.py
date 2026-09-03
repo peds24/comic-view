@@ -16,6 +16,23 @@ def test_normalize_series_strips_year_range_suffix():
     assert normalize_series("Swamp Thing 1989") == "Swamp Thing 1989"
 
 
+def test_normalize_series_strips_volume_suffix():
+    # Real bug found while investigating why Metron cover lookups were
+    # missing for "Batman" single issues: the series name still carried a
+    # "(Vol. 4)" qualifier, polluting the search query.
+    assert normalize_series("Batman (Vol. 4)") == "Batman"
+    assert normalize_series("The Brave and the Bold (Vol. 1)") == "The Brave and the Bold"
+
+
+def test_normalize_series_strips_bare_year_suffix():
+    assert normalize_series("Swamp Thing 1989 (2026)") == "Swamp Thing 1989"
+
+
+def test_normalize_series_strips_edition_note_suffix():
+    assert normalize_series("Watchmen (New Edition)") == "Watchmen"
+    assert normalize_series("Uzumaki (3-in-1, Deluxe Edition)") == "Uzumaki"
+
+
 def test_extract_issue():
     assert extract_issue("Absolute Batman #9") == "9"
     assert extract_issue("Absolute Batman 2025 Annual #1") == "1"

@@ -17,7 +17,7 @@ from library.models import ComicRecord
 
 SHEET_NAME = "Comics"
 
-_YEAR_RANGE_SUFFIX_RE = re.compile(r"\s*\(\d{4}\s*-\s*(?:\d{4}|present)\)\s*$", re.IGNORECASE)
+_TRAILING_PAREN_RE = re.compile(r"\s*\([^()]*\)\s*$")
 _ISSUE_RE = re.compile(r"#(\d+)")
 
 # Titles containing any of these are collected editions / variants — never
@@ -36,7 +36,16 @@ def load_rows(path: str) -> list[dict]:
 
 
 def normalize_series(raw: str) -> str:
-    return _YEAR_RANGE_SUFFIX_RE.sub("", raw or "").strip()
+    """Strips trailing parenthetical qualifiers Comic Geeks appends to series
+    names — year ranges ("(2024 - Present)"), volume numbers ("(Vol. 4)"), a
+    bare year ("(2026)"), edition notes ("(New Edition)"), etc. Applied
+    repeatedly in case more than one trailing group is present."""
+    series = (raw or "").strip()
+    while True:
+        stripped = _TRAILING_PAREN_RE.sub("", series).strip()
+        if stripped == series:
+            return series
+        series = stripped
 
 
 def extract_issue(full_title: str) -> str | None:

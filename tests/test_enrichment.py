@@ -24,7 +24,7 @@ def _complete_record(**overrides) -> ComicRecord:
     defaults = dict(
         id="p1", title="Kingdom Come", type="comic", series="Kingdom Come",
         author="Mark Waid", year=1996, publisher="DC Comics", description="A story.",
-        formats=["physical"],
+        formats=["print"],
     )
     defaults.update(overrides)
     return ComicRecord(**defaults)

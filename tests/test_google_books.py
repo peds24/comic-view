@@ -2,6 +2,8 @@ from library.metadata_sources.google_books import GoogleBooksSource
 
 
 class FakeResponse:
+    status_code = 200
+
     def __init__(self, items):
         self._items = items
 
@@ -21,7 +23,7 @@ def test_cover_image_url_scans_past_first_result_with_no_image(monkeypatch):
         {"volumeInfo": {"title": "Edition C", "imageLinks": {"thumbnail": "https://example.com/c.jpg"}}},
     ]
     monkeypatch.setattr(
-        "library.metadata_sources.google_books.requests.get",
+        "library.http_utils.requests.get",
         lambda *a, **k: FakeResponse(items),
     )
     source = GoogleBooksSource()
@@ -31,7 +33,7 @@ def test_cover_image_url_scans_past_first_result_with_no_image(monkeypatch):
 def test_cover_image_url_returns_none_when_no_candidate_has_image(monkeypatch):
     items = [{"volumeInfo": {"title": "Edition A"}}, {"volumeInfo": {"title": "Edition B"}}]
     monkeypatch.setattr(
-        "library.metadata_sources.google_books.requests.get",
+        "library.http_utils.requests.get",
         lambda *a, **k: FakeResponse(items),
     )
     source = GoogleBooksSource()
@@ -49,7 +51,7 @@ def test_lookup_isbn_returns_title_and_fields(monkeypatch):
         }
     }]
     monkeypatch.setattr(
-        "library.metadata_sources.google_books.requests.get",
+        "library.http_utils.requests.get",
         lambda *a, **k: FakeResponse(items),
     )
     source = GoogleBooksSource()
@@ -62,7 +64,7 @@ def test_lookup_isbn_returns_title_and_fields(monkeypatch):
 
 def test_lookup_isbn_no_results(monkeypatch):
     monkeypatch.setattr(
-        "library.metadata_sources.google_books.requests.get",
+        "library.http_utils.requests.get",
         lambda *a, **k: FakeResponse([]),
     )
     source = GoogleBooksSource()

@@ -122,7 +122,7 @@ def test_find_digital_match_ignores_physical_only_records():
     records = {
         "p1": ComicRecord(
             id="p1", title="Absolute Batman #9", type="comic", series="Absolute Batman",
-            issue_number="9", formats=["physical"],
+            issue_number="9", formats=["print"],
         )
     }
     assert find_digital_match(records, "Absolute Batman", "9") is None
@@ -146,7 +146,7 @@ def test_import_physical_merges_matching_digital_record():
     }]
     merged, new, skipped = import_physical(records, rows)
     assert (merged, new, skipped) == (1, 0, 0)
-    assert records["d1"].formats == ["digital", "physical"]
+    assert records["d1"].formats == ["digital", "print"]
     assert records["d1"].cover_path == "d1/cover.jpg"  # untouched, reused
 
 
@@ -163,7 +163,7 @@ def test_import_physical_creates_physical_only_record_when_no_match():
     merged, new, skipped = import_physical(records, rows)
     assert (merged, new, skipped) == (0, 1, 0)
     (record,) = records.values()
-    assert record.formats == ["physical"]
+    assert record.formats == ["print"]
     assert record.cover_path is None
     assert record.preview_pages == []
 
@@ -201,4 +201,4 @@ def test_import_physical_is_idempotent():
     import_physical(records, rows)
     merged, new, skipped = import_physical(records, rows)
     assert (merged, new, skipped) == (0, 0, 0)
-    assert records["d1"].formats == ["digital", "physical"]
+    assert records["d1"].formats == ["digital", "print"]

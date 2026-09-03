@@ -24,7 +24,7 @@ class FakeResponse:
 
 
 def _comic(**overrides):
-    defaults = dict(id="p1", title="Batman #9", type="comic", issue_number="9", formats=["physical"])
+    defaults = dict(id="p1", title="Batman #9", type="comic", issue_number="9", formats=["print"])
     defaults.update(overrides)
     return ComicRecord(**defaults)
 
@@ -62,7 +62,7 @@ def test_manga_prefers_google_books(tmp_path: Path, monkeypatch):
     metron = FakeSource("metron", "https://example.com/metron.jpg")
     google = FakeSource("google_books", "https://example.com/google.jpg")
     records = {"p1": ComicRecord(
-        id="p1", title="Attack on Titan 29", type="manga", issue_number="29", formats=["physical"],
+        id="p1", title="Attack on Titan 29", type="manga", issue_number="29", formats=["print"],
     )}
 
     refetch_physical_covers(records, [metron, google], tmp_path)
@@ -91,7 +91,7 @@ def test_never_touches_digital_or_merged_records(tmp_path: Path, monkeypatch):
     google = FakeSource("google_books", "https://example.com/google.jpg")
     records = {
         "d1": ComicRecord(id="d1", title="Digital Only", type="comic", formats=["digital"], cover_path=None),
-        "d2": ComicRecord(id="d2", title="Both", type="comic", formats=["digital", "physical"], cover_path=None),
+        "d2": ComicRecord(id="d2", title="Both", type="comic", formats=["digital", "print"], cover_path=None),
     }
 
     updated = refetch_physical_covers(records, [metron, google], tmp_path)

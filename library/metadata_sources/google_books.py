@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import re
 
-import requests
+from library.http_utils import get_with_retry
 
 _BASE_URL = "https://www.googleapis.com/books/v1/volumes"
 
@@ -60,7 +60,7 @@ class GoogleBooksSource:
         if self._api_key:
             params["key"] = self._api_key
 
-        resp = requests.get(_BASE_URL, params=params, timeout=10)
+        resp = get_with_retry(_BASE_URL, params=params, timeout=10)
         resp.raise_for_status()
         return resp.json().get("items", [])
 

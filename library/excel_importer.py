@@ -3,8 +3,8 @@
 No network calls here — same "local pass first, network pass in enrich"
 split as the digital scanner. A physical comic that matches an existing
 digital record (same series + issue number) is merged into that record by
-adding "physical" to its formats; everything else becomes a new
-physical-only record.
+adding "print" to its formats; everything else becomes a new
+print-only record.
 """
 from __future__ import annotations
 
@@ -21,7 +21,7 @@ _TRAILING_PAREN_RE = re.compile(r"\s*\([^()]*\)\s*$")
 _ISSUE_RE = re.compile(r"#(\d+)")
 
 # Titles containing any of these are collected editions / variants — never
-# attempted against a single-issue digital match, always physical-only.
+# attempted against a single-issue digital match, always print-only.
 _NON_MATCHABLE_KEYWORDS = (
     "annual", "hc", "tp", "omnibus", "compendium", "special",
     "printing", "variant", "edition", "collection",
@@ -134,8 +134,8 @@ def import_physical(records: dict[str, ComicRecord], rows: list[dict]) -> tuple[
             match = find_digital_match(records, parsed["series"], parsed["issue_number"])
 
         if match is not None:
-            if "physical" not in match.formats:
-                match.formats.append("physical")
+            if "print" not in match.formats:
+                match.formats.append("print")
                 merged += 1
             continue
 
@@ -152,7 +152,7 @@ def import_physical(records: dict[str, ComicRecord], rows: list[dict]) -> tuple[
             publisher=parsed["publisher"],
             year=parsed["year"],
             status=parsed["status"],
-            formats=["physical"],
+            formats=["print"],
         )
         new += 1
 

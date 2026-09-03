@@ -6,6 +6,7 @@
 <style>
   body { font-family: sans-serif; background: #222; color: #eee; margin: 0; padding: 16px; }
   #status { margin-bottom: 12px; }
+  #sections h1 { margin: 32px 0 4px; border-bottom: 2px solid #666; padding-bottom: 6px; }
   h2.section { margin: 24px 0 8px; border-bottom: 1px solid #444; padding-bottom: 4px; }
   h3.dupe-group { margin: 16px 0 4px; color: #f66; font-size: 13px; }
   .grid { display: flex; flex-wrap: wrap; gap: 12px; }
@@ -19,7 +20,7 @@
   .card .desc { color: #999; font-size: 10px; margin-top: 2px; max-height: 3.2em; overflow: hidden; }
   .badge { display: inline-block; padding: 1px 5px; border-radius: 3px; font-size: 10px; margin-right: 2px; }
   .badge-digital { background: #246; }
-  .badge-physical { background: #642; }
+  .badge-print { background: #642; }
   .status-read { color: #6f6; }
   .status-unread { color: #ff6; }
   .flag { color: #f66; font-weight: bold; }
@@ -132,14 +133,23 @@ fetch('data/library.json')
 
     renderDuplicates(document.getElementById('dupes'), records);
 
-    const digitalOnly = records.filter(r => r.formats.includes('digital') && !r.formats.includes('physical'));
-    const physicalOnly = records.filter(r => r.formats.includes('physical') && !r.formats.includes('digital'));
-    const both = records.filter(r => r.formats.includes('digital') && r.formats.includes('physical'));
-
     const container = document.getElementById('sections');
-    renderSection(container, 'Digital Collection', digitalOnly);
-    renderSection(container, 'Physical Collection', physicalOnly);
-    renderSection(container, 'Digital + Physical', both);
+    for (const [typeLabel, typeValue] of [['Comics', 'comic'], ['Manga', 'manga']]) {
+      const group = records.filter(r => r.type === typeValue);
+      if (group.length === 0) continue;
+
+      const h = document.createElement('h1');
+      h.textContent = `${typeLabel} (${group.length})`;
+      container.appendChild(h);
+
+      const digitalOnly = group.filter(r => r.formats.includes('digital') && !r.formats.includes('print'));
+      const printOnly = group.filter(r => r.formats.includes('print') && !r.formats.includes('digital'));
+      const both = group.filter(r => r.formats.includes('digital') && r.formats.includes('print'));
+
+      renderSection(container, 'Digital Collection', digitalOnly);
+      renderSection(container, 'Print Collection', printOnly);
+      renderSection(container, 'Digital + Print', both);
+    }
   })
   .catch(err => {
     document.getElementById('status').textContent =

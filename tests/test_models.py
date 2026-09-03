@@ -17,6 +17,6 @@ def test_from_dict_respects_explicit_formats():
         "id": "abc123",
         "title": "Physical Comic",
         "type": "comic",
-        "formats": ["physical"],
+        "formats": ["print"],
     })
-    assert record.formats == ["physical"]
+    assert record.formats == ["print"]

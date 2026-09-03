@@ -1,13 +1,18 @@
 """Command-line entry point for the comic/manga library scanner."""
 from __future__ import annotations
 
+import functools
+import http.server
+
 import click
 
+from library.comic_geeks_importer import import_comic_geeks_xlsx
 from library.config import load_config
 from library.enrichment import enrich_all, refetch_physical_covers
 from library.excel_importer import import_physical, load_rows
 from library.metadata_sources.google_books import GoogleBooksSource
 from library.metadata_sources.metron import MetronSource
+from library.metadata_sources.open_library import OpenLibrarySource
 from library.scanner import list_archives, scan_roots
 from library.store import load_library, merge_record, save_library
 
@@ -73,10 +78,10 @@ def enrich(config_path: str, force: bool) -> None:
 @main.command("fetch-covers")
 @click.option("--config", "config_path", default="config.yaml", help="Path to config.yaml")
 def fetch_covers_cmd(config_path: str) -> None:
-    """Re-fetch covers for every physical-only record, routed by kind: Metron
+    """Re-fetch covers for every print-only record, routed by kind: Metron
     for single comic issues, Google Books for manga and TPBs/collected
-    editions. Overwrites existing physical-only covers; never touches
-    digital or digital+physical records."""
+    editions. Overwrites existing print-only covers; never touches
+    digital or digital+print records."""
     config = load_config(config_path)
     library_path = config.data_dir / "library.json"
     covers_dir = config.data_dir / "covers"
@@ -95,8 +100,8 @@ def fetch_covers_cmd(config_path: str) -> None:
 
     updated = refetch_physical_covers(records, sources, covers_dir)
     save_library(library_path, records)
-    physical_only = sum(1 for r in records.values() if r.formats == ["physical"])
-    click.echo(f"Fetched covers for {updated} of {physical_only} physical-only record(s).")
+    print_only = sum(1 for r in records.values() if r.formats == ["print"])
+    click.echo(f"Fetched covers for {updated} of {print_only} print-only record(s).")
 
 
 @main.command("import-physical")
@@ -113,9 +118,67 @@ def import_physical_cmd(config_path: str, excel_path: str) -> None:
 
     save_library(library_path, records)
     click.echo(
-        f"Merged {merged} into existing digital records, added {new} new physical-only "
+        f"Merged {merged} into existing digital records, added {new} new print-only "
         f"record(s), skipped {skipped} not-in-collection row(s)."
     )
+
+
+@main.command("import-comic-geeks")
+@click.option("--config", "config_path", default="config.yaml", help="Path to config.yaml")
+@click.option("--comics", "comics_path", default=None, help="Path to a Comic Geeks comics .xlsx export")
+@click.option("--manga", "manga_path", default=None, help="Path to a Comic Geeks manga .xlsx export")
+def import_comic_geeks_cmd(config_path: str, comics_path: str | None, manga_path: str | None) -> None:
+    """Import comics and/or manga from Comic Geeks exports, enriching each
+    row immediately via the source routed by its own UPC/ISBN code: Metron
+    for a UPC, Google Books + Open Library for an ISBN, Metron title search
+    as a fallback when a row has no usable code."""
+    if not comics_path and not manga_path:
+        click.echo("Pass --comics and/or --manga.")
+        return
+
+    config = load_config(config_path)
+    library_path = config.data_dir / "library.json"
+    covers_dir = config.data_dir / "covers"
+
+    records = load_library(library_path)
+
+    metron = None
+    if config.metron.is_configured:
+        metron = MetronSource(config.metron.username, config.metron.password)
+    else:
+        click.echo("Metron not configured (UPC rows and title-search fallback will be skipped) — fill in config.yaml to enable.")
+    google_books = GoogleBooksSource(config.google_books.api_key)
+    open_library = OpenLibrarySource()
+
+    for label, path, record_type in (("comics", comics_path, "comic"), ("manga", manga_path, "manga")):
+        if not path:
+            continue
+        stats = import_comic_geeks_xlsx(
+            path, record_type, records,
+            metron=metron, google_books=google_books, open_library=open_library, covers_dir=covers_dir,
+        )
+        click.echo(
+            f"{label}: added {stats['new']}, skipped {stats['skipped_not_in_collection']} not-in-collection, "
+            f"{stats['skipped_corrupted_code']} corrupted code, {stats['skipped_duplicate']} duplicate."
+        )
+
+    save_library(library_path, records)
+    click.echo(f"Total library size: {len(records)}.")
+
+
+@main.command()
+@click.option("--port", default=8000, help="Port to serve on.")
+def serve(port: int) -> None:
+    """Serve viewer.html + data/ over HTTP so the browser can fetch
+    data/library.json and cover images (opening viewer.html directly via
+    file:// blocks those fetches)."""
+    handler = functools.partial(http.server.SimpleHTTPRequestHandler, directory=".")
+    with http.server.ThreadingHTTPServer(("127.0.0.1", port), handler) as httpd:
+        click.echo(f"Serving at http://127.0.0.1:{port}/viewer.html — Ctrl+C to stop.")
+        try:
+            httpd.serve_forever()
+        except KeyboardInterrupt:
+            click.echo("\nStopped.")
 
 
 if __name__ == "__main__":

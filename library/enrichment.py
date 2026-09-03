@@ -4,7 +4,7 @@ Metron is tried first (comics-focused), Google Books second (broader
 coverage, better for manga). Idempotent: a record with no missing fields and
 an existing cover is skipped unless force=True.
 
-Also fetches a cover image for records with no cover_path (physical-only
+Also fetches a cover image for records with no cover_path (print-only
 comics imported from excel_importer have no local archive to extract a
 cover from). preview_pages is intentionally left empty for these —
 legitimate metadata APIs expose a cover image, not interior page scans.
@@ -95,13 +95,13 @@ def _ordered_cover_sources(record: ComicRecord, sources: list[MetadataSource]) -
 def refetch_physical_covers(
     records: dict[str, ComicRecord], sources: list[MetadataSource], covers_dir: Path
 ) -> int:
-    """Re-fetches covers for every physical-only record (formats == ["physical"]),
+    """Re-fetches covers for every print-only record (formats == ["print"]),
     using the source routing in _ordered_cover_sources, overwriting whatever
-    cover it currently has. Never touches digital or digital+physical records —
+    cover it currently has. Never touches digital or digital+print records —
     those have a real cover extracted from the scanned archive."""
     updated = 0
     for record in records.values():
-        if record.formats != ["physical"]:
+        if record.formats != ["print"]:
             continue
         if _fetch_cover(record, _ordered_cover_sources(record, sources), covers_dir):
             updated += 1

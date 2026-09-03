@@ -75,19 +75,51 @@ comic-library import-physical --file "/path/to/ComicGeeks-export.xlsx"
 
 Only rows with "In Collection" checked are imported. A physical comic that
 matches an existing digital record (same series + issue number) is merged
-into it — that record's `formats` becomes `["digital", "physical"]`, reusing
+into it — that record's `formats` becomes `["digital", "print"]`, reusing
 the cover/preview pages already extracted from the digital file. Everything
-else becomes a new record with `formats: ["physical"]`. Collected editions,
+else becomes a new record with `formats: ["print"]`. Collected editions,
 annuals, and variant printings are never auto-matched against a single-issue
-digital record — they always become their own physical-only entry.
+digital record — they always become their own print-only entry.
 
-Physical-only records have no local archive to extract a cover from, so
+Print-only records have no local archive to extract a cover from, so
 `comic-library enrich` fetches one from Metron/Google Books instead (this
 needs at least one of those configured in `config.yaml` — see below).
-`preview_pages` stays empty for physical-only records; legitimate metadata
+`preview_pages` stays empty for print-only records; legitimate metadata
 sources expose a cover image, not interior page scans. Re-running
 `import-physical` on an updated export is safe — already-merged and
 already-imported entries aren't duplicated.
+
+Import comics and/or manga from a Comic Geeks export directly into an
+enriched library, in one pass (no separate `enrich` run needed) — routes
+each row to a metadata source by its own barcode:
+
+```bash
+comic-library import-comic-geeks --comics "/path/to/comics-export.xlsx" --manga "/path/to/manga-export.xlsx"
+```
+
+Both flags are optional but at least one is required. Per row: a 17-digit
+Diamond UPC goes to Metron's exact `/issue/?upc=` lookup (falling back to
+an exact series+issue-number lookup if Metron's UPC index doesn't have that
+specific code — a real, common gap); a 13-digit ISBN (978/979 prefix) goes
+to Open Library first, Google Books as fallback for whatever Open Library
+doesn't have (mainly `description`); a row with no usable code falls back
+to an exact series+issue-number Metron lookup when an issue number is
+known, otherwise fuzzy title+year search as a last resort. A cell Excel
+silently corrupted by rounding a long UPC to a float is detected and
+skipped (reported in the command's output) rather than looked up wrong —
+fix the source file (re-enter that column as Text) and re-run; already-
+imported rows aren't duplicated. `formats` is always `["print"]`; `status`
+comes from the export's "Marked Read" column.
+
+Serve `viewer.html` + `data/` over HTTP, so the browser can actually fetch
+`data/library.json` and cover images (opening `viewer.html` via `file://`
+blocks those fetches):
+
+```bash
+comic-library serve --port 8000
+```
+
+Then open `http://127.0.0.1:8000/viewer.html`.
 
 ## Data
 

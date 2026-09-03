@@ -5,6 +5,8 @@ import click
 
 from library.config import load_config
 from library.enrichment import enrich_all
+from library.excel_importer import import_physical, load_rows
+from library.isbn_importer import import_isbn_csv, load_csv_rows
 from library.metadata_sources.google_books import GoogleBooksSource
 from library.metadata_sources.metron import MetronSource
 from library.scanner import scan_roots
@@ -44,9 +46,10 @@ def scan(config_path: str) -> None:
 @click.option("--config", "config_path", default="config.yaml", help="Path to config.yaml")
 @click.option("--force", is_flag=True, help="Re-query even records that already have all fields.")
 def enrich(config_path: str, force: bool) -> None:
-    """Fill in missing metadata via Metron and Google Books."""
+    """Fill in missing metadata (and cover images) via Metron and Google Books."""
     config = load_config(config_path)
     library_path = config.data_dir / "library.json"
+    covers_dir = config.data_dir / "covers"
 
     records = load_library(library_path)
     if not records:
@@ -60,9 +63,56 @@ def enrich(config_path: str, force: bool) -> None:
         click.echo("Metron not configured (skipping) — fill in config.yaml to enable.")
     sources.append(GoogleBooksSource(config.google_books.api_key))
 
-    updated = enrich_all(records, sources, force=force)
+    updated = enrich_all(records, sources, covers_dir, force=force)
     save_library(library_path, records)
     click.echo(f"Enriched {updated} of {len(records)} record(s).")
+
+
+@main.command("import-physical")
+@click.option("--config", "config_path", default="config.yaml", help="Path to config.yaml")
+@click.option("--file", "excel_path", required=True, help="Path to a Comic Geeks .xlsx export")
+def import_physical_cmd(config_path: str, excel_path: str) -> None:
+    """Import physical comics from a Comic Geeks Excel export (no network)."""
+    config = load_config(config_path)
+    library_path = config.data_dir / "library.json"
+
+    records = load_library(library_path)
+    rows = load_rows(excel_path)
+    merged, new, skipped = import_physical(records, rows)
+
+    save_library(library_path, records)
+    click.echo(
+        f"Merged {merged} into existing digital records, added {new} new physical-only "
+        f"record(s), skipped {skipped} not-in-collection row(s)."
+    )
+
+
+@main.command("import-manga-isbn")
+@click.option("--config", "config_path", default="config.yaml", help="Path to config.yaml")
+@click.option("--file", "csv_path", required=True, help="Path to a barcode-scanner CSV export (ISBNs)")
+def import_manga_isbn_cmd(config_path: str, csv_path: str) -> None:
+    """Import physical manga from an ISBN barcode-scan CSV. Requires network —
+    a bare barcode can only be identified by looking it up via Google Books."""
+    config = load_config(config_path)
+    library_path = config.data_dir / "library.json"
+    covers_dir = config.data_dir / "covers"
+
+    if not config.google_books.api_key:
+        click.echo("google_books.api_key is not set in config.yaml — required for ISBN lookup.")
+        return
+
+    records = load_library(library_path)
+    rows = load_csv_rows(csv_path)
+    source = GoogleBooksSource(config.google_books.api_key)
+
+    merged, new, skipped_invalid, skipped_no_result = import_isbn_csv(records, rows, source, covers_dir)
+
+    save_library(library_path, records)
+    click.echo(
+        f"Merged {merged} into existing digital records, added {new} new physical-only "
+        f"record(s), skipped {skipped_invalid} non-ISBN code(s), "
+        f"skipped {skipped_no_result} ISBN(s) with no lookup result."
+    )
 
 
 if __name__ == "__main__":

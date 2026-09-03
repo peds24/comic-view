@@ -23,6 +23,9 @@ class ComicRecord:
     cover_path: str | None = None
     preview_pages: list[str] = field(default_factory=list)
     status: ReadStatus = "unread"
+    # "digital", "physical", or both — defaults to ["digital"] so records
+    # saved before this field existed still load correctly.
+    formats: list[str] = field(default_factory=lambda: ["digital"])
     added_date: str = field(default_factory=lambda: date.today().isoformat())
     metadata_source: dict[str, str] = field(default_factory=dict)
 

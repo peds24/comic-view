@@ -64,6 +64,7 @@ def build_record(path: Path, root: RootConfig, covers_dir: Path) -> ComicRecord:
         cover_path=cover_path,
         preview_pages=preview_pages,
         metadata_source=sources,
+        formats=["digital"],
     )
 
 

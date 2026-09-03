@@ -39,6 +39,13 @@ class MetronSource:
 
         return result
 
+    def cover_image_url(self, title: str, year: int | None = None) -> str | None:
+        series = self._find_series(title)
+        if series is None:
+            return None
+        issue = self._find_issue(series["id"], year)
+        return issue.get("image") if issue else None
+
     def _find_series(self, title: str) -> dict | None:
         resp = requests.get(
             f"{_BASE_URL}/series/",

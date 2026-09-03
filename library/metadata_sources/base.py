@@ -14,3 +14,7 @@ class MetadataSource(Protocol):
     def search(self, title: str, year: int | None = None) -> dict:
         """Best-effort lookup. Returns a partial ComicRecord field dict, or {} if not found."""
         ...
+
+    def cover_image_url(self, title: str, year: int | None = None) -> str | None:
+        """Best-effort lookup of a cover image URL, or None if not found."""
+        ...

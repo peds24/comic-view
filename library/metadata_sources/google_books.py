@@ -1,5 +1,5 @@
 """Google Books API client — fallback metadata source, and the primary
-source for ISBN-based physical manga import (see isbn_importer.py).
+source for ISBN-based lookups (see lookup_isbn).
 
 Broader catalog coverage than Metron, especially useful for manga volumes.
 Works keyless at low request volume.

@@ -5,8 +5,8 @@ coverage, better for manga). Idempotent: a record with no missing fields and
 an existing cover is skipped unless force=True.
 
 Also fetches a cover image for records with no cover_path (physical-only
-comics imported from excel_importer/isbn_importer have no local archive to
-extract a cover from). preview_pages is intentionally left empty for these —
+comics imported from excel_importer have no local archive to extract a
+cover from). preview_pages is intentionally left empty for these —
 legitimate metadata APIs expose a cover image, not interior page scans.
 
 Cover source routing (see refetch_physical_covers): Metron is preferred for

@@ -6,7 +6,6 @@ import click
 from library.config import load_config
 from library.enrichment import enrich_all, refetch_physical_covers
 from library.excel_importer import import_physical, load_rows
-from library.isbn_importer import import_isbn_csv, load_csv_rows
 from library.metadata_sources.google_books import GoogleBooksSource
 from library.metadata_sources.metron import MetronSource
 from library.scanner import scan_roots
@@ -113,34 +112,6 @@ def import_physical_cmd(config_path: str, excel_path: str) -> None:
     click.echo(
         f"Merged {merged} into existing digital records, added {new} new physical-only "
         f"record(s), skipped {skipped} not-in-collection row(s)."
-    )
-
-
-@main.command("import-manga-isbn")
-@click.option("--config", "config_path", default="config.yaml", help="Path to config.yaml")
-@click.option("--file", "csv_path", required=True, help="Path to a barcode-scanner CSV export (ISBNs)")
-def import_manga_isbn_cmd(config_path: str, csv_path: str) -> None:
-    """Import physical manga from an ISBN barcode-scan CSV. Requires network —
-    a bare barcode can only be identified by looking it up via Google Books."""
-    config = load_config(config_path)
-    library_path = config.data_dir / "library.json"
-    covers_dir = config.data_dir / "covers"
-
-    if not config.google_books.api_key:
-        click.echo("google_books.api_key is not set in config.yaml — required for ISBN lookup.")
-        return
-
-    records = load_library(library_path)
-    rows = load_csv_rows(csv_path)
-    source = GoogleBooksSource(config.google_books.api_key)
-
-    merged, new, skipped_invalid, skipped_no_result = import_isbn_csv(records, rows, source, covers_dir)
-
-    save_library(library_path, records)
-    click.echo(
-        f"Merged {merged} into existing digital records, added {new} new physical-only "
-        f"record(s), skipped {skipped_invalid} non-ISBN code(s), "
-        f"skipped {skipped_no_result} ISBN(s) with no lookup result."
     )
 
 

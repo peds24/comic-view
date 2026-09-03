@@ -6,6 +6,12 @@
 <style>
   body { font-family: sans-serif; background: #222; color: #eee; margin: 0; padding: 16px; }
   #status { margin-bottom: 12px; }
+  #search {
+    display: block; width: 100%; max-width: 420px; margin-bottom: 16px;
+    padding: 6px 8px; font-size: 13px; background: #333; color: #eee;
+    border: 1px solid #555; border-radius: 3px;
+  }
+  #search:focus { outline: none; border-color: #7af; }
   #sections h1 { margin: 32px 0 4px; border-bottom: 2px solid #666; padding-bottom: 6px; }
   h2.section { margin: 24px 0 8px; border-bottom: 1px solid #444; padding-bottom: 4px; }
   h3.dupe-group { margin: 16px 0 4px; color: #f66; font-size: 13px; }
@@ -15,6 +21,7 @@
   .card .title { font-weight: bold; margin-top: 4px; font-size: 12px; }
   .card .meta { color: #aaa; }
   .card .id { color: #888; font-family: monospace; font-size: 10px; user-select: all; word-break: break-all; }
+  .card .code { color: #fc6; font-family: monospace; font-size: 10px; user-select: all; word-break: break-all; }
   .card .sources { color: #7af; font-size: 10px; margin-top: 2px; }
   .card .cover-path { color: #8f8; font-size: 10px; font-family: monospace; user-select: all; word-break: break-all; }
   .card .desc { color: #999; font-size: 10px; margin-top: 2px; max-height: 3.2em; overflow: hidden; }
@@ -25,18 +32,42 @@
   .status-unread { color: #ff6; }
   .flag { color: #f66; font-weight: bold; }
   #dupes .grid { border: 1px solid #633; padding: 8px; margin-bottom: 8px; background: #2a1f1f; }
+  #empty-filter { color: #999; font-style: italic; }
+  .card .attach { margin-top: 6px; padding-top: 6px; border-top: 1px solid #444; }
+  .card .attach input[type="file"] { width: 100%; font-size: 9px; color: #ccc; margin-bottom: 4px; }
+  .card .attach-link { display: flex; gap: 3px; }
+  .card .attach-link input[type="text"] {
+    flex: 1; min-width: 0; font-size: 9px; padding: 2px 4px;
+    background: #222; color: #eee; border: 1px solid #555; border-radius: 2px;
+  }
+  .card .attach-link button {
+    font-size: 9px; padding: 2px 6px; background: #456; color: #eee; border: none; border-radius: 2px; cursor: pointer;
+  }
+  .card .attach-link button:hover { background: #567; }
+  .card .attach-status { font-size: 9px; margin-top: 3px; min-height: 1.2em; }
+  .card .attach-status.error { color: #f66; }
+  .card .attach-status.ok { color: #6f6; }
 </style>
 </head>
 <body>
 <h2>library.json viewer</h2>
 <div id="status">loading data/library.json ...</div>
+<input id="search" type="text" placeholder="Filter by title, series, publisher, or author...">
 <div id="dupes"></div>
 <div id="sections"></div>
 
 <script>
+let allRecords = [];
+
 function normalizeIssue(issue) {
   if (issue && /^\d+$/.test(issue)) return String(parseInt(issue, 10));
   return issue;
+}
+
+function codeText(r) {
+  if (r.upc) return `UPC: ${r.upc}`;
+  if (r.isbn) return `ISBN: ${r.isbn}`;
+  return '(no code)';
 }
 
 function cardHtml(r) {
@@ -59,14 +90,25 @@ function cardHtml(r) {
     <div class="meta">${r.year || '?'} · ${r.publisher || '?'} · ${r.type}</div>
     <div>${formatBadges} <span class="status-${r.status}">${r.status}</span></div>
     <div class="id">${r.id}</div>
+    <div class="code">${codeText(r)}</div>
     <div class="cover-path">${r.cover_path || '(none)'}</div>
     <div class="sources">${sourcesText}</div>
     <div class="desc" title="${(r.description || '').replace(/"/g, '&quot;')}">${r.description ? r.description.slice(0, 120) + (r.description.length > 120 ? '…' : '') : '(no description)'}</div>
     ${missingText}
+    <div class="attach">
+      <input type="file" accept="image/*" class="attach-cover-input" data-id="${r.id}">
+      <div class="attach-link">
+        <input type="text" placeholder="Metron or Comic Geeks issue link" class="attach-link-input" data-id="${r.id}">
+        <button class="attach-link-btn" data-id="${r.id}">Attach</button>
+      </div>
+      <div class="attach-status" data-id="${r.id}"></div>
+    </div>
   `;
 }
 
 function renderSection(container, heading, records) {
+  if (records.length === 0) return;
+
   const h = document.createElement('h2');
   h.className = 'section';
   h.textContent = `${heading} (${records.length})`;
@@ -123,33 +165,141 @@ function renderDuplicates(container, records) {
   }
 }
 
+function renderAll(records) {
+  const dupesEl = document.getElementById('dupes');
+  const sectionsEl = document.getElementById('sections');
+  dupesEl.innerHTML = '';
+  sectionsEl.innerHTML = '';
+
+  if (records.length === 0) {
+    const p = document.createElement('div');
+    p.id = 'empty-filter';
+    p.textContent = 'No records match this filter.';
+    sectionsEl.appendChild(p);
+    return;
+  }
+
+  renderDuplicates(dupesEl, records);
+
+  for (const [typeLabel, typeValue] of [['Comics', 'comic'], ['Manga', 'manga']]) {
+    const group = records.filter(r => r.type === typeValue);
+    if (group.length === 0) continue;
+
+    const h = document.createElement('h1');
+    h.textContent = `${typeLabel} (${group.length})`;
+    sectionsEl.appendChild(h);
+
+    const digitalOnly = group.filter(r => r.formats.includes('digital') && !r.formats.includes('print'));
+    const printOnly = group.filter(r => r.formats.includes('print') && !r.formats.includes('digital'));
+    const both = group.filter(r => r.formats.includes('digital') && r.formats.includes('print'));
+
+    renderSection(sectionsEl, 'Digital Collection', digitalOnly);
+    renderSection(sectionsEl, 'Print Collection', printOnly);
+    renderSection(sectionsEl, 'Digital + Print', both);
+  }
+}
+
+function applyFilter() {
+  const query = document.getElementById('search').value.trim().toLowerCase();
+  const filtered = query
+    ? allRecords.filter(r => [r.title, r.series, r.publisher, r.author]
+        .some(field => (field || '').toLowerCase().includes(query)))
+    : allRecords;
+
+  document.getElementById('status').textContent = query
+    ? `Showing ${filtered.length} of ${allRecords.length} record(s).`
+    : `Loaded ${allRecords.length} record(s).`;
+
+  renderAll(filtered);
+}
+
+function statusElFor(id) {
+  return document.querySelector(`.attach-status[data-id="${CSS.escape(id)}"]`);
+}
+
+function fileToDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(new Error('Could not read file'));
+    reader.readAsDataURL(file);
+  });
+}
+
+async function postJson(path, body) {
+  const resp = await fetch(path, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  let result = {};
+  try {
+    result = await resp.json();
+  } catch (e) {
+    // non-JSON response (e.g. a raw 404) — fall through to the generic message below
+  }
+  if (!resp.ok) throw new Error(result.error || `HTTP ${resp.status}`);
+  return result;
+}
+
+async function reloadLibrary() {
+  const resp = await fetch('data/library.json');
+  allRecords = await resp.json();
+  applyFilter();
+}
+
+document.addEventListener('change', async (e) => {
+  if (!e.target.classList.contains('attach-cover-input')) return;
+  const input = e.target;
+  const file = input.files[0];
+  if (!file) return;
+  const id = input.dataset.id;
+  const statusEl = statusElFor(id);
+
+  statusEl.className = 'attach-status';
+  statusEl.textContent = 'Uploading…';
+  try {
+    const dataUrl = await fileToDataUrl(file);
+    const match = /^data:image\/([a-zA-Z0-9.+-]+);base64,(.*)$/.exec(dataUrl);
+    if (!match) throw new Error('Could not read this file as an image');
+    const [, subtype, base64] = match;
+    const ext = '.' + subtype.split('+')[0].replace('jpeg', 'jpg');
+    await postJson('/api/attach-cover', { id, ext, data_base64: base64 });
+    await reloadLibrary();
+  } catch (err) {
+    statusEl.className = 'attach-status error';
+    statusEl.textContent = 'Error: ' + err.message;
+  }
+});
+
+document.addEventListener('click', async (e) => {
+  if (!e.target.classList.contains('attach-link-btn')) return;
+  const id = e.target.dataset.id;
+  const input = document.querySelector(`.attach-link-input[data-id="${CSS.escape(id)}"]`);
+  const statusEl = statusElFor(id);
+  const url = input.value.trim();
+  if (!url) return;
+
+  statusEl.className = 'attach-status';
+  statusEl.textContent = 'Looking up…';
+  try {
+    await postJson('/api/attach-link', { id, url });
+    await reloadLibrary();
+  } catch (err) {
+    statusEl.className = 'attach-status error';
+    statusEl.textContent = 'Error: ' + err.message;
+  }
+});
+
 fetch('data/library.json')
   .then(r => {
     if (!r.ok) throw new Error('HTTP ' + r.status);
     return r.json();
   })
   .then(records => {
-    document.getElementById('status').textContent = `Loaded ${records.length} records.`;
-
-    renderDuplicates(document.getElementById('dupes'), records);
-
-    const container = document.getElementById('sections');
-    for (const [typeLabel, typeValue] of [['Comics', 'comic'], ['Manga', 'manga']]) {
-      const group = records.filter(r => r.type === typeValue);
-      if (group.length === 0) continue;
-
-      const h = document.createElement('h1');
-      h.textContent = `${typeLabel} (${group.length})`;
-      container.appendChild(h);
-
-      const digitalOnly = group.filter(r => r.formats.includes('digital') && !r.formats.includes('print'));
-      const printOnly = group.filter(r => r.formats.includes('print') && !r.formats.includes('digital'));
-      const both = group.filter(r => r.formats.includes('digital') && r.formats.includes('print'));
-
-      renderSection(container, 'Digital Collection', digitalOnly);
-      renderSection(container, 'Print Collection', printOnly);
-      renderSection(container, 'Digital + Print', both);
-    }
+    allRecords = records;
+    document.getElementById('search').addEventListener('input', applyFilter);
+    applyFilter();
   })
   .catch(err => {
     document.getElementById('status').textContent =

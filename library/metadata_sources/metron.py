@@ -5,10 +5,20 @@ comics; used as the first enrichment source.
 """
 from __future__ import annotations
 
-from library.excel_importer import normalize_series
+from library.matching import normalize_series
 from library.http_utils import get_with_retry
 
 _BASE_URL = "https://metron.cloud/api"
+
+
+def year_from_issue(issue: dict) -> int | None:
+    """The store date (when the issue actually shipped) rather than the
+    cover date (a nominal, often several-months-later publisher
+    convention) is used as the release year."""
+    store_date = issue.get("store_date") or ""
+    if len(store_date) >= 4 and store_date[:4].isdigit():
+        return int(store_date[:4])
+    return None
 
 
 class MetronSource:
@@ -31,9 +41,9 @@ class MetronSource:
         if issue:
             if issue.get("desc"):
                 result["description"] = issue["desc"]
-            cover_date = issue.get("cover_date")
-            if cover_date and len(cover_date) >= 4 and cover_date[:4].isdigit():
-                result["year"] = int(cover_date[:4])
+            issue_year = year_from_issue(issue)
+            if issue_year:
+                result["year"] = issue_year
             writer = self._extract_writer(issue)
             if writer:
                 result["author"] = writer
@@ -58,6 +68,12 @@ class MetronSource:
         if not results:
             return None
         return self._issue_detail(results[0]["id"])
+
+    def get_issue_by_id(self, issue_id: int) -> dict:
+        """Exact issue lookup by Metron's own numeric id — used when a
+        pasted metron.cloud issue link is bare-numeric rather than the
+        usual slug-based URL."""
+        return self._issue_detail(issue_id)
 
     def find_issue_by_series_and_number(self, series: str, number: str, year: int | None = None) -> dict | None:
         """Exact issue lookup by series name + issue number (Metron's
@@ -128,8 +144,8 @@ class MetronSource:
             return None
         if year:
             for candidate in results:
-                cover_date = candidate.get("cover_date", "")
-                if cover_date.startswith(str(year)):
+                store_date = candidate.get("store_date", "")
+                if store_date.startswith(str(year)):
                     return self._issue_detail(candidate["id"])
         return self._issue_detail(results[0]["id"])
 

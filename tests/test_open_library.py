@@ -36,6 +36,17 @@ def test_lookup_isbn_returns_title_author_publisher_year_and_cover(monkeypatch):
     assert result["_image_url"] == "https://covers.openlibrary.org/b/id/9255173-L.jpg"
 
 
+def test_lookup_isbn_parses_year_from_month_day_year_date(monkeypatch):
+    """Regression test: concatenating all digits in "Oct 13, 2009" used to
+    read the day + year run-together as "132009" -> year 1320."""
+    monkeypatch.setattr(
+        "library.metadata_sources.open_library.get_with_retry",
+        lambda *a, **k: FakeResponse({"ISBN:9781935429005": {"publish_date": "Oct 13, 2009"}}),
+    )
+    source = OpenLibrarySource()
+    assert source.lookup_isbn("9781935429005")["year"] == 2009
+
+
 def test_lookup_isbn_joins_multiple_authors(monkeypatch):
     monkeypatch.setattr(
         "library.metadata_sources.open_library.get_with_retry",

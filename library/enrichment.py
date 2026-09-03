@@ -5,7 +5,7 @@ coverage, better for manga). Idempotent: a record with no missing fields and
 an existing cover is skipped unless force=True.
 
 Also fetches a cover image for records with no cover_path (print-only
-comics imported from excel_importer have no local archive to extract a
+comics imported via physical_importer have no local archive to extract a
 cover from). preview_pages is intentionally left empty for these —
 legitimate metadata APIs expose a cover image, not interior page scans.
 
@@ -23,7 +23,7 @@ from urllib.parse import urlparse
 
 import requests
 
-from library.excel_importer import is_matchable
+from library.matching import is_matchable
 from library.metadata_sources.base import MetadataSource
 from library.models import ComicRecord
 
@@ -73,9 +73,8 @@ def enrich_all(
 
 def _is_single_issue_comic(record: ComicRecord) -> bool:
     """True for an individual comic issue (not a TPB/HC/omnibus/annual/etc,
-    which excel_importer's is_matchable() already treats as "not a single
-    issue" via the same title-keyword check used for digital/physical
-    matching)."""
+    which matching.is_matchable() already treats as "not a single issue"
+    via the same title-keyword check used for digital/physical matching)."""
     return record.type == "comic" and is_matchable(record.title, record.issue_number)
 
 

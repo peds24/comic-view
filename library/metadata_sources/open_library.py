@@ -1,5 +1,5 @@
 """Open Library API client — primary source for ISBN-coded items (see
-enrichment routing in comic_geeks_importer.py), matching the routing
+enrichment routing in physical_importer.py), matching the routing
 already proven in the longbox app (github.com/peds24/longbox): Open
 Library first, Google Books as fallback only for what Open Library lacks.
 
@@ -12,7 +12,11 @@ either way, which is why Google Books still runs as a second pass.
 """
 from __future__ import annotations
 
+import re
+
 from library.http_utils import get_with_retry
+
+_YEAR_RE = re.compile(r"\b(\d{4})\b")
 
 _BOOKS_URL = "https://openlibrary.org/api/books"
 
@@ -50,9 +54,13 @@ class OpenLibrarySource:
 
         publish_date = book.get("publish_date")
         if publish_date:
-            digits = "".join(c for c in publish_date if c.isdigit())
-            if len(digits) >= 4:
-                result["year"] = int(digits[:4])
+            # Concatenating all digits breaks on "Oct 13, 2009" (day + year
+            # digits run together into "132009" -> wrongly reads as 1320) —
+            # a standalone 4-digit run is unambiguously the year, since a
+            # day/month component is never 4 digits.
+            match = _YEAR_RE.search(publish_date)
+            if match:
+                result["year"] = int(match.group(1))
 
         cover = book.get("cover") or {}
         image_url = cover.get("large") or cover.get("medium") or cover.get("small")

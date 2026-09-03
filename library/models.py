@@ -20,6 +20,7 @@ class ComicRecord:
     year: int | None = None
     publisher: str | None = None
     description: str | None = None
+    upc: str | None = None
     isbn: str | None = None
     cover_path: str | None = None
     preview_pages: list[str] = field(default_factory=list)

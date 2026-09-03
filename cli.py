@@ -6,15 +6,15 @@ import http.server
 
 import click
 
-from library.comic_geeks_importer import import_comic_geeks_xlsx
 from library.config import load_config
 from library.enrichment import enrich_all, refetch_physical_covers
-from library.excel_importer import import_physical, load_rows
 from library.metadata_sources.google_books import GoogleBooksSource
 from library.metadata_sources.metron import MetronSource
 from library.metadata_sources.open_library import OpenLibrarySource
+from library.physical_importer import count_rows, import_physical_xlsx
 from library.scanner import list_archives, scan_roots
 from library.store import load_library, merge_record, save_library
+from library.viewer_server import ViewerRequestHandler
 
 
 @click.group()
@@ -106,36 +106,14 @@ def fetch_covers_cmd(config_path: str) -> None:
 
 @main.command("import-physical")
 @click.option("--config", "config_path", default="config.yaml", help="Path to config.yaml")
-@click.option("--file", "excel_path", required=True, help="Path to a Comic Geeks .xlsx export")
+@click.option("--file", "excel_path", required=True, help="Path to the physical-collection .xlsx ('comics' and 'manga' sheets)")
 def import_physical_cmd(config_path: str, excel_path: str) -> None:
-    """Import physical comics from a Comic Geeks Excel export (no network)."""
-    config = load_config(config_path)
-    library_path = config.data_dir / "library.json"
-
-    records = load_library(library_path)
-    rows = load_rows(excel_path)
-    merged, new, skipped = import_physical(records, rows)
-
-    save_library(library_path, records)
-    click.echo(
-        f"Merged {merged} into existing digital records, added {new} new print-only "
-        f"record(s), skipped {skipped} not-in-collection row(s)."
-    )
-
-
-@main.command("import-comic-geeks")
-@click.option("--config", "config_path", default="config.yaml", help="Path to config.yaml")
-@click.option("--comics", "comics_path", default=None, help="Path to a Comic Geeks comics .xlsx export")
-@click.option("--manga", "manga_path", default=None, help="Path to a Comic Geeks manga .xlsx export")
-def import_comic_geeks_cmd(config_path: str, comics_path: str | None, manga_path: str | None) -> None:
-    """Import comics and/or manga from Comic Geeks exports, enriching each
-    row immediately via the source routed by its own UPC/ISBN code: Metron
-    for a UPC, Google Books + Open Library for an ISBN, Metron title search
-    as a fallback when a row has no usable code."""
-    if not comics_path and not manga_path:
-        click.echo("Pass --comics and/or --manga.")
-        return
-
+    """Import physical comics/manga from a workbook with 'Comics' (Name,
+    UPC/ISBN) and 'Manga' (Name, UPC/ISBN) sheets, enriching each new row
+    immediately. A manga row, or a comics row whose code is ISBN-shaped
+    (starts with 9 — a collected edition sold under a book ISBN, not a
+    single issue's Diamond UPC) goes to Open Library then Google Books;
+    everything else goes to Metron."""
     config = load_config(config_path)
     library_path = config.data_dir / "library.json"
     covers_dir = config.data_dir / "covers"
@@ -146,33 +124,45 @@ def import_comic_geeks_cmd(config_path: str, comics_path: str | None, manga_path
     if config.metron.is_configured:
         metron = MetronSource(config.metron.username, config.metron.password)
     else:
-        click.echo("Metron not configured (UPC rows and title-search fallback will be skipped) — fill in config.yaml to enable.")
+        click.echo("Metron not configured (comics rows will be added without enrichment) — fill in config.yaml to enable.")
     google_books = GoogleBooksSource(config.google_books.api_key)
     open_library = OpenLibrarySource()
 
-    for label, path, record_type in (("comics", comics_path, "comic"), ("manga", manga_path, "manga")):
-        if not path:
-            continue
-        stats = import_comic_geeks_xlsx(
-            path, record_type, records,
+    total = count_rows(excel_path)
+    with click.progressbar(length=total, label="Importing", show_pos=True) as bar:
+        stats = import_physical_xlsx(
+            excel_path, records,
             metron=metron, google_books=google_books, open_library=open_library, covers_dir=covers_dir,
-        )
-        click.echo(
-            f"{label}: added {stats['new']}, skipped {stats['skipped_not_in_collection']} not-in-collection, "
-            f"{stats['skipped_corrupted_code']} corrupted code, {stats['skipped_duplicate']} duplicate."
+            on_progress=lambda completed, total: bar.update(1),
         )
 
     save_library(library_path, records)
+    click.echo(
+        f"Comics: added {stats['comics_added']}, merged {stats['comics_merged']} into digital records.\n"
+        f"Manga: added {stats['manga_added']}, merged {stats['manga_merged']} into digital records.\n"
+        f"Skipped {stats['skipped_corrupted_code']} corrupted code, {stats['skipped_blank_code']} blank code, "
+        f"{stats['skipped_duplicate']} duplicate."
+    )
     click.echo(f"Total library size: {len(records)}.")
 
 
 @main.command()
+@click.option("--config", "config_path", default="config.yaml", help="Path to config.yaml")
 @click.option("--port", default=8000, help="Port to serve on.")
-def serve(port: int) -> None:
+def serve(config_path: str, port: int) -> None:
     """Serve viewer.html + data/ over HTTP so the browser can fetch
     data/library.json and cover images (opening viewer.html directly via
-    file:// blocks those fetches)."""
-    handler = functools.partial(http.server.SimpleHTTPRequestHandler, directory=".")
+    file:// blocks those fetches). Also exposes two write endpoints
+    viewer.html's per-card controls use to manually attach a cover image
+    or a specific Metron issue to a record."""
+    config = load_config(config_path)
+    library_path = config.data_dir / "library.json"
+    covers_dir = config.data_dir / "covers"
+    metron = MetronSource(config.metron.username, config.metron.password) if config.metron.is_configured else None
+
+    handler = functools.partial(
+        ViewerRequestHandler, directory=".", library_path=library_path, covers_dir=covers_dir, metron=metron,
+    )
     with http.server.ThreadingHTTPServer(("127.0.0.1", port), handler) as httpd:
         click.echo(f"Serving at http://127.0.0.1:{port}/viewer.html — Ctrl+C to stop.")
         try:

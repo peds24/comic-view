@@ -1,4 +1,4 @@
-from library.metadata_sources.metron import MetronSource
+from library.metadata_sources.metron import MetronSource, year_from_issue
 
 
 class FakeResponse:
@@ -124,3 +124,27 @@ def test_find_issue_by_series_and_number_returns_none_when_series_not_found(monk
     )
     source = MetronSource("user", "pass")
     assert source.find_issue_by_series_and_number("Nonexistent Series", "1") is None
+
+
+def test_year_from_issue_uses_store_date_not_cover_date():
+    """Store date (when the issue actually shipped) is used instead of
+    cover date (a nominal, often several-months-later publisher
+    convention)."""
+    issue = {"cover_date": "2025-09-01", "store_date": "2025-07-16"}
+    assert year_from_issue(issue) == 2025
+
+
+def test_year_from_issue_returns_none_when_missing():
+    assert year_from_issue({}) is None
+    assert year_from_issue({"store_date": None}) is None
+
+
+def test_get_issue_by_id_returns_issue_detail(monkeypatch):
+    monkeypatch.setattr(
+        "library.http_utils.requests.get",
+        lambda *a, **k: FakeResponse({"id": 158565, "number": "16"}),
+    )
+    source = MetronSource("user", "pass")
+    issue = source.get_issue_by_id(158565)
+    assert issue["id"] == 158565
+    assert issue["number"] == "16"

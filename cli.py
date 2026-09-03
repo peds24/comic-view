@@ -24,7 +24,7 @@ def scan(config_path: str) -> None:
     library_path = config.data_dir / "library.json"
 
     existing = load_library(library_path)
-    found = scan_roots(config)
+    found, skipped = scan_roots(config)
 
     added = 0
     for record in found:
@@ -33,6 +33,11 @@ def scan(config_path: str) -> None:
 
     save_library(library_path, existing)
     click.echo(f"Scanned {len(found)} archive(s). Added {added} new record(s). Total: {len(existing)}.")
+
+    if skipped:
+        click.echo(f"Skipped {len(skipped)} unreadable file(s):")
+        for path, reason in skipped:
+            click.echo(f"  {path}: {reason}")
 
 
 @main.command()

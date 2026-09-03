@@ -50,10 +50,26 @@ class _RarArchive:
 def _open_archive(path: Path):
     suffix = path.suffix.lower()
     if suffix == ".cbz":
-        return _ZipArchive(path)
+        return _open_as_zip(path)
     if suffix == ".cbr":
-        return _RarArchive(path)
+        try:
+            return _RarArchive(path)
+        except rarfile.NotRarFile:
+            # Some "cbr" files in the wild are actually mislabeled ZIPs.
+            try:
+                return _open_as_zip(path)
+            except ArchiveError:
+                raise ArchiveError(f"{path} is neither a valid RAR nor ZIP archive")
+        except rarfile.Error as e:
+            raise ArchiveError(f"Failed to open {path}: {e}") from e
     raise ArchiveError(f"Unsupported archive type: {path}")
+
+
+def _open_as_zip(path: Path) -> "_ZipArchive":
+    try:
+        return _ZipArchive(path)
+    except zipfile.BadZipFile as e:
+        raise ArchiveError(f"Failed to open {path}: {e}") from e
 
 
 def read_comicinfo_bytes(path: Path) -> bytes | None:

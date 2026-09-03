@@ -8,7 +8,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from library import comicinfo_parser, filename_parser
-from library.archive_reader import extract_cover_and_preview, read_comicinfo_bytes
+from library.archive_reader import ArchiveError, extract_cover_and_preview, read_comicinfo_bytes
 from library.config import Config, RootConfig
 from library.hashing import compute_id
 from library.models import ComicRecord
@@ -17,7 +17,14 @@ ARCHIVE_EXTENSIONS = {".cbz", ".cbr"}
 
 
 def find_archives(root: Path) -> list[Path]:
-    return sorted(p for p in root.rglob("*") if p.suffix.lower() in ARCHIVE_EXTENSIONS)
+    # Skip hidden dot-files (e.g. macOS "._Name.cbr" AppleDouble resource-fork
+    # files created when copying to non-native filesystems like exFAT) — they
+    # share the extension but aren't real archives.
+    return sorted(
+        p
+        for p in root.rglob("*")
+        if p.suffix.lower() in ARCHIVE_EXTENSIONS and not p.name.startswith(".")
+    )
 
 
 def build_record(path: Path, root: RootConfig, covers_dir: Path) -> ComicRecord:
@@ -60,12 +67,19 @@ def build_record(path: Path, root: RootConfig, covers_dir: Path) -> ComicRecord:
     )
 
 
-def scan_roots(config: Config) -> list[ComicRecord]:
+def scan_roots(config: Config) -> tuple[list[ComicRecord], list[tuple[Path, str]]]:
+    """Returns (records, skipped) — skipped is (path, reason) for archives that
+    couldn't be read (e.g. corrupt files), so one bad file doesn't abort the scan.
+    """
     covers_dir = config.data_dir / "covers"
     records: list[ComicRecord] = []
+    skipped: list[tuple[Path, str]] = []
     for root in config.roots:
         if not root.path.exists():
             continue
         for archive_path in find_archives(root.path):
-            records.append(build_record(archive_path, root, covers_dir))
-    return records
+            try:
+                records.append(build_record(archive_path, root, covers_dir))
+            except ArchiveError as e:
+                skipped.append((archive_path, str(e)))
+    return records, skipped

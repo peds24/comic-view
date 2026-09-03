@@ -4,24 +4,12 @@ import http.client
 import http.server
 import json
 import threading
-from pathlib import Path
 
 import pytest
 
 from library.models import ComicRecord
 from library.store import load_library, save_library
 from library.viewer_server import ViewerRequestHandler
-
-
-class FakeMetron:
-    def __init__(self, issue=None):
-        self.issue = issue
-
-    def get_issue_by_id(self, issue_id):
-        return self.issue
-
-    def find_issue_by_series_and_number(self, series, number, year=None):
-        return self.issue
 
 
 class FakeCoverResponse:
@@ -42,14 +30,11 @@ def server(tmp_path, monkeypatch):
     }
     save_library(library_path, records)
 
-    metron_holder = {"metron": None}
-
     handler = functools.partial(
         ViewerRequestHandler,
         directory=str(tmp_path),
         library_path=library_path,
         covers_dir=covers_dir,
-        metron=None,
     )
     httpd = http.server.ThreadingHTTPServer(("127.0.0.1", 0), handler)
     thread = threading.Thread(target=httpd.serve_forever, daemon=True)
@@ -98,18 +83,20 @@ def test_attach_cover_endpoint_unknown_id_returns_404(server):
     assert "error" in data
 
 
-def test_attach_link_endpoint_metron_url_without_metron_configured_returns_422(server):
+def test_attach_link_endpoint_rejects_non_comic_geeks_url(server):
     httpd, _ = server
     port = httpd.server_address[1]
     status, data = _post(port, "/api/attach-link", {"id": "upc-1", "url": "https://metron.cloud/issue/158565/"})
     assert status == 422
-    assert "not" in data["error"].lower() or "isn't" in data["error"].lower()
+    assert "error" in data
 
 
-def test_attach_link_endpoint_comic_geeks_url_works_without_metron_configured(server, monkeypatch):
+def test_attach_link_endpoint_comic_geeks_success(server, monkeypatch):
     monkeypatch.setattr(
         "library.metadata_sources.comic_geeks.fetch_issue",
-        lambda url: {"publisher": "DC Comics", "year": 2026},
+        lambda url: {
+            "series": "Absolute Batman", "issue_number": "16", "publisher": "DC Comics", "year": 2026,
+        },
     )
     httpd, library_path = server
     port = httpd.server_address[1]
@@ -117,6 +104,8 @@ def test_attach_link_endpoint_comic_geeks_url_works_without_metron_configured(se
         "id": "upc-1", "url": "https://leagueofcomicgeeks.com/comic/6297209/absolute-batman-16",
     })
     assert status == 200
+    assert data["ok"] is True
+    assert data["record"]["title"] == "Absolute Batman #16 2nd Printing"  # untouched
     assert data["record"]["publisher"] == "DC Comics"
     assert load_library(library_path)["upc-1"].publisher == "DC Comics"
 
@@ -130,35 +119,3 @@ def test_unknown_route_returns_404(server):
     resp.read()
     conn.close()
     assert resp.status == 404
-
-
-def test_attach_link_endpoint_metron_success(tmp_path, monkeypatch):
-    monkeypatch.setattr("library.covers.get_with_retry", lambda *a, **k: FakeCoverResponse())
-    library_path = tmp_path / "library.json"
-    covers_dir = tmp_path / "covers"
-    records = {
-        "upc-1": ComicRecord(id="upc-1", title="Absolute Batman #16 2nd Printing", type="comic", formats=["print"]),
-    }
-    save_library(library_path, records)
-
-    metron = FakeMetron(issue={
-        "series": {"name": "Absolute Batman"}, "number": "16", "publisher": {"name": "DC Comics"},
-        "store_date": "2026-01-28", "desc": "A synopsis.", "credits": [], "image": "https://example.com/c.jpg",
-    })
-    handler = functools.partial(
-        ViewerRequestHandler, directory=str(tmp_path), library_path=library_path, covers_dir=covers_dir, metron=metron,
-    )
-    httpd = http.server.ThreadingHTTPServer(("127.0.0.1", 0), handler)
-    thread = threading.Thread(target=httpd.serve_forever, daemon=True)
-    thread.start()
-    try:
-        port = httpd.server_address[1]
-        status, data = _post(port, "/api/attach-link", {"id": "upc-1", "url": "https://metron.cloud/issue/158565/"})
-        assert status == 200
-        assert data["ok"] is True
-        assert data["record"]["title"] == "Absolute Batman #16 2nd Printing"  # untouched
-        assert data["record"]["series"] == "Absolute Batman"
-        assert data["record"]["year"] == 2026
-    finally:
-        httpd.shutdown()
-        thread.join()

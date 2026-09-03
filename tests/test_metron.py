@@ -139,12 +139,3 @@ def test_year_from_issue_returns_none_when_missing():
     assert year_from_issue({"store_date": None}) is None
 
 
-def test_get_issue_by_id_returns_issue_detail(monkeypatch):
-    monkeypatch.setattr(
-        "library.http_utils.requests.get",
-        lambda *a, **k: FakeResponse({"id": 158565, "number": "16"}),
-    )
-    source = MetronSource("user", "pass")
-    issue = source.get_issue_by_id(158565)
-    assert issue["id"] == 158565
-    assert issue["number"] == "16"

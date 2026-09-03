@@ -113,14 +113,13 @@ still missing a cover):
 
 - **Upload a cover image** directly — saved as-is, overwriting any
   existing cover.
-- **Paste a Metron or League of Comic Geeks issue link** (auto-detected by
-  URL, e.g. `https://metron.cloud/issue/absolute-batman-2024-16/` or
+- **Paste a League of Comic Geeks issue link** (e.g.
   `https://leagueofcomicgeeks.com/comic/6297209/absolute-batman-16`) —
   replaces series, issue number, publisher, year, description, author,
-  and cover with that issue's data (Comic Geeks also fills `upc`, since
-  each printing/variant there has its own accurate barcode). The record's
-  `title` is left untouched, since it's what encodes printing/variant info
-  (e.g. "2nd Printing") specific to the physical copy owned.
+  cover, and `upc` (each printing/variant there has its own accurate
+  barcode) with that issue's data. The record's `title` is left untouched,
+  since it's what encodes printing/variant info (e.g. "2nd Printing")
+  specific to the physical copy owned.
 
 ## Data
 

@@ -1,9 +1,9 @@
 """HTTP handler for `comic-library serve`: serves the repo root as static
 files (so viewer.html can fetch data/library.json and cover images) exactly
 like http.server.SimpleHTTPRequestHandler, plus two POST routes that let
-viewer.html manually attach a cover image or a specific Metron/Comic Geeks
-issue to a record — the only way a record gets written to from the
-browser, instead of a CLI import/enrich command.
+viewer.html manually attach a cover image or a specific Comic Geeks issue
+to a record — the only way a record gets written to from the browser,
+instead of a CLI import/enrich command.
 """
 from __future__ import annotations
 
@@ -14,7 +14,6 @@ from pathlib import Path
 from typing import Callable
 
 from library.manual_attach import LinkAttachError, attach_cover_bytes, attach_from_link
-from library.metadata_sources.metron import MetronSource
 from library.store import load_library, save_library
 
 
@@ -24,12 +23,10 @@ class ViewerRequestHandler(http.server.SimpleHTTPRequestHandler):
         *args,
         library_path: Path,
         covers_dir: Path,
-        metron: MetronSource | None,
         **kwargs,
     ) -> None:
         self.library_path = library_path
         self.covers_dir = covers_dir
-        self.metron = metron
         super().__init__(*args, **kwargs)
 
     def do_POST(self) -> None:
@@ -68,7 +65,7 @@ class ViewerRequestHandler(http.server.SimpleHTTPRequestHandler):
             return 404, {"error": f"No record with id {body['id']!r}"}
 
         try:
-            attach_from_link(record, body["url"], metron=self.metron, covers_dir=self.covers_dir)
+            attach_from_link(record, body["url"], covers_dir=self.covers_dir)
         except LinkAttachError as e:
             return 422, {"error": str(e)}
 

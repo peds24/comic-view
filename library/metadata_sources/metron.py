@@ -69,12 +69,6 @@ class MetronSource:
             return None
         return self._issue_detail(results[0]["id"])
 
-    def get_issue_by_id(self, issue_id: int) -> dict:
-        """Exact issue lookup by Metron's own numeric id — used when a
-        pasted metron.cloud issue link is bare-numeric rather than the
-        usual slug-based URL."""
-        return self._issue_detail(issue_id)
-
     def find_issue_by_series_and_number(self, series: str, number: str, year: int | None = None) -> dict | None:
         """Exact issue lookup by series name + issue number (Metron's
         `/issue/?series_id=&number=`) — for an ongoing series, title+year

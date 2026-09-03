@@ -154,14 +154,13 @@ def serve(config_path: str, port: int) -> None:
     data/library.json and cover images (opening viewer.html directly via
     file:// blocks those fetches). Also exposes two write endpoints
     viewer.html's per-card controls use to manually attach a cover image
-    or a specific Metron issue to a record."""
+    or a specific Comic Geeks issue to a record."""
     config = load_config(config_path)
     library_path = config.data_dir / "library.json"
     covers_dir = config.data_dir / "covers"
-    metron = MetronSource(config.metron.username, config.metron.password) if config.metron.is_configured else None
 
     handler = functools.partial(
-        ViewerRequestHandler, directory=".", library_path=library_path, covers_dir=covers_dir, metron=metron,
+        ViewerRequestHandler, directory=".", library_path=library_path, covers_dir=covers_dir,
     )
     with http.server.ThreadingHTTPServer(("127.0.0.1", port), handler) as httpd:
         click.echo(f"Serving at http://127.0.0.1:{port}/viewer.html — Ctrl+C to stop.")

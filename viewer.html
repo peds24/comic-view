@@ -7,21 +7,64 @@
   body { font-family: sans-serif; background: #222; color: #eee; margin: 0; padding: 16px; }
   #status { margin-bottom: 12px; }
   h2.section { margin: 24px 0 8px; border-bottom: 1px solid #444; padding-bottom: 4px; }
+  h3.dupe-group { margin: 16px 0 4px; color: #f66; font-size: 13px; }
   .grid { display: flex; flex-wrap: wrap; gap: 12px; }
-  .card { width: 160px; background: #333; padding: 6px; font-size: 12px; }
+  .card { width: 200px; background: #333; padding: 6px; font-size: 11px; }
   .card img { width: 100%; height: 220px; object-fit: cover; background: #000; }
-  .card .title { font-weight: bold; margin-top: 4px; }
+  .card .title { font-weight: bold; margin-top: 4px; font-size: 12px; }
   .card .meta { color: #aaa; }
+  .card .id { color: #888; font-family: monospace; font-size: 10px; user-select: all; word-break: break-all; }
+  .card .sources { color: #7af; font-size: 10px; margin-top: 2px; }
+  .card .cover-path { color: #8f8; font-size: 10px; font-family: monospace; user-select: all; word-break: break-all; }
+  .card .desc { color: #999; font-size: 10px; margin-top: 2px; max-height: 3.2em; overflow: hidden; }
+  .badge { display: inline-block; padding: 1px 5px; border-radius: 3px; font-size: 10px; margin-right: 2px; }
+  .badge-digital { background: #246; }
+  .badge-physical { background: #642; }
   .status-read { color: #6f6; }
   .status-unread { color: #ff6; }
+  .flag { color: #f66; font-weight: bold; }
+  #dupes .grid { border: 1px solid #633; padding: 8px; margin-bottom: 8px; background: #2a1f1f; }
 </style>
 </head>
 <body>
 <h2>library.json viewer</h2>
 <div id="status">loading data/library.json ...</div>
+<div id="dupes"></div>
 <div id="sections"></div>
 
 <script>
+function normalizeIssue(issue) {
+  if (issue && /^\d+$/.test(issue)) return String(parseInt(issue, 10));
+  return issue;
+}
+
+function cardHtml(r) {
+  const coverSrc = r.cover_path ? 'data/covers/' + r.cover_path : '';
+  const formatBadges = r.formats.map(f => `<span class="badge badge-${f}">${f}</span>`).join('');
+  const sourceEntries = Object.entries(r.metadata_source || {});
+  const sourcesText = sourceEntries.length
+    ? sourceEntries.map(([field, src]) => `${field}:${src}`).join(', ')
+    : '(no enrichment)';
+  const missing = [];
+  if (!r.year) missing.push('year');
+  if (!r.description) missing.push('description');
+  if (!r.publisher) missing.push('publisher');
+  const missingText = missing.length ? `<div class="flag">missing: ${missing.join(', ')}</div>` : '';
+
+  return `
+    ${coverSrc ? `<img src="${coverSrc}" loading="lazy">` : '<div style="height:220px;background:#000;color:#f66;display:flex;align-items:center;justify-content:center;">NO COVER</div>'}
+    <div class="title">${r.title || '(no title)'}</div>
+    <div class="meta">${r.series || ''} ${r.issue_number ? '#' + r.issue_number : ''}</div>
+    <div class="meta">${r.year || '?'} · ${r.publisher || '?'} · ${r.type}</div>
+    <div>${formatBadges} <span class="status-${r.status}">${r.status}</span></div>
+    <div class="id">${r.id}</div>
+    <div class="cover-path">${r.cover_path || '(none)'}</div>
+    <div class="sources">${sourcesText}</div>
+    <div class="desc" title="${(r.description || '').replace(/"/g, '&quot;')}">${r.description ? r.description.slice(0, 120) + (r.description.length > 120 ? '…' : '') : '(no description)'}</div>
+    ${missingText}
+  `;
+}
+
 function renderSection(container, heading, records) {
   const h = document.createElement('h2');
   h.className = 'section';
@@ -33,18 +76,50 @@ function renderSection(container, heading, records) {
   for (const r of records) {
     const card = document.createElement('div');
     card.className = 'card';
-    const coverSrc = r.cover_path ? 'data/covers/' + r.cover_path : '';
-    card.innerHTML = `
-      ${coverSrc ? `<img src="${coverSrc}" loading="lazy">` : '<div style="height:220px;background:#000"></div>'}
-      <div class="title">${r.title || '(no title)'}</div>
-      <div class="meta">${r.series || ''} ${r.issue_number ? '#' + r.issue_number : ''}</div>
-      <div class="meta">${r.year || ''} ${r.publisher || ''}</div>
-      <div class="meta">${r.type}</div>
-      <div class="status-${r.status}">${r.status}</div>
-    `;
+    card.innerHTML = cardHtml(r);
     grid.appendChild(card);
   }
   container.appendChild(grid);
+}
+
+function renderDuplicates(container, records) {
+  const groups = new Map();
+  for (const r of records) {
+    if (!r.series) continue;
+    const key = `${r.type}|${r.series.toLowerCase()}|${normalizeIssue(r.issue_number)}`;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(r);
+  }
+  const dupeGroups = [...groups.entries()].filter(([, list]) => list.length > 1);
+
+  const h = document.createElement('h2');
+  h.className = 'section';
+  h.textContent = `Possible Duplicates — same series + issue (${dupeGroups.length} group${dupeGroups.length === 1 ? '' : 's'})`;
+  container.appendChild(h);
+
+  if (dupeGroups.length === 0) {
+    const p = document.createElement('div');
+    p.textContent = 'None found.';
+    container.appendChild(p);
+    return;
+  }
+
+  for (const [key, list] of dupeGroups) {
+    const label = document.createElement('h3');
+    label.className = 'dupe-group';
+    label.textContent = key.replace(/\|/g, ' — ');
+    container.appendChild(label);
+
+    const grid = document.createElement('div');
+    grid.className = 'grid';
+    for (const r of list) {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = cardHtml(r);
+      grid.appendChild(card);
+    }
+    container.appendChild(grid);
+  }
 }
 
 fetch('data/library.json')
@@ -54,6 +129,9 @@ fetch('data/library.json')
   })
   .then(records => {
     document.getElementById('status').textContent = `Loaded ${records.length} records.`;
+
+    renderDuplicates(document.getElementById('dupes'), records);
+
     const digitalOnly = records.filter(r => r.formats.includes('digital') && !r.formats.includes('physical'));
     const physicalOnly = records.filter(r => r.formats.includes('physical') && !r.formats.includes('digital'));
     const both = records.filter(r => r.formats.includes('digital') && r.formats.includes('physical'));

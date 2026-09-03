@@ -49,6 +49,10 @@ def parse_comicinfo(xml_bytes: bytes) -> dict:
     if year and year.isdigit():
         result["year"] = int(year)
 
+    isbn = text("GTIN")
+    if isbn:
+        result["isbn"] = isbn
+
     author = None
     for tag in _CREATOR_TAGS:
         value = text(tag)

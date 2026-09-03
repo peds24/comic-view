@@ -8,7 +8,7 @@ from library.enrichment import enrich_all, refetch_physical_covers
 from library.excel_importer import import_physical, load_rows
 from library.metadata_sources.google_books import GoogleBooksSource
 from library.metadata_sources.metron import MetronSource
-from library.scanner import scan_roots
+from library.scanner import list_archives, scan_roots
 from library.store import load_library, merge_record, save_library
 
 
@@ -25,7 +25,10 @@ def scan(config_path: str) -> None:
     library_path = config.data_dir / "library.json"
 
     existing = load_library(library_path)
-    found, skipped = scan_roots(config)
+
+    total = len(list_archives(config))
+    with click.progressbar(length=total, label="Scanning", show_pos=True) as bar:
+        found, skipped = scan_roots(config, on_progress=lambda completed, total: bar.update(1))
 
     added = 0
     for record in found:

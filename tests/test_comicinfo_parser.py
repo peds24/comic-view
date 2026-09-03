@@ -10,6 +10,7 @@ SAMPLE_XML = b"""<?xml version="1.0"?>
   <Summary>Harvey Dent asks Batman, Gordon, and Falcone for help.</Summary>
   <Writer>Jeph Loeb</Writer>
   <Penciller>Tim Sale</Penciller>
+  <GTIN>9781401203864</GTIN>
 </ComicInfo>
 """
 
@@ -23,6 +24,7 @@ def test_parses_all_known_fields():
     assert result["year"] == 1996
     assert result["description"].startswith("Harvey Dent")
     assert result["author"] == "Jeph Loeb"
+    assert result["isbn"] == "9781401203864"
 
 
 def test_missing_tags_are_omitted():

@@ -6,6 +6,7 @@ cover/preview extraction. See enrichment.py for the online lookup pass.
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Callable
 
 from library import comicinfo_parser, filename_parser
 from library.archive_reader import ArchiveError, extract_cover_and_preview, read_comicinfo_bytes
@@ -61,6 +62,7 @@ def build_record(path: Path, root: RootConfig, covers_dir: Path) -> ComicRecord:
         year=fields.get("year"),
         publisher=fields.get("publisher"),
         description=fields.get("description"),
+        isbn=fields.get("isbn"),
         cover_path=cover_path,
         preview_pages=preview_pages,
         metadata_source=sources,
@@ -68,19 +70,39 @@ def build_record(path: Path, root: RootConfig, covers_dir: Path) -> ComicRecord:
     )
 
 
-def scan_roots(config: Config) -> tuple[list[ComicRecord], list[tuple[Path, str]]]:
-    """Returns (records, skipped) — skipped is (path, reason) for archives that
-    couldn't be read (e.g. corrupt files), so one bad file doesn't abort the scan.
-    """
-    covers_dir = config.data_dir / "covers"
-    records: list[ComicRecord] = []
-    skipped: list[tuple[Path, str]] = []
+def list_archives(config: Config) -> list[tuple[Path, RootConfig]]:
+    """All archives across configured roots, paired with the root they came
+    from (needed for its `type`). Roots that don't currently exist (e.g. an
+    unmounted drive) are silently skipped."""
+    archives: list[tuple[Path, RootConfig]] = []
     for root in config.roots:
         if not root.path.exists():
             continue
-        for archive_path in find_archives(root.path):
-            try:
-                records.append(build_record(archive_path, root, covers_dir))
-            except ArchiveError as e:
-                skipped.append((archive_path, str(e)))
+        archives.extend((path, root) for path in find_archives(root.path))
+    return archives
+
+
+def scan_roots(
+    config: Config, on_progress: Callable[[int, int], None] | None = None
+) -> tuple[list[ComicRecord], list[tuple[Path, str]]]:
+    """Returns (records, skipped) — skipped is (path, reason) for archives that
+    couldn't be read (e.g. corrupt files), so one bad file doesn't abort the scan.
+
+    If given, on_progress(completed, total) is called after each archive is
+    processed (whether it succeeded or was skipped) — lets a caller show a
+    progress bar over a scan that can take a while on a large library.
+    """
+    covers_dir = config.data_dir / "covers"
+    archives = list_archives(config)
+    total = len(archives)
+
+    records: list[ComicRecord] = []
+    skipped: list[tuple[Path, str]] = []
+    for i, (archive_path, root) in enumerate(archives, start=1):
+        try:
+            records.append(build_record(archive_path, root, covers_dir))
+        except ArchiveError as e:
+            skipped.append((archive_path, str(e)))
+        if on_progress:
+            on_progress(i, total)
     return records, skipped

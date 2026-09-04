@@ -68,10 +68,10 @@ def _add_comic_from_comic_geeks_link(records: dict[str, ComicRecord], url: str, 
     except LinkAttachError as e:
         raise QuickAddError(str(e)) from e
 
-    if not record.series:
-        raise QuickAddError("Comics need at least a series name from Comic Geeks.")
-
-    record.title = f"{record.series} #{record.issue_number}" if record.issue_number else (record.series or "")
+    if record.series and record.issue_number:
+        record.title = f"{record.series} #{record.issue_number}"
+    else:
+        record.title = record.series or ""
     record.id = f"cg-{_comic_geeks_id_from_url(url)}"
 
     return _merge_or_add(records, record, "upc", record.upc)

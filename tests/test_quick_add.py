@@ -87,3 +87,20 @@ def test_add_comic_from_unreadable_comic_geeks_link_raises(tmp_path: Path, monke
             records, "https://leagueofcomicgeeks.com/comic/999/nope", ["print"],
             metron=None, google_books=None, open_library=None, covers_dir=tmp_path,
         )
+
+
+def test_add_comic_from_comic_geeks_link_handles_missing_series(tmp_path: Path, monkeypatch):
+    monkeypatch.setattr("library.metadata_sources.comic_geeks.fetch_issue", lambda url: {
+        "issue_number": "16",
+    })
+    records: dict[str, ComicRecord] = {}
+
+    result = add_comic(
+        records, "https://leagueofcomicgeeks.com/comic/1/something", ["print"],
+        metron=None, google_books=None, open_library=None, covers_dir=tmp_path,
+    )
+
+    assert result.record.title == ""
+    assert result.record.issue_number == "16"
+    assert result.merged is False
+    assert result.record.id in records

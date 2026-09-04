@@ -49,6 +49,9 @@
   }
   #tabs .tab-btn:hover { background: #333; color: #ccc; }
   #tabs .tab-btn.active { background: #345; color: #7af; border-color: #7af; }
+  #format-filters { margin-bottom: 12px; font-size: 13px; color: #aaa; }
+  #format-filters label { margin-right: 14px; cursor: pointer; user-select: none; }
+  #format-filters input { margin-right: 4px; vertical-align: middle; }
   .card .title-input {
     font-weight: bold; font-size: 12px; width: 100%; margin-top: 4px;
     background: transparent; color: #eee; border: 1px solid transparent; border-radius: 2px;
@@ -87,6 +90,11 @@
   <button class="tab-btn" data-type="manga">Manga</button>
 </div>
 <input id="search" type="text" placeholder="Filter by title, series, publisher, or author...">
+<div id="format-filters">
+  <label><input type="checkbox" id="filter-digital"> Digital</label>
+  <label><input type="checkbox" id="filter-print"> Print</label>
+  <span id="format-filter-hint"></span>
+</div>
 <div id="missing"></div>
 <div id="dupes"></div>
 <div id="sections"></div>
@@ -309,15 +317,33 @@ function renderAll(records) {
   renderSection(sectionsEl, 'Library', sorted);
 }
 
+function matchesFormatFilter(r) {
+  const digitalOn = document.getElementById('filter-digital').checked;
+  const printOn = document.getElementById('filter-print').checked;
+  if (!digitalOn && !printOn) return true; // no filter applied
+  if (digitalOn && printOn) return r.formats.includes('digital') && r.formats.includes('print');
+  if (digitalOn) return r.formats.includes('digital');
+  return r.formats.includes('print');
+}
+
+function updateFormatFilterHint() {
+  const digitalOn = document.getElementById('filter-digital').checked;
+  const printOn = document.getElementById('filter-print').checked;
+  const hint = document.getElementById('format-filter-hint');
+  hint.textContent = (digitalOn && printOn) ? '(showing only items owned both digitally and physically)' : '';
+}
+
 function applyFilter() {
   const query = document.getElementById('search').value.trim().toLowerCase();
   const inTab = allRecords.filter(r => r.type === activeType);
-  const filtered = query
+  const searched = query
     ? inTab.filter(r => [r.title, r.series, r.publisher, r.author]
         .some(field => (field || '').toLowerCase().includes(query)))
     : inTab;
+  const filtered = searched.filter(matchesFormatFilter);
 
-  document.getElementById('status').textContent = query
+  updateFormatFilterHint();
+  document.getElementById('status').textContent = (query || filtered.length !== inTab.length)
     ? `Showing ${filtered.length} of ${inTab.length} record(s).`
     : `Loaded ${inTab.length} record(s).`;
 
@@ -554,6 +580,8 @@ fetch('data/library.json')
   .then(records => {
     allRecords = records;
     document.getElementById('search').addEventListener('input', applyFilter);
+    document.getElementById('filter-digital').addEventListener('change', applyFilter);
+    document.getElementById('filter-print').addEventListener('change', applyFilter);
     for (const btn of document.querySelectorAll('#tabs .tab-btn')) {
       btn.addEventListener('click', () => setActiveTab(btn.dataset.type));
     }

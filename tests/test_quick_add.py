@@ -278,3 +278,51 @@ def test_add_manga_from_bare_isbn_never_merges_since_no_title_to_match_on(tmp_pa
     assert result.merged is False
     assert records["d1"].formats == ["digital"]  # untouched
     assert records["isbn-9781632368287"].isbn == "9781632368287"
+
+
+def test_add_manga_from_title_handles_google_books_search_exception(tmp_path: Path):
+    """Google Books API can error out (e.g., 429 rate limit). The title-search
+    path should gracefully fall back to a bare record, not propagate the exception."""
+    records: dict[str, ComicRecord] = {}
+    google_books = FakeGoogleBooks()
+
+    # Mock search to raise an exception
+    def raise_on_search(title, year=None):
+        raise Exception("Google Books API error: 429 Too Many Requests")
+    google_books.search = raise_on_search
+
+    result = add_manga(
+        records, "Attack on Titan, Vol. 29", ["print"],
+        google_books=google_books, open_library=FakeOpenLibrary(), covers_dir=tmp_path,
+    )
+
+    # Should still return a record with parsed series/issue, just no enrichment
+    assert result.merged is False
+    assert result.record.title == "Attack on Titan, Vol. 29"
+    assert result.record.series == "Attack on Titan"
+    assert result.record.issue_number == "29"
+    assert result.record.author is None  # not enriched due to exception
+    assert result.record.id in records
+
+
+def test_add_manga_from_title_handles_cover_image_url_exception(tmp_path: Path):
+    """Cover image lookup can also error out. Should degrade gracefully."""
+    records: dict[str, ComicRecord] = {}
+    google_books = FakeGoogleBooks()
+    google_books.search_result = {"author": "Hajime Isayama"}
+
+    # Mock cover_image_url to raise an exception
+    def raise_on_cover(title, year=None):
+        raise Exception("Google Books API error: network timeout")
+    google_books.cover_image_url = raise_on_cover
+
+    result = add_manga(
+        records, "Attack on Titan, Vol. 29", ["print"],
+        google_books=google_books, open_library=FakeOpenLibrary(), covers_dir=tmp_path,
+    )
+
+    # Should still return enriched record (search worked), just no cover
+    assert result.merged is False
+    assert result.record.author == "Hajime Isayama"
+    assert result.record.cover_path is None  # not downloaded due to exception
+    assert result.record.id in records

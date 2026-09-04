@@ -143,12 +143,18 @@ def add_manga(
             series=strip_manga_volume_suffix(title) if issue_number else None,
             issue_number=issue_number, formats=list(formats),
         )
-        partial = google_books.search(title)
+        try:
+            partial = google_books.search(title)
+        except Exception:
+            partial = {}
         for field, value in partial.items():
             if value:
                 setattr(record, field, value)
                 record.metadata_source[field] = "google_books"
-        cover_url = google_books.cover_image_url(title)
+        try:
+            cover_url = google_books.cover_image_url(title)
+        except Exception:
+            cover_url = None
         if cover_url:
             from library.covers import download_cover
             download_cover(record, cover_url, "google_books", covers_dir)

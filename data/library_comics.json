@@ -1281,8 +1281,7 @@
     "preview_pages": [],
     "status": "unread",
     "formats": [
-      "digital",
-      "print"
+      "digital"
     ],
     "added_date": "2026-09-03",
     "metadata_source": {
@@ -1344,8 +1343,7 @@
     "preview_pages": [],
     "status": "unread",
     "formats": [
-      "digital",
-      "print"
+      "digital"
     ],
     "added_date": "2026-09-03",
     "metadata_source": {
@@ -1407,8 +1405,7 @@
     "preview_pages": [],
     "status": "unread",
     "formats": [
-      "digital",
-      "print"
+      "digital"
     ],
     "added_date": "2026-09-03",
     "metadata_source": {
@@ -1560,8 +1557,7 @@
     "preview_pages": [],
     "status": "unread",
     "formats": [
-      "digital",
-      "print"
+      "digital"
     ],
     "added_date": "2026-09-03",
     "metadata_source": {
@@ -1623,8 +1619,7 @@
     "preview_pages": [],
     "status": "unread",
     "formats": [
-      "digital",
-      "print"
+      "digital"
     ],
     "added_date": "2026-09-03",
     "metadata_source": {
@@ -1686,8 +1681,7 @@
     "preview_pages": [],
     "status": "unread",
     "formats": [
-      "digital",
-      "print"
+      "digital"
     ],
     "added_date": "2026-09-03",
     "metadata_source": {
@@ -1749,8 +1743,7 @@
     "preview_pages": [],
     "status": "unread",
     "formats": [
-      "digital",
-      "print"
+      "digital"
     ],
     "added_date": "2026-09-03",
     "metadata_source": {
@@ -1812,8 +1805,7 @@
     "preview_pages": [],
     "status": "unread",
     "formats": [
-      "digital",
-      "print"
+      "digital"
     ],
     "added_date": "2026-09-03",
     "metadata_source": {
@@ -1875,8 +1867,7 @@
     "preview_pages": [],
     "status": "unread",
     "formats": [
-      "digital",
-      "print"
+      "digital"
     ],
     "added_date": "2026-09-03",
     "metadata_source": {
@@ -1938,8 +1929,7 @@
     "preview_pages": [],
     "status": "unread",
     "formats": [
-      "digital",
-      "print"
+      "digital"
     ],
     "added_date": "2026-09-03",
     "metadata_source": {
@@ -7081,6 +7071,84 @@
       "publisher": "comicinfo",
       "description": "comicinfo",
       "author": "comicinfo"
+    }
+  },
+  {
+    "id": "6ab0e21-2eb7855f7bf64dc8",
+    "title": "Universal Monsters - Frankenstein #1",
+    "type": "comic",
+    "series": "Universal Monsters - Frankenstein",
+    "issue_number": "001",
+    "author": null,
+    "year": 2024,
+    "publisher": null,
+    "description": null,
+    "upc": null,
+    "isbn": null,
+    "cover_path": "6ab0e21-2eb7855f7bf64dc8/cover.jpg",
+    "preview_pages": [],
+    "status": "unread",
+    "formats": [
+      "digital"
+    ],
+    "added_date": "2026-09-03",
+    "metadata_source": {
+      "year": "filename",
+      "issue_number": "filename",
+      "series": "filename",
+      "title": "filename"
+    }
+  },
+  {
+    "id": "7a0abb5-a456a713f8e3fc1a",
+    "title": "Universal Monsters - Frankenstein #2",
+    "type": "comic",
+    "series": "Universal Monsters - Frankenstein",
+    "issue_number": "002",
+    "author": null,
+    "year": 2024,
+    "publisher": null,
+    "description": null,
+    "upc": null,
+    "isbn": null,
+    "cover_path": "7a0abb5-a456a713f8e3fc1a/cover.jpg",
+    "preview_pages": [],
+    "status": "unread",
+    "formats": [
+      "digital"
+    ],
+    "added_date": "2026-09-03",
+    "metadata_source": {
+      "year": "filename",
+      "issue_number": "filename",
+      "series": "filename",
+      "title": "filename"
+    }
+  },
+  {
+    "id": "7c047b6-461e307ef8bc94be",
+    "title": "Universal Monsters - Frankenstein #3",
+    "type": "comic",
+    "series": "Universal Monsters - Frankenstein",
+    "issue_number": "003",
+    "author": null,
+    "year": 2024,
+    "publisher": null,
+    "description": null,
+    "upc": null,
+    "isbn": null,
+    "cover_path": "7c047b6-461e307ef8bc94be/cover.jpg",
+    "preview_pages": [],
+    "status": "unread",
+    "formats": [
+      "digital"
+    ],
+    "added_date": "2026-09-03",
+    "metadata_source": {
+      "year": "filename",
+      "issue_number": "filename",
+      "series": "filename",
+      "title": "filename"
     }
   }
 ]

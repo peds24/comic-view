@@ -5,6 +5,7 @@ import pytest
 from library.manual_attach import LinkAttachError
 from library.models import ComicRecord
 from library.quick_add import AddResult, QuickAddError, add_comic
+from tests.test_physical_importer import FakeGoogleBooks, FakeMetron, FakeOpenLibrary
 
 
 class FakeCoverResponse:
@@ -104,3 +105,80 @@ def test_add_comic_from_comic_geeks_link_handles_missing_series(tmp_path: Path, 
     assert result.record.issue_number == "16"
     assert result.merged is False
     assert result.record.id in records
+
+
+def test_add_comic_from_upc_routes_to_metron(tmp_path: Path):
+    records: dict[str, ComicRecord] = {}
+    metron = FakeMetron(upc_result={
+        "series": {"name": "Absolute Batman"}, "number": "10",
+        "desc": "A synopsis.", "credits": [],
+    })
+
+    result = add_comic(
+        records, "76194138584601011", ["print"],
+        metron=metron, google_books=FakeGoogleBooks(), open_library=FakeOpenLibrary(), covers_dir=tmp_path,
+    )
+
+    assert metron.upc_calls == ["76194138584601011"]
+    assert result.record.id == "upc-76194138584601011"
+    assert result.record.upc == "76194138584601011"
+    assert result.record.description == "A synopsis."
+    assert result.record.formats == ["print"]
+
+
+def test_add_comic_from_isbn_shaped_code_routes_to_open_library(tmp_path: Path):
+    records: dict[str, ComicRecord] = {}
+    open_library = FakeOpenLibrary(isbn_result={"author": "Frank Miller"})
+
+    result = add_comic(
+        records, "9781401207526", ["digital", "print"],
+        metron=None, google_books=FakeGoogleBooks(), open_library=open_library, covers_dir=tmp_path,
+    )
+
+    assert result.record.id == "isbn-9781401207526"
+    assert result.record.isbn == "9781401207526"
+    assert result.record.author == "Frank Miller"
+    assert result.record.formats == ["digital", "print"]
+
+
+def test_add_comic_from_upc_with_no_metron_match_still_creates_bare_record(tmp_path: Path):
+    records: dict[str, ComicRecord] = {}
+    metron = FakeMetron(upc_result=None, search_result={})
+
+    result = add_comic(
+        records, "76194138584601011", ["print"],
+        metron=metron, google_books=FakeGoogleBooks(), open_library=FakeOpenLibrary(), covers_dir=tmp_path,
+    )
+
+    assert result.merged is False
+    assert result.record.id == "upc-76194138584601011"
+    assert result.record.title == "76194138584601011"
+
+
+def test_add_comic_from_upc_merges_into_existing_digital_record(tmp_path: Path):
+    records: dict[str, ComicRecord] = {
+        "d1": ComicRecord(
+            id="d1", title="Absolute Batman", type="comic", series="Absolute Batman",
+            issue_number="10", formats=["digital"],
+        )
+    }
+    metron = FakeMetron(upc_result={"series": {"name": "Absolute Batman"}, "number": "10", "credits": []})
+
+    result = add_comic(
+        records, "76194138584601011", ["print"],
+        metron=metron, google_books=FakeGoogleBooks(), open_library=FakeOpenLibrary(), covers_dir=tmp_path,
+    )
+
+    assert result.merged is True
+    assert records["d1"].formats == ["digital", "print"]
+    assert records["d1"].upc == "76194138584601011"
+    assert "upc-76194138584601011" not in records
+
+
+def test_add_comic_rejects_unrecognized_input(tmp_path: Path):
+    records: dict[str, ComicRecord] = {}
+    with pytest.raises(QuickAddError):
+        add_comic(
+            records, "not a valid identifier", ["print"],
+            metron=None, google_books=FakeGoogleBooks(), open_library=FakeOpenLibrary(), covers_dir=tmp_path,
+        )

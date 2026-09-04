@@ -15,6 +15,7 @@ from library.manual_attach import LinkAttachError, attach_comic_geeks_issue
 from library.matching import find_digital_match, is_matchable
 from library.metadata_sources import comic_geeks
 from library.models import ComicRecord
+from library.physical_importer import enrich_comic_by_upc, enrich_isbn, is_isbn_shaped, truncate_isbn
 
 
 class QuickAddError(Exception):
@@ -77,6 +78,27 @@ def _add_comic_from_comic_geeks_link(records: dict[str, ComicRecord], url: str, 
     return _merge_or_add(records, record, "upc", record.upc)
 
 
+def _add_comic_from_code(records: dict[str, ComicRecord], code: str, formats: list[str], *, metron, google_books, open_library, covers_dir: Path) -> AddResult:
+    is_isbn = is_isbn_shaped(code)
+    if is_isbn:
+        code = truncate_isbn(code)
+
+    record = ComicRecord(
+        id=f"{'isbn' if is_isbn else 'upc'}-{code}", title=code, type="comic", formats=list(formats),
+        **({"isbn": code} if is_isbn else {"upc": code}),
+    )
+    if is_isbn:
+        enrich_isbn(record, code, google_books, open_library, covers_dir)
+    else:
+        enrich_comic_by_upc(record, code, metron, covers_dir)
+
+    if record.series and record.issue_number:
+        record.title = f"{record.series} #{record.issue_number}"
+
+    code_field = "isbn" if is_isbn else "upc"
+    return _merge_or_add(records, record, code_field, code)
+
+
 def add_comic(
     records: dict[str, ComicRecord], raw_input: str, formats: list[str], *,
     metron, google_books, open_library, covers_dir: Path,
@@ -85,5 +107,11 @@ def add_comic(
 
     if comic_geeks.is_comic_geeks_url(raw_input):
         return _add_comic_from_comic_geeks_link(records, raw_input, formats, covers_dir)
+
+    if raw_input.isdigit():
+        return _add_comic_from_code(
+            records, raw_input, formats,
+            metron=metron, google_books=google_books, open_library=open_library, covers_dir=covers_dir,
+        )
 
     raise QuickAddError("Comics need a UPC, ISBN, or a League of Comic Geeks link.")

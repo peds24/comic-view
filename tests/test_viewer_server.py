@@ -110,6 +110,126 @@ def test_attach_link_endpoint_comic_geeks_success(server, monkeypatch):
     assert load_library(library_path)["upc-1"].publisher == "DC Comics"
 
 
+def test_update_title_endpoint(server):
+    httpd, library_path = server
+    port = httpd.server_address[1]
+
+    status, data = _post(port, "/api/update-title", {"id": "upc-1", "title": "Absolute Batman #16"})
+
+    assert status == 200
+    assert data["record"]["title"] == "Absolute Batman #16"
+    records = load_library(library_path)
+    assert records["upc-1"].title == "Absolute Batman #16"
+    assert records["upc-1"].metadata_source["title"] == "manual"
+
+
+def test_update_title_endpoint_rejects_blank_title(server):
+    httpd, _ = server
+    port = httpd.server_address[1]
+    status, data = _post(port, "/api/update-title", {"id": "upc-1", "title": "   "})
+    assert status == 400
+    assert "error" in data
+
+
+def test_update_title_endpoint_unknown_id_returns_404(server):
+    httpd, _ = server
+    port = httpd.server_address[1]
+    status, data = _post(port, "/api/update-title", {"id": "nope", "title": "X"})
+    assert status == 404
+
+
+def test_update_year_endpoint(server):
+    httpd, library_path = server
+    port = httpd.server_address[1]
+
+    status, data = _post(port, "/api/update-year", {"id": "upc-1", "year": 2016})
+
+    assert status == 200
+    assert data["record"]["year"] == 2016
+    records = load_library(library_path)
+    assert records["upc-1"].year == 2016
+    assert records["upc-1"].metadata_source["year"] == "manual"
+
+
+def test_update_year_endpoint_clears_year_on_blank(server):
+    httpd, library_path = server
+    port = httpd.server_address[1]
+    _post(port, "/api/update-year", {"id": "upc-1", "year": 2016})
+
+    status, data = _post(port, "/api/update-year", {"id": "upc-1", "year": ""})
+
+    assert status == 200
+    assert data["record"]["year"] is None
+    assert "year" not in load_library(library_path)["upc-1"].metadata_source
+
+
+def test_update_year_endpoint_rejects_non_numeric(server):
+    httpd, _ = server
+    port = httpd.server_address[1]
+    status, data = _post(port, "/api/update-year", {"id": "upc-1", "year": "not-a-year"})
+    assert status == 400
+    assert "error" in data
+
+
+def test_update_year_endpoint_rejects_out_of_range(server):
+    httpd, _ = server
+    port = httpd.server_address[1]
+    status, data = _post(port, "/api/update-year", {"id": "upc-1", "year": 9999})
+    assert status == 400
+    assert "error" in data
+
+
+def test_update_formats_endpoint(server):
+    httpd, library_path = server
+    port = httpd.server_address[1]
+
+    status, data = _post(port, "/api/update-formats", {"id": "upc-1", "formats": ["digital", "print"]})
+
+    assert status == 200
+    assert data["record"]["formats"] == ["digital", "print"]
+    assert load_library(library_path)["upc-1"].formats == ["digital", "print"]
+
+
+def test_update_formats_endpoint_rejects_empty_list(server):
+    httpd, _ = server
+    port = httpd.server_address[1]
+    status, data = _post(port, "/api/update-formats", {"id": "upc-1", "formats": []})
+    assert status == 400
+    assert "error" in data
+
+
+def test_update_formats_endpoint_rejects_invalid_format(server):
+    httpd, _ = server
+    port = httpd.server_address[1]
+    status, data = _post(port, "/api/update-formats", {"id": "upc-1", "formats": ["ebook"]})
+    assert status == 400
+    assert "error" in data
+
+
+def test_delete_record_endpoint_removes_record_and_cover(server, tmp_path):
+    httpd, library_path = server
+    port = httpd.server_address[1]
+    covers_dir = tmp_path / "covers"
+    cover_dir = covers_dir / "upc-1"
+    cover_dir.mkdir(parents=True)
+    (cover_dir / "cover.jpg").write_bytes(b"bytes")
+
+    status, data = _post(port, "/api/delete-record", {"id": "upc-1"})
+
+    assert status == 200
+    assert data["ok"] is True
+    assert "upc-1" not in load_library(library_path)
+    assert not cover_dir.exists()
+
+
+def test_delete_record_endpoint_unknown_id_returns_404(server):
+    httpd, _ = server
+    port = httpd.server_address[1]
+    status, data = _post(port, "/api/delete-record", {"id": "nope"})
+    assert status == 404
+    assert "error" in data
+
+
 def test_unknown_route_returns_404(server):
     httpd, _ = server
     port = httpd.server_address[1]

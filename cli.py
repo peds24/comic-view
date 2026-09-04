@@ -24,10 +24,11 @@ def main() -> None:
 
 @main.command()
 @click.option("--config", "config_path", default="config.yaml", help="Path to config.yaml")
-def scan(config_path: str) -> None:
-    """Recursively scan configured roots and update library.json (no network)."""
+@click.option("--data", "data_filename", default="library_digital.json", help="Library JSON filename under data/ to update — scan only ever produces digital-format records.")
+def scan(config_path: str, data_filename: str) -> None:
+    """Recursively scan configured roots and update the digital library JSON (no network)."""
     config = load_config(config_path)
-    library_path = config.data_dir / "library.json"
+    library_path = config.data_dir / data_filename
 
     existing = load_library(library_path)
 
@@ -149,14 +150,17 @@ def import_physical_cmd(config_path: str, excel_path: str) -> None:
 @main.command()
 @click.option("--config", "config_path", default="config.yaml", help="Path to config.yaml")
 @click.option("--port", default=8000, help="Port to serve on.")
-def serve(config_path: str, port: int) -> None:
+@click.option("--data", "data_filename", default="library.json", help="Library JSON filename under data/ to serve — e.g. library_digital.json.")
+def serve(config_path: str, port: int, data_filename: str) -> None:
     """Serve viewer.html + data/ over HTTP so the browser can fetch
     data/library.json and cover images (opening viewer.html directly via
     file:// blocks those fetches). Also exposes two write endpoints
     viewer.html's per-card controls use to manually attach a cover image
-    or a specific Comic Geeks issue to a record."""
+    or a specific Comic Geeks issue to a record. --data picks which
+    library JSON viewer.html actually sees, served transparently as
+    data/library.json regardless of its real filename."""
     config = load_config(config_path)
-    library_path = config.data_dir / "library.json"
+    library_path = config.data_dir / data_filename
     covers_dir = config.data_dir / "covers"
 
     handler = functools.partial(

@@ -6,6 +6,7 @@ def test_series_year_and_issue_hash():
     assert result["series"] == "Batman"
     assert result["year"] == 2019
     assert result["issue_number"] == "003"
+    assert result["title"] == "Batman #3"  # leading zeros stripped for display
 
 
 def test_series_and_year_only():
@@ -13,6 +14,7 @@ def test_series_and_year_only():
     assert result["series"] == "Saga"
     assert result["year"] == 2012
     assert "issue_number" not in result
+    assert result["title"] == "Saga"  # no issue number to append
 
 
 def test_series_with_volume():
@@ -62,6 +64,7 @@ def test_bare_trailing_issue_no_tags():
     result = parse_filename("Absolute Batman 01.cbr")
     assert result["series"] == "Absolute Batman"
     assert result["issue_number"] == "01"
+    assert result["title"] == "Absolute Batman #1"
 
 
 def test_leading_batch_index_is_stripped():

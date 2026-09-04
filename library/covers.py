@@ -3,6 +3,7 @@ data/covers/<id>/ — used by the automatic importer, and by manually
 attaching a cover or Metron issue to a record."""
 from __future__ import annotations
 
+import shutil
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -33,3 +34,9 @@ def download_cover(record: ComicRecord, url: str, source_name: str, covers_dir: 
     ext = Path(urlparse(url).path).suffix or _DEFAULT_COVER_EXT
     save_cover_bytes(record, resp.content, ext, source_name, covers_dir)
     return True
+
+
+def delete_cover_dir(record_id: str, covers_dir: Path) -> None:
+    """Removes a record's extracted/downloaded cover, if any. Never touches
+    the original archive or file it may have come from."""
+    shutil.rmtree(covers_dir / record_id, ignore_errors=True)

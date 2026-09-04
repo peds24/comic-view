@@ -24,6 +24,28 @@ def attach_cover_bytes(record: ComicRecord, data: bytes, ext: str, covers_dir: P
     save_cover_bytes(record, data, ext, "manual", covers_dir)
 
 
+def set_title(record: ComicRecord, title: str) -> None:
+    """Overwrites this record's title with a manually-edited value."""
+    record.title = title
+    record.metadata_source["title"] = "manual"
+
+
+def set_year(record: ComicRecord, year: int | None) -> None:
+    """Overwrites this record's year with a manually-edited value, or clears
+    it (and its source) back to unknown if year is None."""
+    record.year = year
+    if year is None:
+        record.metadata_source.pop("year", None)
+    else:
+        record.metadata_source["year"] = "manual"
+
+
+def set_formats(record: ComicRecord, formats: list[str]) -> None:
+    """Overwrites this record's formats (e.g. correcting a digital scan
+    that's actually also owned in print, or vice versa)."""
+    record.formats = formats
+
+
 def _overwrite(record: ComicRecord, field: str, value, source_name: str) -> None:
     if value:
         setattr(record, field, value)

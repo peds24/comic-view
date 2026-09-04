@@ -1,7 +1,7 @@
 """Walk configured root folders, find archives, and build ComicRecords.
 
 No network calls happen here — only ComicInfo.xml + filename parsing, plus
-cover/preview extraction. See enrichment.py for the online lookup pass.
+cover extraction. See enrichment.py for the online lookup pass.
 """
 from __future__ import annotations
 
@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Callable
 
 from library import comicinfo_parser, filename_parser
-from library.archive_reader import ArchiveError, extract_cover_and_preview, read_comicinfo_bytes
+from library.archive_reader import ArchiveError, extract_cover, read_comicinfo_bytes
 from library.config import Config, RootConfig
 from library.hashing import compute_id
 from library.models import ComicRecord
@@ -46,9 +46,8 @@ def build_record(path: Path, root: RootConfig, covers_dir: Path) -> ComicRecord:
             fields[key] = value
             sources[key] = "comicinfo"
 
-    cover_filename, preview_filenames = extract_cover_and_preview(path, covers_dir / comic_id)
+    cover_filename = extract_cover(path, covers_dir / comic_id)
     cover_path = f"{comic_id}/{cover_filename}" if cover_filename else None
-    preview_pages = [f"{comic_id}/{name}" for name in preview_filenames]
 
     title = fields.pop("title", None) or path.stem
 
@@ -64,7 +63,6 @@ def build_record(path: Path, root: RootConfig, covers_dir: Path) -> ComicRecord:
         description=fields.get("description"),
         isbn=fields.get("isbn"),
         cover_path=cover_path,
-        preview_pages=preview_pages,
         metadata_source=sources,
         formats=["digital"],
     )
@@ -86,7 +84,8 @@ def scan_roots(
     config: Config, on_progress: Callable[[int, int], None] | None = None
 ) -> tuple[list[ComicRecord], list[tuple[Path, str]]]:
     """Returns (records, skipped) — skipped is (path, reason) for archives that
-    couldn't be read (e.g. corrupt files), so one bad file doesn't abort the scan.
+    couldn't be read (corrupt files, or an I/O error such as a cloud-synced
+    file timing out mid-download), so one bad file doesn't abort the scan.
 
     If given, on_progress(completed, total) is called after each archive is
     processed (whether it succeeded or was skipped) — lets a caller show a
@@ -101,7 +100,7 @@ def scan_roots(
     for i, (archive_path, root) in enumerate(archives, start=1):
         try:
             records.append(build_record(archive_path, root, covers_dir))
-        except ArchiveError as e:
+        except (ArchiveError, OSError) as e:
             skipped.append((archive_path, str(e)))
         if on_progress:
             on_progress(i, total)

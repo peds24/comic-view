@@ -1,8 +1,7 @@
-"""Read CBZ/CBR archives: find ComicInfo.xml and extract the cover + preview pages.
+"""Read CBZ/CBR archives: find ComicInfo.xml and extract the cover image.
 
 This is the only place archives are opened. It never extracts more than the
-first few pages — the rest of the book is read (for listing) but never
-copied out.
+cover — the rest of the book is read (for listing) but never copied out.
 """
 from __future__ import annotations
 
@@ -12,7 +11,6 @@ from pathlib import Path
 import rarfile
 
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp", ".gif"}
-PREVIEW_PAGE_COUNT = 4  # 1 cover + 3 preview pages
 
 
 class ArchiveError(Exception):
@@ -84,10 +82,11 @@ def read_comicinfo_bytes(path: Path) -> bytes | None:
         archive.close()
 
 
-def extract_cover_and_preview(path: Path, dest_dir: Path) -> tuple[str | None, list[str]]:
-    """Extract the cover (first image) and up to 3 following pages to dest_dir.
+def extract_cover(path: Path, dest_dir: Path) -> str | None:
+    """Extract the cover (first image, by name order) to dest_dir.
 
-    Returns (cover_filename, [preview_page_filenames]), relative to dest_dir.
+    Returns the cover filename, relative to dest_dir, or None if the
+    archive has no images.
     """
     archive = _open_archive(path)
     try:
@@ -95,25 +94,15 @@ def extract_cover_and_preview(path: Path, dest_dir: Path) -> tuple[str | None, l
             n for n in archive.namelist() if Path(n).suffix.lower() in IMAGE_EXTENSIONS
         )
         if not image_names:
-            return None, []
+            return None
 
         dest_dir.mkdir(parents=True, exist_ok=True)
 
-        selected = image_names[:PREVIEW_PAGE_COUNT]
-        cover_filename: str | None = None
-        preview_filenames: list[str] = []
+        ext = Path(image_names[0]).suffix.lower()
+        data = archive.read(image_names[0])
+        cover_filename = f"cover{ext}"
+        (dest_dir / cover_filename).write_bytes(data)
 
-        for i, name in enumerate(selected):
-            ext = Path(name).suffix.lower()
-            data = archive.read(name)
-            if i == 0:
-                out_name = f"cover{ext}"
-                cover_filename = out_name
-            else:
-                out_name = f"page-{i:02d}{ext}"
-                preview_filenames.append(out_name)
-            (dest_dir / out_name).write_bytes(data)
-
-        return cover_filename, preview_filenames
+        return cover_filename
     finally:
         archive.close()

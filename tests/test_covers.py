@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from library.covers import download_cover, save_cover_bytes
+from library.covers import delete_cover_dir, download_cover, save_cover_bytes
 from library.models import ComicRecord
 
 
@@ -58,3 +58,17 @@ def test_download_cover_failure_leaves_record_untouched(tmp_path: Path, monkeypa
     record = _record()
     assert download_cover(record, "https://example.com/cover.jpg", "metron", tmp_path) is False
     assert record.cover_path is None
+
+
+def test_delete_cover_dir_removes_it(tmp_path: Path):
+    cover_dir = tmp_path / "p1"
+    cover_dir.mkdir()
+    (cover_dir / "cover.jpg").write_bytes(b"bytes")
+
+    delete_cover_dir("p1", tmp_path)
+
+    assert not cover_dir.exists()
+
+
+def test_delete_cover_dir_missing_dir_is_a_noop(tmp_path: Path):
+    delete_cover_dir("does-not-exist", tmp_path)  # should not raise

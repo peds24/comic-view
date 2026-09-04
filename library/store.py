@@ -31,3 +31,8 @@ def merge_record(records: dict[str, ComicRecord], new_record: ComicRecord) -> bo
         return False
     records[new_record.id] = new_record
     return True
+
+
+def delete_record(records: dict[str, ComicRecord], record_id: str) -> ComicRecord | None:
+    """Removes and returns the record, or None if record_id isn't present."""
+    return records.pop(record_id, None)

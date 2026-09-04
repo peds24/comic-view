@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from library.models import ComicRecord
-from library.store import load_library, merge_record, save_library
+from library.store import delete_record, load_library, merge_record, save_library
 
 
 def make_record(id_: str, status: str = "unread") -> ComicRecord:
@@ -47,3 +47,17 @@ def test_rescan_preserves_status_after_reload(tmp_path: Path):
     reloaded = load_library(library_path)
     merge_record(reloaded, make_record("a", status="unread"))  # simulate rescan finding same file
     assert reloaded["a"].status == "read"
+
+
+def test_delete_record_removes_and_returns_it():
+    records = {"a": make_record("a")}
+    deleted = delete_record(records, "a")
+    assert deleted is not None
+    assert deleted.id == "a"
+    assert "a" not in records
+
+
+def test_delete_record_missing_id_returns_none():
+    records = {"a": make_record("a")}
+    assert delete_record(records, "nope") is None
+    assert "a" in records

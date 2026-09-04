@@ -2,7 +2,15 @@ from pathlib import Path
 
 import pytest
 
-from library.manual_attach import LinkAttachError, attach_comic_geeks_issue, attach_cover_bytes, attach_from_link
+from library.manual_attach import (
+    LinkAttachError,
+    attach_comic_geeks_issue,
+    attach_cover_bytes,
+    attach_from_link,
+    set_formats,
+    set_title,
+    set_year,
+)
 from library.models import ComicRecord
 
 
@@ -87,3 +95,39 @@ def test_attach_from_link_rejects_non_comic_geeks_url(tmp_path: Path):
     record = _record()
     with pytest.raises(LinkAttachError):
         attach_from_link(record, "https://metron.cloud/issue/absolute-batman-2024-16/", covers_dir=tmp_path)
+
+
+# --- set_title ---
+
+
+def test_set_title_overwrites_title_and_marks_source_manual():
+    record = _record()
+    set_title(record, "Absolute Batman #16")
+    assert record.title == "Absolute Batman #16"
+    assert record.metadata_source["title"] == "manual"
+
+
+# --- set_year ---
+
+
+def test_set_year_overwrites_year_and_marks_source_manual():
+    record = _record()
+    set_year(record, 2016)
+    assert record.year == 2016
+    assert record.metadata_source["year"] == "manual"
+
+
+def test_set_year_none_clears_year_and_its_source():
+    record = _record(year=2016, metadata_source={"year": "filename"})
+    set_year(record, None)
+    assert record.year is None
+    assert "year" not in record.metadata_source
+
+
+# --- set_formats ---
+
+
+def test_set_formats_overwrites_formats():
+    record = _record(formats=["digital"])
+    set_formats(record, ["digital", "print"])
+    assert record.formats == ["digital", "print"]

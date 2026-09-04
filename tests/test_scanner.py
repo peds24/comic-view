@@ -64,3 +64,25 @@ def test_scan_roots_works_without_on_progress(tmp_path):
     records, skipped = scanner.scan_roots(config)
     assert records == []
     assert skipped == []
+
+
+def test_scan_roots_skips_files_that_raise_os_error(tmp_path, monkeypatch):
+    comics_root = tmp_path / "comics"
+    comics_root.mkdir()
+    (comics_root / "A.cbz").write_bytes(b"")
+    (comics_root / "B.cbz").write_bytes(b"")
+
+    config = _config(tmp_path, [RootConfig(path=comics_root, type="comic")])
+
+    def fake_build_record(path, root, covers_dir):
+        if path.name == "A.cbz":
+            raise TimeoutError("cloud file not downloaded")
+        return ComicRecord(id=path.name, title=path.name, type="comic")
+
+    monkeypatch.setattr(scanner, "build_record", fake_build_record)
+
+    records, skipped = scanner.scan_roots(config)
+
+    assert len(records) == 1
+    assert len(skipped) == 1
+    assert skipped[0][0].name == "A.cbz"

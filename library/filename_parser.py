@@ -3,12 +3,17 @@
 Used only to fill fields ComicInfo.xml didn't provide. Handles common
 scene/release conventions seen in the wild, e.g.:
 
-  Batman (2019) #003.cbz                              -> series, year, issue
-  Berserk v01 (2003) (Digital) (danke-Empire).cbz      -> series, year, issue
-  Slam Dunk, v01 [1991] .cbz                           -> series, year, issue
-  Absolute Batman 021 (2026) (Digital) (Lil-Empire).cbz -> series, year, issue
-  001 Batman 001 (7 covers) (2011) (Megan-Empire).cbr  -> series, year, issue
-  Plain Title.cbz                                      -> title only
+  Batman (2019) #003.cbz                              -> series, year, issue, title "Batman #3"
+  Berserk v01 (2003) (Digital) (danke-Empire).cbz      -> series, year, issue, title "Berserk #1"
+  Slam Dunk, v01 [1991] .cbz                           -> series, year, issue, title "Slam Dunk #1"
+  Absolute Batman 021 (2026) (Digital) (Lil-Empire).cbz -> series, year, issue, title "Absolute Batman #21"
+  001 Batman 001 (7 covers) (2011) (Megan-Empire).cbr  -> series, year, issue, title "Batman #1"
+  Plain Title.cbz                                      -> title only (no series/issue found)
+
+When an issue number is found, title is always "{series} #{issue}" (issue
+with any leading zeros stripped) rather than the bare series name — keeps
+every filename-derived title in the same shape as one pulled from
+ComicInfo.xml's Title tag.
 
 Any parenthesized/bracketed group left after the year is pulled out is
 treated as release-group noise (quality tags, scanlation group names, "X
@@ -18,6 +23,8 @@ the wild isn't tractable, so this strips generically instead.
 from __future__ import annotations
 
 import re
+
+from library.matching import normalize_issue
 
 _YEAR_RE = re.compile(r"[(\[](?P<year>19\d{2}|20\d{2})[)\]]")
 _BRACKET_GROUP_RE = re.compile(r"\s*[(\[][^()\[\]]*[)\]]")
@@ -66,7 +73,8 @@ def parse_filename(filename: str) -> dict:
     series = re.sub(r"\s{2,}", " ", series)
     if series:
         result["series"] = series
-        result["title"] = series
+        issue = result.get("issue_number")
+        result["title"] = f"{series} #{normalize_issue(issue)}" if issue else series
     else:
         result["title"] = stem
 

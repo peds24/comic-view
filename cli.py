@@ -54,15 +54,10 @@ def scan(config_path: str, data_filename: str) -> None:
 @click.option("--config", "config_path", default="config.yaml", help="Path to config.yaml")
 @click.option("--force", is_flag=True, help="Re-query even records that already have all fields.")
 def enrich(config_path: str, force: bool) -> None:
-    """Fill in missing metadata (and cover images) via Metron and Google Books."""
+    """Fill in missing metadata (and cover images) via Metron and Google Books,
+    across both the comics and manga library files."""
     config = load_config(config_path)
-    library_path = config.data_dir / "library.json"
     covers_dir = config.data_dir / "covers"
-
-    records = load_library(library_path)
-    if not records:
-        click.echo("No records found — run `scan` first.")
-        return
 
     sources = []
     if config.metron.is_configured:
@@ -71,9 +66,21 @@ def enrich(config_path: str, force: bool) -> None:
         click.echo("Metron not configured (skipping) — fill in config.yaml to enable.")
     sources.append(GoogleBooksSource(config.google_books.api_key))
 
-    updated = enrich_all(records, sources, covers_dir, force=force)
-    save_library(library_path, records)
-    click.echo(f"Enriched {updated} of {len(records)} record(s).")
+    total_updated = 0
+    total_records = 0
+    for filename in ("library_comics.json", "library_manga.json"):
+        library_path = config.data_dir / filename
+        records = load_library(library_path)
+        if not records:
+            click.echo(f"No records found in {filename} — run `scan` first.")
+            continue
+        updated = enrich_all(records, sources, covers_dir, force=force)
+        save_library(library_path, records)
+        click.echo(f"{filename}: enriched {updated} of {len(records)} record(s).")
+        total_updated += updated
+        total_records += len(records)
+
+    click.echo(f"Total: enriched {total_updated} of {total_records} record(s).")
 
 
 @main.command("fetch-covers")

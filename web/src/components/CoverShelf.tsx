@@ -13,7 +13,7 @@ interface CoverShelfProps {
 
 export function CoverShelf({ records, currentIndex, onIndexChange, onSelect }: CoverShelfProps) {
   const visibleIndices = useVirtualizedWindow(records.length, currentIndex, 6)
-  const { handleWheel } = useScrollPhysics(records.length, onIndexChange)
+  const { handleWheel } = useScrollPhysics(records.length, currentIndex, onIndexChange)
   const containerRef = useRef<HTMLDivElement>(null)
 
   return (

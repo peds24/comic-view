@@ -29,4 +29,9 @@ describe('useVirtualizedWindow', () => {
     const { result } = renderHook(() => useVirtualizedWindow(0, 0, 6))
     expect(result.current).toEqual([])
   })
+
+  it('clamps a stale currentIndex past the end of a shrunk list instead of returning empty', () => {
+    const { result } = renderHook(() => useVirtualizedWindow(5, 40, 6))
+    expect(result.current).toEqual([0, 1, 2, 3, 4])
+  })
 })

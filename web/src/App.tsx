@@ -20,6 +20,11 @@ function BrowsingView() {
     [records, publisher, sortMode],
   )
 
+  const safeIndex = useMemo(
+    () => Math.min(currentIndex, Math.max(0, visible.length - 1)),
+    [currentIndex, visible.length],
+  )
+
   if (loading) return <div>Loading…</div>
   if (error) return <div>Error: {error}</div>
 
@@ -34,13 +39,13 @@ function BrowsingView() {
       />
       <TimelineScrubber
         records={visible}
-        currentIndex={currentIndex}
+        currentIndex={safeIndex}
         sortMode={sortMode}
         onScrub={setCurrentIndex}
       />
       <CoverShelf
         records={visible}
-        currentIndex={currentIndex}
+        currentIndex={safeIndex}
         onIndexChange={setCurrentIndex}
         onSelect={setSelected}
       />

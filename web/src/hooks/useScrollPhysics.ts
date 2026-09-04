@@ -4,7 +4,7 @@ import { snapToNearest, stepPhysics, type PhysicsState } from './scrollPhysics'
 const FRICTION = 0.92
 const WHEEL_TO_VELOCITY = 0.05
 
-export function useScrollPhysics(itemCount: number, onIndexChange: (index: number) => void) {
+export function useScrollPhysics(itemCount: number, currentIndex: number, onIndexChange: (index: number) => void) {
   const [position, setPosition] = useState(0)
   const stateRef = useRef<PhysicsState>({ position: 0, velocity: 0 })
   const rafRef = useRef<number | null>(null)
@@ -31,6 +31,13 @@ export function useScrollPhysics(itemCount: number, onIndexChange: (index: numbe
     },
     [tick],
   )
+
+  useEffect(() => {
+    if (rafRef.current === null) {
+      stateRef.current = { position: currentIndex, velocity: 0 }
+      setPosition(currentIndex)
+    }
+  }, [currentIndex])
 
   useEffect(() => {
     return () => {

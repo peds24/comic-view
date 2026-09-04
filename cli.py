@@ -166,7 +166,8 @@ def serve(config_path: str, port: int, comics_filename: str, manga_filename: str
     covers_dir = config.data_dir / "covers"
 
     handler = functools.partial(
-        ViewerRequestHandler, directory=".", comics_path=comics_path, manga_path=manga_path, covers_dir=covers_dir,
+        ViewerRequestHandler, directory=".", comics_path=comics_path, manga_path=manga_path,
+        covers_dir=covers_dir, config=config,
     )
     with http.server.ThreadingHTTPServer(("127.0.0.1", port), handler) as httpd:
         click.echo(f"Serving at http://127.0.0.1:{port}/viewer.html — Ctrl+C to stop.")

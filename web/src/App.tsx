@@ -6,6 +6,7 @@ import { CoverShelf } from './components/CoverShelf'
 import { FilterBar } from './components/FilterBar'
 import { TimelineScrubber } from './components/TimelineScrubber'
 import { DetailOverlay } from './components/DetailOverlay'
+import { AddItemForm } from './components/admin/AddItemForm'
 import type { ComicRecord } from './types/comic'
 
 function BrowsingView() {
@@ -54,12 +55,7 @@ function BrowsingView() {
   )
 }
 
-function AdminPlaceholder() {
-  // Replaced by the quick-add flow in a follow-up plan.
-  return <div>Admin — coming soon</div>
-}
-
 export default function App() {
   const isAdmin = window.location.pathname === '/admin'
-  return isAdmin ? <AdminPlaceholder /> : <BrowsingView />
+  return isAdmin ? <AddItemForm /> : <BrowsingView />
 }

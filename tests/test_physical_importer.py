@@ -34,13 +34,23 @@ class FakeMetron:
 
 
 class FakeGoogleBooks:
-    def __init__(self, isbn_result=None):
+    def __init__(self, isbn_result=None, search_result=None, cover_result=None):
         self.isbn_result = isbn_result or {}
+        self.search_result = search_result or {}
+        self.cover_result = cover_result
         self.calls = []
+        self.search_calls = []
 
     def lookup_isbn(self, isbn):
         self.calls.append(isbn)
         return self.isbn_result
+
+    def search(self, title, year=None):
+        self.search_calls.append(title)
+        return self.search_result
+
+    def cover_image_url(self, title, year=None):
+        return self.cover_result
 
 
 class FakeOpenLibrary:

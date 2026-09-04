@@ -7,12 +7,13 @@ to the web app's owner-only quick-add form.
 """
 from __future__ import annotations
 
+import hashlib
 import re
 from dataclasses import dataclass
 from pathlib import Path
 
 from library.manual_attach import LinkAttachError, attach_comic_geeks_issue
-from library.matching import find_digital_match, is_matchable
+from library.matching import extract_manga_issue, find_digital_match, is_matchable, strip_manga_volume_suffix
 from library.metadata_sources import comic_geeks
 from library.models import ComicRecord
 from library.physical_importer import enrich_comic_by_upc, enrich_isbn, is_isbn_shaped, truncate_isbn
@@ -115,3 +116,42 @@ def add_comic(
         )
 
     raise QuickAddError("Comics need a UPC, ISBN, or a League of Comic Geeks link.")
+
+
+def _slugify(title: str) -> str:
+    slug = re.sub(r"[^a-z0-9]+", "-", title.lower()).strip("-")
+    return slug or "untitled"
+
+
+def add_manga(
+    records: dict[str, ComicRecord], raw_input: str, formats: list[str], *,
+    google_books, open_library, covers_dir: Path,
+) -> AddResult:
+    raw_input = raw_input.strip()
+
+    if raw_input.isdigit():
+        code = truncate_isbn(raw_input)
+        record = ComicRecord(id=f"isbn-{code}", title=code, type="manga", isbn=code, formats=list(formats))
+        enrich_isbn(record, code, google_books, open_library, covers_dir)
+        code_field, code_value = "isbn", code
+    else:
+        title = raw_input
+        issue_number = extract_manga_issue(title)
+        record = ComicRecord(
+            id=f"manual-{_slugify(title)}-{hashlib.sha1(title.encode()).hexdigest()[:8]}",
+            title=title, type="manga",
+            series=strip_manga_volume_suffix(title) if issue_number else None,
+            issue_number=issue_number, formats=list(formats),
+        )
+        partial = google_books.search(title)
+        for field, value in partial.items():
+            if value:
+                setattr(record, field, value)
+                record.metadata_source[field] = "google_books"
+        cover_url = google_books.cover_image_url(title)
+        if cover_url:
+            from library.covers import download_cover
+            download_cover(record, cover_url, "google_books", covers_dir)
+        code_field, code_value = None, None
+
+    return _merge_or_add(records, record, code_field, code_value)

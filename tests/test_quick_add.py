@@ -4,7 +4,7 @@ import pytest
 
 from library.manual_attach import LinkAttachError
 from library.models import ComicRecord
-from library.quick_add import AddResult, QuickAddError, add_comic
+from library.quick_add import AddResult, QuickAddError, add_comic, add_manga
 from tests.test_physical_importer import FakeGoogleBooks, FakeMetron, FakeOpenLibrary
 
 
@@ -182,3 +182,99 @@ def test_add_comic_rejects_unrecognized_input(tmp_path: Path):
             records, "not a valid identifier", ["print"],
             metron=None, google_books=FakeGoogleBooks(), open_library=FakeOpenLibrary(), covers_dir=tmp_path,
         )
+
+
+def test_add_manga_from_isbn_routes_to_open_library(tmp_path: Path):
+    records: dict[str, ComicRecord] = {}
+    open_library = FakeOpenLibrary(isbn_result={"author": "Hajime Isayama"})
+
+    result = add_manga(
+        records, "9781632368287", ["print"],
+        google_books=FakeGoogleBooks(), open_library=open_library, covers_dir=tmp_path,
+    )
+
+    assert result.record.id == "isbn-9781632368287"
+    assert result.record.isbn == "9781632368287"
+    assert result.record.type == "manga"
+    assert result.record.author == "Hajime Isayama"
+
+
+def test_add_manga_from_title_searches_google_books(tmp_path: Path):
+    records: dict[str, ComicRecord] = {}
+    google_books = FakeGoogleBooks()
+    google_books.search_result = {"author": "Hajime Isayama", "description": "Titans."}
+    google_books.cover_result = "https://example.com/cover.jpg"
+
+    result = add_manga(
+        records, "Attack on Titan, Vol. 29", ["digital"],
+        google_books=google_books, open_library=FakeOpenLibrary(), covers_dir=tmp_path,
+    )
+
+    assert result.record.type == "manga"
+    assert result.record.title == "Attack on Titan, Vol. 29"
+    assert result.record.series == "Attack on Titan"
+    assert result.record.issue_number == "29"
+    assert result.record.author == "Hajime Isayama"
+    assert result.record.description == "Titans."
+    assert result.record.id.startswith("manual-attack-on-titan-vol-29-")
+
+
+def test_add_manga_from_title_with_no_search_results_still_creates_bare_record(tmp_path: Path):
+    records: dict[str, ComicRecord] = {}
+    google_books = FakeGoogleBooks()
+
+    result = add_manga(
+        records, "Some Obscure Title", ["print"],
+        google_books=google_books, open_library=FakeOpenLibrary(), covers_dir=tmp_path,
+    )
+
+    assert result.merged is False
+    assert result.record.title == "Some Obscure Title"
+    assert result.record.author is None
+
+
+def test_add_manga_from_title_merges_into_existing_digital_record(tmp_path: Path):
+    """Merging needs a series + issue number to match against — a bare ISBN
+    has no title text to derive those from (`enrich_isbn`, like the batch
+    importer, never fills series/issue_number, only author/publisher/year/
+    description), so only the title path can ever merge. This is a real
+    limitation of ISBN-only quick-add input, not an oversight: if the owner
+    wants a merge, typing the title (or fixing it up afterward in
+    viewer.html) is the way."""
+    records: dict[str, ComicRecord] = {
+        "d1": ComicRecord(
+            id="d1", title="Attack on Titan, Vol. 29", type="manga", series="Attack on Titan",
+            issue_number="29", formats=["digital"],
+        )
+    }
+    google_books = FakeGoogleBooks()
+    google_books.search_result = {"author": "Hajime Isayama"}
+
+    result = add_manga(
+        records, "Attack on Titan, Vol. 29", ["print"],
+        google_books=google_books, open_library=FakeOpenLibrary(), covers_dir=tmp_path,
+    )
+
+    assert result.merged is True
+    assert result.record is records["d1"]
+    assert records["d1"].formats == ["digital", "print"]
+    assert len(records) == 1
+
+
+def test_add_manga_from_bare_isbn_never_merges_since_no_title_to_match_on(tmp_path: Path):
+    records: dict[str, ComicRecord] = {
+        "d1": ComicRecord(
+            id="d1", title="Attack on Titan, Vol. 29", type="manga", series="Attack on Titan",
+            issue_number="29", formats=["digital"],
+        )
+    }
+    open_library = FakeOpenLibrary(isbn_result={"author": "Hajime Isayama"})
+
+    result = add_manga(
+        records, "9781632368287", ["print"],
+        google_books=FakeGoogleBooks(), open_library=open_library, covers_dir=tmp_path,
+    )
+
+    assert result.merged is False
+    assert records["d1"].formats == ["digital"]  # untouched
+    assert records["isbn-9781632368287"].isbn == "9781632368287"

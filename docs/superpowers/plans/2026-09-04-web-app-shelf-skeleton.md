@@ -101,6 +101,8 @@ git commit -m "Scaffold web/ Vite React+TS app"
 **Files:**
 - Create: `web/src/types/comic.ts`
 - Create: `web/src/data/useLibrary.ts`
+- Modify: `web/vite.config.ts` (adds the `test` block and packages for Vitest+jsdom)
+- Modify: `web/package.json` (adds `@testing-library/react` and `jsdom` as dev deps)
 - Test: `web/src/data/useLibrary.test.ts`
 
 **Interfaces:**
@@ -139,7 +141,7 @@ export interface ComicRecord {
 - [ ] **Step 2: Install a testing utility for hooks**
 
 ```bash
-cd web && npm install -D @testing-library/react @testing-library/jest-dom jsdom
+cd web && npm install -D @testing-library/react jsdom
 ```
 
 Replace the full contents of `web/vite.config.ts` with:

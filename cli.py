@@ -150,21 +150,23 @@ def import_physical_cmd(config_path: str, excel_path: str) -> None:
 @main.command()
 @click.option("--config", "config_path", default="config.yaml", help="Path to config.yaml")
 @click.option("--port", default=8000, help="Port to serve on.")
-@click.option("--data", "data_filename", default="library.json", help="Library JSON filename under data/ to serve — e.g. library_digital.json.")
-def serve(config_path: str, port: int, data_filename: str) -> None:
+@click.option("--data-comics", "comics_filename", default="library_comics.json", help="Comics library JSON filename under data/ to serve.")
+@click.option("--data-manga", "manga_filename", default="library_manga.json", help="Manga library JSON filename under data/ to serve.")
+def serve(config_path: str, port: int, comics_filename: str, manga_filename: str) -> None:
     """Serve viewer.html + data/ over HTTP so the browser can fetch
     data/library.json and cover images (opening viewer.html directly via
-    file:// blocks those fetches). Also exposes two write endpoints
-    viewer.html's per-card controls use to manually attach a cover image
-    or a specific Comic Geeks issue to a record. --data picks which
-    library JSON viewer.html actually sees, served transparently as
-    data/library.json regardless of its real filename."""
+    file:// blocks those fetches). Also exposes the write endpoints
+    viewer.html's per-card controls use to manually attach a cover image,
+    attach a Comic Geeks link, edit a title/year/formats, or delete a
+    record. GET /data/library.json merges the comics and manga files
+    transparently — viewer.html doesn't know the library is split."""
     config = load_config(config_path)
-    library_path = config.data_dir / data_filename
+    comics_path = config.data_dir / comics_filename
+    manga_path = config.data_dir / manga_filename
     covers_dir = config.data_dir / "covers"
 
     handler = functools.partial(
-        ViewerRequestHandler, directory=".", library_path=library_path, covers_dir=covers_dir,
+        ViewerRequestHandler, directory=".", comics_path=comics_path, manga_path=manga_path, covers_dir=covers_dir,
     )
     with http.server.ThreadingHTTPServer(("127.0.0.1", port), handler) as httpd:
         click.echo(f"Serving at http://127.0.0.1:{port}/viewer.html — Ctrl+C to stop.")

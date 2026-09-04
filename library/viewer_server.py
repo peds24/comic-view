@@ -6,10 +6,12 @@ to a record, rename a record's title, or delete a record — the only way a
 record gets written to (or removed) from the browser, instead of a CLI
 import/enrich command.
 
-GET /data/library.json is special-cased to always return `library_path`'s
-content, whatever its actual filename — lets `serve --data <file>` point
-viewer.html at e.g. library_digital.json without viewer.html knowing about
-the swap.
+GET /data/library.json is special-cased to merge `comics_path` and
+`manga_path` into one JSON array — lets viewer.html keep fetching a single
+URL and filtering by `type` client-side (its Comics/Manga tabs) without
+knowing the library is actually stored as two separate files. Each POST
+route looks up which of the two files actually holds the given record id
+and writes back only that one.
 """
 from __future__ import annotations
 
@@ -21,6 +23,7 @@ from typing import Callable
 
 from library.covers import delete_cover_dir
 from library.manual_attach import LinkAttachError, attach_cover_bytes, attach_from_link, set_formats, set_title, set_year
+from library.models import ComicRecord
 from library.store import delete_record, load_library, save_library
 
 _VALID_FORMATS = ("digital", "print")
@@ -30,11 +33,13 @@ class ViewerRequestHandler(http.server.SimpleHTTPRequestHandler):
     def __init__(
         self,
         *args,
-        library_path: Path,
+        comics_path: Path,
+        manga_path: Path,
         covers_dir: Path,
         **kwargs,
     ) -> None:
-        self.library_path = library_path
+        self.comics_path = comics_path
+        self.manga_path = manga_path
         self.covers_dir = covers_dir
         super().__init__(*args, **kwargs)
 
@@ -45,10 +50,14 @@ class ViewerRequestHandler(http.server.SimpleHTTPRequestHandler):
         super().do_GET()
 
     def _serve_library_json(self) -> None:
-        if not self.library_path.exists():
+        if not self.comics_path.exists() and not self.manga_path.exists():
             self.send_error(404)
             return
-        body = self.library_path.read_bytes()
+        records: list[dict] = []
+        for path in (self.comics_path, self.manga_path):
+            if path.exists():
+                records.extend(json.loads(path.read_text()))
+        body = json.dumps(records).encode()
         self.send_response(200)
         self.send_header("Content-Type", "application/json")
         self.send_header("Content-Length", str(len(body)))
@@ -77,20 +86,29 @@ class ViewerRequestHandler(http.server.SimpleHTTPRequestHandler):
             status, payload = 400, {"error": str(e)}
         self._respond_json(status, payload)
 
+    def _find_record(self, record_id: str) -> tuple[ComicRecord | None, dict[str, ComicRecord], Path | None]:
+        """Loads both library files and returns the record, the dict it
+        lives in, and that dict's backing path — so a caller can mutate the
+        dict and save back only that one file. (None, {}, None) if the id
+        isn't in either file."""
+        for path in (self.comics_path, self.manga_path):
+            records = load_library(path)
+            if record_id in records:
+                return records[record_id], records, path
+        return None, {}, None
+
     def _attach_cover(self, body: dict) -> tuple[int, dict]:
-        records = load_library(self.library_path)
-        record = records.get(body["id"])
+        record, records, path = self._find_record(body["id"])
         if record is None:
             return 404, {"error": f"No record with id {body['id']!r}"}
 
         image_bytes = base64.b64decode(body["data_base64"])
         attach_cover_bytes(record, image_bytes, body.get("ext") or ".jpg", self.covers_dir)
-        save_library(self.library_path, records)
+        save_library(path, records)
         return 200, {"ok": True, "cover_path": record.cover_path}
 
     def _attach_link(self, body: dict) -> tuple[int, dict]:
-        records = load_library(self.library_path)
-        record = records.get(body["id"])
+        record, records, path = self._find_record(body["id"])
         if record is None:
             return 404, {"error": f"No record with id {body['id']!r}"}
 
@@ -99,12 +117,11 @@ class ViewerRequestHandler(http.server.SimpleHTTPRequestHandler):
         except LinkAttachError as e:
             return 422, {"error": str(e)}
 
-        save_library(self.library_path, records)
+        save_library(path, records)
         return 200, {"ok": True, "record": record.to_dict()}
 
     def _update_title(self, body: dict) -> tuple[int, dict]:
-        records = load_library(self.library_path)
-        record = records.get(body["id"])
+        record, records, path = self._find_record(body["id"])
         if record is None:
             return 404, {"error": f"No record with id {body['id']!r}"}
 
@@ -113,12 +130,11 @@ class ViewerRequestHandler(http.server.SimpleHTTPRequestHandler):
             return 400, {"error": "title can't be empty"}
 
         set_title(record, title)
-        save_library(self.library_path, records)
+        save_library(path, records)
         return 200, {"ok": True, "record": record.to_dict()}
 
     def _update_year(self, body: dict) -> tuple[int, dict]:
-        records = load_library(self.library_path)
-        record = records.get(body["id"])
+        record, records, path = self._find_record(body["id"])
         if record is None:
             return 404, {"error": f"No record with id {body['id']!r}"}
 
@@ -134,12 +150,11 @@ class ViewerRequestHandler(http.server.SimpleHTTPRequestHandler):
                 return 400, {"error": "year looks out of range"}
 
         set_year(record, year)
-        save_library(self.library_path, records)
+        save_library(path, records)
         return 200, {"ok": True, "record": record.to_dict()}
 
     def _update_formats(self, body: dict) -> tuple[int, dict]:
-        records = load_library(self.library_path)
-        record = records.get(body["id"])
+        record, records, path = self._find_record(body["id"])
         if record is None:
             return 404, {"error": f"No record with id {body['id']!r}"}
 
@@ -151,17 +166,17 @@ class ViewerRequestHandler(http.server.SimpleHTTPRequestHandler):
             return 400, {"error": f"invalid format(s): {invalid}"}
 
         set_formats(record, list(dict.fromkeys(formats)))
-        save_library(self.library_path, records)
+        save_library(path, records)
         return 200, {"ok": True, "record": record.to_dict()}
 
     def _delete_record(self, body: dict) -> tuple[int, dict]:
-        records = load_library(self.library_path)
-        record = delete_record(records, body["id"])
+        record, records, path = self._find_record(body["id"])
         if record is None:
             return 404, {"error": f"No record with id {body['id']!r}"}
 
+        delete_record(records, record.id)
         delete_cover_dir(record.id, self.covers_dir)
-        save_library(self.library_path, records)
+        save_library(path, records)
         return 200, {"ok": True}
 
     def _respond_json(self, status: int, payload: dict) -> None:

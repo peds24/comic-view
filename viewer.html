@@ -40,7 +40,15 @@
   .status-unread { color: #ff6; }
   .flag { color: #f66; font-weight: bold; }
   #dupes .grid { border: 1px solid #633; padding: 8px; margin-bottom: 8px; background: #2a1f1f; }
+  #missing .grid { border: 1px solid #654; padding: 8px; margin-bottom: 8px; background: #2a2519; }
   #empty-filter { color: #999; font-style: italic; }
+  #tabs { display: flex; gap: 4px; margin-bottom: 16px; }
+  #tabs .tab-btn {
+    padding: 6px 18px; font-size: 13px; font-weight: bold; background: #2a2a2a; color: #999;
+    border: 1px solid #444; border-radius: 4px; cursor: pointer;
+  }
+  #tabs .tab-btn:hover { background: #333; color: #ccc; }
+  #tabs .tab-btn.active { background: #345; color: #7af; border-color: #7af; }
   .card .title-input {
     font-weight: bold; font-size: 12px; width: 100%; margin-top: 4px;
     background: transparent; color: #eee; border: 1px solid transparent; border-radius: 2px;
@@ -74,12 +82,18 @@
 <body>
 <h2>library.json viewer</h2>
 <div id="status">loading data/library.json ...</div>
+<div id="tabs">
+  <button class="tab-btn" data-type="comic">Comics</button>
+  <button class="tab-btn" data-type="manga">Manga</button>
+</div>
 <input id="search" type="text" placeholder="Filter by title, series, publisher, or author...">
+<div id="missing"></div>
 <div id="dupes"></div>
 <div id="sections"></div>
 
 <script>
 let allRecords = [];
+let activeType = 'comic';
 
 function normalizeIssue(issue) {
   if (issue && /^\d+$/.test(issue)) return String(parseInt(issue, 10));
@@ -94,6 +108,10 @@ function codeText(r) {
   if (r.upc) return `UPC: ${r.upc}`;
   if (r.isbn) return `ISBN: ${r.isbn}`;
   return '(no code)';
+}
+
+function isMissingInfo(r) {
+  return !r.cover_path || !r.year || !r.description || !r.publisher;
 }
 
 function formatCheckboxes(r) {
@@ -163,6 +181,36 @@ function renderSection(container, heading, records) {
   container.appendChild(grid);
 }
 
+function renderMissing(container, records) {
+  const missing = records.filter(isMissingInfo).sort((a, b) => {
+    const sa = (a.series || a.title || '').toLowerCase();
+    const sb = (b.series || b.title || '').toLowerCase();
+    return sa < sb ? -1 : sa > sb ? 1 : 0;
+  });
+
+  const h = document.createElement('h2');
+  h.className = 'section';
+  h.textContent = `Missing Info — needs a cover, year, description, or publisher (${missing.length})`;
+  container.appendChild(h);
+
+  if (missing.length === 0) {
+    const p = document.createElement('div');
+    p.textContent = 'None found.';
+    container.appendChild(p);
+    return;
+  }
+
+  const grid = document.createElement('div');
+  grid.className = 'grid';
+  for (const r of missing) {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = cardHtml(r);
+    grid.appendChild(card);
+  }
+  container.appendChild(grid);
+}
+
 function renderDuplicates(container, records) {
   // Group by series+issue first, then split each group by year — different
   // runs of the same title reuse issue numbers (Batman #1 (2016) vs Batman
@@ -224,8 +272,10 @@ function renderDuplicates(container, records) {
 }
 
 function renderAll(records) {
+  const missingEl = document.getElementById('missing');
   const dupesEl = document.getElementById('dupes');
   const sectionsEl = document.getElementById('sections');
+  missingEl.innerHTML = '';
   dupesEl.innerHTML = '';
   sectionsEl.innerHTML = '';
 
@@ -237,6 +287,7 @@ function renderAll(records) {
     return;
   }
 
+  renderMissing(missingEl, records);
   renderDuplicates(dupesEl, records);
 
   const sorted = [...records].sort((a, b) => {
@@ -260,16 +311,25 @@ function renderAll(records) {
 
 function applyFilter() {
   const query = document.getElementById('search').value.trim().toLowerCase();
+  const inTab = allRecords.filter(r => r.type === activeType);
   const filtered = query
-    ? allRecords.filter(r => [r.title, r.series, r.publisher, r.author]
+    ? inTab.filter(r => [r.title, r.series, r.publisher, r.author]
         .some(field => (field || '').toLowerCase().includes(query)))
-    : allRecords;
+    : inTab;
 
   document.getElementById('status').textContent = query
-    ? `Showing ${filtered.length} of ${allRecords.length} record(s).`
-    : `Loaded ${allRecords.length} record(s).`;
+    ? `Showing ${filtered.length} of ${inTab.length} record(s).`
+    : `Loaded ${inTab.length} record(s).`;
 
   renderAll(filtered);
+}
+
+function setActiveTab(type) {
+  activeType = type;
+  for (const btn of document.querySelectorAll('#tabs .tab-btn')) {
+    btn.classList.toggle('active', btn.dataset.type === type);
+  }
+  applyFilter();
 }
 
 function statusElFor(id) {
@@ -494,7 +554,10 @@ fetch('data/library.json')
   .then(records => {
     allRecords = records;
     document.getElementById('search').addEventListener('input', applyFilter);
-    applyFilter();
+    for (const btn of document.querySelectorAll('#tabs .tab-btn')) {
+      btn.addEventListener('click', () => setActiveTab(btn.dataset.type));
+    }
+    setActiveTab(activeType);
   })
   .catch(err => {
     document.getElementById('status').textContent =

@@ -35,8 +35,22 @@ class AddResult:
 
 def _merge_or_add(records: dict[str, ComicRecord], record: ComicRecord, code_field: str | None, code: str | None) -> AddResult:
     match = None
+    # Deliberately stricter than physical_importer._import_manga_row's merge
+    # gate (which only checks `series and issue_number`, no is_matchable):
+    # quick-add is a single, owner-driven add, so it's worth the extra
+    # caution to avoid merging a manga title that matches a non-matchable
+    # keyword like "Deluxe Edition" into an unrelated digital record. Keep
+    # this stricter than the batch importer rather than "fixing" it to match.
     if record.series and record.issue_number and is_matchable(record.title, record.issue_number):
         match = find_digital_match(records, record.series, record.issue_number)
+    if match is None:
+        # Re-adding the same UPC/ISBN/Comic Geeks link/manga a second time
+        # must not silently clobber whatever's already stored under this
+        # exact id (a hand-edited title, year, status, cover...) — the
+        # batch importer guards the equivalent case with its
+        # seen_upcs/seen_isbns sets; here there's no "skip" outcome to
+        # return, so it's treated as a merge into the existing record.
+        match = records.get(record.id)
 
     if match is not None:
         for fmt in record.formats:
@@ -64,7 +78,12 @@ def _comic_geeks_id_from_url(url: str) -> str:
 
 
 def _add_comic_from_comic_geeks_link(records: dict[str, ComicRecord], url: str, formats: list[str], covers_dir: Path) -> AddResult:
-    record = ComicRecord(id="pending", title="", type="comic", formats=list(formats))
+    # The id is computed up front (not assigned after attach_comic_geeks_issue
+    # returns) because that call downloads the cover using record.id at the
+    # time it runs — if the record were still "pending" then, every Comic
+    # Geeks add would download to the same data/covers/pending/cover.jpg,
+    # clobbering the previous add's cover.
+    record = ComicRecord(id=f"cg-{_comic_geeks_id_from_url(url)}", title="", type="comic", formats=list(formats))
     try:
         attach_comic_geeks_issue(record, url, covers_dir)
     except LinkAttachError as e:
@@ -73,8 +92,11 @@ def _add_comic_from_comic_geeks_link(records: dict[str, ComicRecord], url: str, 
     if record.series and record.issue_number:
         record.title = f"{record.series} #{record.issue_number}"
     else:
-        record.title = record.series or ""
-    record.id = f"cg-{_comic_geeks_id_from_url(url)}"
+        # Never leave the title empty — an empty-titled record renders as a
+        # blank, unrecoverable card (_update_title refuses an empty title),
+        # so fall back to the parsed id as a placeholder, same convention as
+        # the UPC/ISBN path in _add_comic_from_code.
+        record.title = record.series or record.id
 
     return _merge_or_add(records, record, "upc", record.upc)
 
@@ -148,7 +170,7 @@ def add_manga(
         except Exception:
             partial = {}
         for field, value in partial.items():
-            if value:
+            if value and not getattr(record, field, None):
                 setattr(record, field, value)
                 record.metadata_source[field] = "google_books"
         try:

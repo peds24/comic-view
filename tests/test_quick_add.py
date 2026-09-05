@@ -79,6 +79,28 @@ def test_add_comic_from_comic_geeks_link_merges_into_existing_digital_record(tmp
     assert len(records) == 1
 
 
+def test_add_comic_from_comic_geeks_link_downloads_cover_to_real_id_not_pending(tmp_path: Path, monkeypatch):
+    monkeypatch.setattr("library.metadata_sources.comic_geeks.fetch_issue", lambda url: {
+        "series": "Absolute Batman", "issue_number": "16",
+        "_image_url": "https://example.com/cover.jpg",
+    })
+    records: dict[str, ComicRecord] = {}
+
+    result = add_comic(
+        records, "https://leagueofcomicgeeks.com/comic/6297209/absolute-batman-16", ["print"],
+        metron=None, google_books=None, open_library=None, covers_dir=tmp_path,
+    )
+
+    # The cover must be downloaded under the real cg-<id> directory, not
+    # "pending" — attach_comic_geeks_issue downloads the cover using
+    # record.id at call time, so the id has to be assigned before that call,
+    # or every Comic Geeks add would collide on data/covers/pending/cover.jpg.
+    assert result.record.cover_path is not None
+    assert result.record.cover_path.startswith("cg-6297209/")
+    assert (tmp_path / "cg-6297209" / "cover.jpg").exists()
+    assert not (tmp_path / "pending").exists()
+
+
 def test_add_comic_from_unreadable_comic_geeks_link_raises(tmp_path: Path, monkeypatch):
     monkeypatch.setattr("library.metadata_sources.comic_geeks.fetch_issue", lambda url: {})
     records: dict[str, ComicRecord] = {}
@@ -101,7 +123,10 @@ def test_add_comic_from_comic_geeks_link_handles_missing_series(tmp_path: Path, 
         metron=None, google_books=None, open_library=None, covers_dir=tmp_path,
     )
 
-    assert result.record.title == ""
+    # A record must never end up with an empty title (it would render as a
+    # blank, unrecoverable card since _update_title refuses an empty title),
+    # so a missing series falls back to the parsed Comic Geeks id.
+    assert result.record.title == "cg-1"
     assert result.record.issue_number == "16"
     assert result.merged is False
     assert result.record.id in records
@@ -175,6 +200,58 @@ def test_add_comic_from_upc_merges_into_existing_digital_record(tmp_path: Path):
     assert "upc-76194138584601011" not in records
 
 
+def test_add_comic_readding_same_upc_merges_into_existing_record_instead_of_overwriting(tmp_path: Path):
+    """Re-scanning the same UPC a second time (a double-click, or genuinely
+    re-scanning a barcode) must not silently destroy the existing record's
+    hand-edited title/year/status/cover — find_digital_match won't fire here
+    (the existing record isn't "digital"), so without the records.get(id)
+    fallback in _merge_or_add this would fall through to a plain overwrite."""
+    existing = ComicRecord(
+        id="upc-76194138584601011", title="My Custom Title", type="comic",
+        upc="76194138584601011", year=1999, status="read",
+        cover_path="upc-76194138584601011/cover.jpg", formats=["print"],
+    )
+    records: dict[str, ComicRecord] = {"upc-76194138584601011": existing}
+    metron = FakeMetron(upc_result={"series": {"name": "Absolute Batman"}, "number": "10", "credits": []})
+
+    result = add_comic(
+        records, "76194138584601011", ["print"],
+        metron=metron, google_books=FakeGoogleBooks(), open_library=FakeOpenLibrary(), covers_dir=tmp_path,
+    )
+
+    assert result.merged is True
+    assert result.record is existing
+    assert existing.title == "My Custom Title"
+    assert existing.year == 1999
+    assert existing.status == "read"
+    assert existing.cover_path == "upc-76194138584601011/cover.jpg"
+    assert len(records) == 1
+
+
+def test_add_comic_readding_same_comic_geeks_link_merges_into_existing_record_instead_of_overwriting(tmp_path: Path, monkeypatch):
+    monkeypatch.setattr("library.metadata_sources.comic_geeks.fetch_issue", lambda url: {
+        "series": "Absolute Batman", "issue_number": "16",
+    })
+    existing = ComicRecord(
+        id="cg-6297209", title="My Custom Title", type="comic",
+        year=1999, status="read", cover_path="cg-6297209/cover.jpg", formats=["print"],
+    )
+    records: dict[str, ComicRecord] = {"cg-6297209": existing}
+
+    result = add_comic(
+        records, "https://leagueofcomicgeeks.com/comic/6297209/absolute-batman-16", ["print"],
+        metron=None, google_books=None, open_library=None, covers_dir=tmp_path,
+    )
+
+    assert result.merged is True
+    assert result.record is existing
+    assert existing.title == "My Custom Title"
+    assert existing.year == 1999
+    assert existing.status == "read"
+    assert existing.cover_path == "cg-6297209/cover.jpg"
+    assert len(records) == 1
+
+
 def test_add_comic_rejects_unrecognized_input(tmp_path: Path):
     records: dict[str, ComicRecord] = {}
     with pytest.raises(QuickAddError):
@@ -199,6 +276,32 @@ def test_add_manga_from_isbn_routes_to_open_library(tmp_path: Path):
     assert result.record.author == "Hajime Isayama"
 
 
+def test_add_manga_readding_same_isbn_merges_into_existing_record_instead_of_overwriting(tmp_path: Path):
+    """Same guard as the UPC case, for manga's ISBN id scheme: re-adding the
+    same ISBN must merge into the existing record rather than overwrite its
+    hand-edited fields."""
+    existing = ComicRecord(
+        id="isbn-9781632368287", title="My Custom Title", type="manga",
+        isbn="9781632368287", year=1999, status="read",
+        cover_path="isbn-9781632368287/cover.jpg", formats=["print"],
+    )
+    records: dict[str, ComicRecord] = {"isbn-9781632368287": existing}
+    open_library = FakeOpenLibrary(isbn_result={"author": "Hajime Isayama"})
+
+    result = add_manga(
+        records, "9781632368287", ["print"],
+        google_books=FakeGoogleBooks(), open_library=open_library, covers_dir=tmp_path,
+    )
+
+    assert result.merged is True
+    assert result.record is existing
+    assert existing.title == "My Custom Title"
+    assert existing.year == 1999
+    assert existing.status == "read"
+    assert existing.cover_path == "isbn-9781632368287/cover.jpg"
+    assert len(records) == 1
+
+
 def test_add_manga_from_title_searches_google_books(tmp_path: Path):
     records: dict[str, ComicRecord] = {}
     google_books = FakeGoogleBooks()
@@ -217,6 +320,25 @@ def test_add_manga_from_title_searches_google_books(tmp_path: Path):
     assert result.record.author == "Hajime Isayama"
     assert result.record.description == "Titans."
     assert result.record.id.startswith("manual-attack-on-titan-vol-29-")
+
+
+def test_add_manga_from_title_search_does_not_overwrite_already_set_title(tmp_path: Path):
+    """Defensive: google_books.search() never returns a `title` key today,
+    but if it ever did (its sibling lookup_isbn already does), the typed
+    title must survive rather than being silently clobbered by a fuzzy
+    search match — matching physical_importer._fill_missing's
+    fill-only-if-empty convention."""
+    records: dict[str, ComicRecord] = {}
+    google_books = FakeGoogleBooks()
+    google_books.search_result = {"title": "Some Other Title", "author": "Hajime Isayama"}
+
+    result = add_manga(
+        records, "Attack on Titan, Vol. 29", ["digital"],
+        google_books=google_books, open_library=FakeOpenLibrary(), covers_dir=tmp_path,
+    )
+
+    assert result.record.title == "Attack on Titan, Vol. 29"
+    assert result.record.author == "Hajime Isayama"
 
 
 def test_add_manga_from_title_with_no_search_results_still_creates_bare_record(tmp_path: Path):

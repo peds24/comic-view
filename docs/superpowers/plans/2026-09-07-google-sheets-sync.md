@@ -619,6 +619,7 @@ git commit -m "Add sync-sheet CLI command"
 
 **Interfaces:**
 - Consumes: `sync_comics_to_sheet` (Task 3, already imported into `cli.py` in Task 4).
+- Produces: `_sync_sheet_or_warn(records: dict[str, ComicRecord], config: Config, *, on_success: str | None = None) -> None` — a private `cli.py` helper that Task 6 also uses, so the try/except-and-warn block isn't duplicated across `check_pulls_cmd` and `add_comic_cmd`'s two save points.
 
 - [ ] **Step 1: Extend the test config helper and write the failing tests**
 
@@ -719,17 +720,30 @@ def test_check_pulls_skips_sync_when_not_configured(tmp_path: Path, monkeypatch)
 Run: `pytest tests/test_cli_check_pulls.py -v`
 Expected: FAIL — the new assertions about "Synced to Google Sheets." find no such output, and `_fail_if_called` is never exercised so that test passes vacuously today (confirm the first two fail; that's the meaningful signal).
 
-- [ ] **Step 3: Add the sync call to `check_pulls_cmd`**
+- [ ] **Step 3: Add the shared `_sync_sheet_or_warn` helper and call it from `check_pulls_cmd`**
 
-In `cli.py`, inside `check_pulls_cmd`, immediately after the existing git-commit `try`/`except` block (right after the line `click.echo(f"Warning: could not commit to git: {e}")`, still inside the `if pending:` block), add:
+In `cli.py`, add this private helper near `_echo_comic_preview` (both are small shared helpers used by more than one command):
 
 ```python
-        if (added or merged) and config.google_sheets.is_configured:
-            try:
-                sync_comics_to_sheet(records, config)
-                click.echo("Synced to Google Sheets.")
-            except Exception as e:
-                click.echo(f"Warning: could not sync to Google Sheets: {e}")
+def _sync_sheet_or_warn(records: dict[str, ComicRecord], config, *, on_success: str | None = None) -> None:
+    """Syncs to Google Sheets if configured; never raises — a failure
+    only prints a warning, matching the existing git-commit error
+    handling. No-ops silently if google_sheets isn't configured."""
+    if not config.google_sheets.is_configured:
+        return
+    try:
+        sync_comics_to_sheet(records, config)
+        if on_success:
+            click.echo(on_success)
+    except Exception as e:
+        click.echo(f"Warning: could not sync to Google Sheets: {e}")
+```
+
+Then, inside `check_pulls_cmd`, immediately after the existing git-commit `try`/`except` block (right after the line `click.echo(f"Warning: could not commit to git: {e}")`, still inside the `if pending:` block), add:
+
+```python
+        if added or merged:
+            _sync_sheet_or_warn(records, config, on_success="Synced to Google Sheets.")
 ```
 
 - [ ] **Step 4: Run the tests to verify they pass**
@@ -758,7 +772,7 @@ git commit -m "Auto-sync to Google Sheets after check-pulls"
 - Test: `tests/test_cli_add_comic.py`
 
 **Interfaces:**
-- Consumes: `sync_comics_to_sheet` (Task 3, already imported into `cli.py` in Task 4).
+- Consumes: `_sync_sheet_or_warn` (Task 5 — do not redefine it; both call sites here just call it).
 
 **Note:** `add_comic_cmd`'s "new record" save path (`cli.py:347-349`, the `records[record.id] = record; save_library(...)` branch) has no existing git-commit call to piggyback on — only the "merge into existing" branch commits today. That's a pre-existing gap, out of scope for this plan; the sync call is added independently of git-commit in both branches.
 
@@ -865,22 +879,16 @@ Expected: FAIL — the sync-related assertions (`len(synced_with) == 1`, the war
 In `cli.py`, inside `add_comic_cmd`'s "merge into existing" branch, right after its existing git-commit `try`/`except` block and before the `return` (i.e. right after `click.echo(f"Warning: could not commit to git: {e}")`, still inside `if changed:`), add:
 
 ```python
-            if config.google_sheets.is_configured:
-                try:
-                    sync_comics_to_sheet(records, config)
-                except Exception as e:
-                    click.echo(f"Warning: could not sync to Google Sheets: {e}")
+            _sync_sheet_or_warn(records, config)
 ```
 
 And at the end of the function, right after the final `click.echo(f"Added {record.series or record.title} #{record.issue_number or '?'} ({record.id}) as {new_format}.")`, add:
 
 ```python
-    if config.google_sheets.is_configured:
-        try:
-            sync_comics_to_sheet(records, config)
-        except Exception as e:
-            click.echo(f"Warning: could not sync to Google Sheets: {e}")
+    _sync_sheet_or_warn(records, config)
 ```
+
+Neither call site passes `on_success` — matching the original behavior of only ever printing a warning on failure, never a success message, at these two spots.
 
 - [ ] **Step 4: Run the tests to verify they pass**
 

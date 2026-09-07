@@ -2,9 +2,11 @@ from library.matching import (
     extract_issue,
     extract_manga_issue,
     find_digital_match,
+    find_matching_record,
     is_matchable,
     normalize_issue,
     normalize_series,
+    strip_issue_suffix,
     strip_manga_volume_suffix,
 )
 from library.models import ComicRecord
@@ -96,3 +98,37 @@ def test_find_digital_match_ignores_physical_only_records():
         )
     }
     assert find_digital_match(records, "Absolute Batman", "9") is None
+
+
+def test_find_matching_record_matches_regardless_of_format():
+    records = {
+        "p1": ComicRecord(
+            id="p1", title="Absolute Batman #9", type="comic", series="Absolute Batman",
+            issue_number="9", formats=["print"],
+        )
+    }
+    match = find_matching_record(records, "Absolute Batman", "9")
+    assert match is not None
+    assert match.id == "p1"
+
+
+def test_find_matching_record_normalizes_issue_numbers():
+    records = {
+        "d1": ComicRecord(
+            id="d1", title="Absolute Batman", type="comic", series="Absolute Batman",
+            issue_number="021", formats=["digital"],
+        )
+    }
+    assert find_matching_record(records, "Absolute Batman", "21").id == "d1"
+
+
+def test_find_matching_record_returns_none_when_no_match():
+    assert find_matching_record({}, "Absolute Batman", "9") is None
+
+
+def test_strip_issue_suffix_removes_hash_number():
+    assert strip_issue_suffix("Batman #14") == "Batman"
+
+
+def test_strip_issue_suffix_returns_title_unchanged_when_no_suffix():
+    assert strip_issue_suffix("Billy Bat Vol. 2 TP") == "Billy Bat Vol. 2 TP"

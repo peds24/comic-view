@@ -38,14 +38,34 @@ def test_check_pulls_adds_new_confident_match_and_updates_state(tmp_path: Path, 
         lambda self, series, number, year=None: ({"id": 999, "series": {"name": "Batman"}, "number": "13"}, "ok", []),
     )
 
-    result = CliRunner().invoke(main, ["check-pulls", "--config", str(config_path)])
+    result = CliRunner().invoke(main, ["check-pulls", "--config", str(config_path)], input="y\n")
 
     assert result.exit_code == 0
     assert "Added 1" in result.output
+    assert "Batman #13" in result.output  # confirmation preview
     library = (tmp_path / "data" / "library_comics.json").read_text()
     assert "metron-999" in library
     state = (tmp_path / "data" / "pull_state.json").read_text()
     assert "uid@cg" in state
+
+
+def test_check_pulls_declining_confirmation_makes_no_changes(tmp_path: Path, monkeypatch):
+    config_path = _write_config(tmp_path)
+    monkeypatch.chdir(tmp_path)
+
+    item = PulledItem(event_uid="uid@cg", release_date=date(2020, 1, 1), title="Batman #13", price="$4.99")
+    monkeypatch.setattr("cli.fetch_pulled_items", lambda url: [item])
+    monkeypatch.setattr(
+        "cli.MetronSource.find_issue_confident",
+        lambda self, series, number, year=None: ({"id": 999, "series": {"name": "Batman"}, "number": "13"}, "ok", []),
+    )
+
+    result = CliRunner().invoke(main, ["check-pulls", "--config", str(config_path)], input="n\n")
+
+    assert result.exit_code == 0
+    assert "Cancelled" in result.output
+    assert not (tmp_path / "data" / "library_comics.json").exists()
+    assert not (tmp_path / "data" / "pull_state.json").exists()
 
 
 def test_check_pulls_skips_already_processed_events(tmp_path: Path, monkeypatch):
@@ -142,7 +162,7 @@ def test_check_pulls_handles_metron_exception_without_crashing(tmp_path: Path, m
 
     monkeypatch.setattr("cli.MetronSource.find_issue_confident", _find_issue_confident)
 
-    result = CliRunner().invoke(main, ["check-pulls", "--config", str(config_path)])
+    result = CliRunner().invoke(main, ["check-pulls", "--config", str(config_path)], input="y\n")
 
     assert result.exit_code == 0
     assert "Added 1" in result.output

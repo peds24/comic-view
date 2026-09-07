@@ -128,11 +128,14 @@ add-comic "https://leagueofcomicgeeks.com/comic/6297209/absolute-batman-16" --ph
 ```
 
 (`add-comic` is the shell alias set up above; without it, run
-`comic-library add-comic <url>` from this checkout instead.) It resolves
-to an existing record by UPC or by series+issue-number match, adding the
-new format to it, or otherwise creates a new one. This is the manual
-counterpart to `check-pulls` — use it for a one-off digital buy, or a
-physical pickup outside your regular pull list.
+`comic-library add-comic <url>` from this checkout instead.) It shows a
+preview of the fetched title/year/author/description and asks you to
+confirm before writing anything. Once confirmed, it resolves to an
+existing record by UPC or by series+issue-number match, adding the new
+format to it, or otherwise creates a new one, then commits the change
+locally (never pushes). This is the manual counterpart to `check-pulls` —
+use it for a one-off digital buy, or a physical pickup outside your
+regular pull list.
 
 Fetch your pull-list calendar and auto-add anything newly released
 (optional, needs both Metron credentials and `pull_list.calendar_url` set
@@ -143,15 +146,17 @@ find your League of Comic Geeks pull-list ICS feed URL):
 comic-library check-pulls
 ```
 
-`check-pulls` resolves each new release via Metron and adds it as a
+`check-pulls` resolves each new release via Metron and, before writing
+anything, previews what it's about to add or merge (title, year, author,
+description) and asks for confirmation. Once confirmed, it adds each as a
 physical record (merging into a matching existing record — digital or
-print — where possible), the same way `import-physical` does. An
-ambiguous or unresolvable title is flagged in the command's output rather
-than guessed at, for `add-comic` to sort out by hand. This command is
-meant to be run by a scheduled routine, not typically invoked directly —
-and it never touches git itself, so that routine can review its changes
-before committing. It tracks which calendar events it's already processed
-in `data/pull_state.json` (see below), so re-runs don't duplicate work.
+print — where possible, the same way `import-physical` does) and commits
+the change locally (never pushes). An ambiguous or unresolvable title is
+flagged in the command's output rather than guessed at, for `add-comic` to
+sort out by hand. It tracks which calendar events it's already processed
+in `data/pull_state.json` (see below), so re-runs don't duplicate work —
+declining the confirmation prompt discards the whole run, including that
+tracking, so a declined run is safe to just re-run later.
 
 Serve `viewer.html` + `data/` over HTTP, so the browser can actually fetch
 `data/library.json` and cover images (opening `viewer.html` via `file://`

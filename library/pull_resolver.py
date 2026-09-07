@@ -25,6 +25,7 @@ class ResolveResult:
     title: str
     reason: str | None = None
     candidates: list[dict] | None = None
+    record: ComicRecord | None = None
 
 
 def _slugify(text: str) -> str:
@@ -66,10 +67,10 @@ def resolve_and_add(
         if match is not None:
             if "print" not in match.formats:
                 match.formats.append("print")
-            return ResolveResult("merged", item.title)
+            return ResolveResult("merged", item.title, record=match)
 
         records[record.id] = record
-        return ResolveResult("added", item.title)
+        return ResolveResult("added", item.title, record=record)
 
     # Collected edition / variant / annual / unmatchable title — best-effort
     # title search only; matching.is_matchable already excludes these from
@@ -84,4 +85,4 @@ def resolve_and_add(
     )
     record.apply_partial(partial, "metron")
     records[record.id] = record
-    return ResolveResult("added", item.title)
+    return ResolveResult("added", item.title, record=record)

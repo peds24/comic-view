@@ -53,9 +53,10 @@ def test_add_comic_creates_new_digital_record_by_default(tmp_path: Path, monkeyp
     monkeypatch.setattr("cli.comic_geeks.fetch_issue", lambda url: dict(_FETCHED_INFO))
     monkeypatch.setattr("library.covers.get_with_retry", lambda *a, **k: FakeCoverResponse())
 
-    result = CliRunner().invoke(main, ["add-comic", "https://leagueofcomicgeeks.com/comic/6297209/absolute-batman-16", "--config", str(config_path)])
+    result = CliRunner().invoke(main, ["add-comic", "https://leagueofcomicgeeks.com/comic/6297209/absolute-batman-16", "--config", str(config_path)], input="y\n")
 
     assert result.exit_code == 0
+    assert "A synopsis." in result.output  # confirmation preview shows the fetched description
     library = (tmp_path / "data" / "library_comics.json").read_text()
     assert "upc-76194138584601611" in library
     assert '"digital"' in library
@@ -67,12 +68,25 @@ def test_add_comic_physical_flag_adds_print_format(tmp_path: Path, monkeypatch):
     monkeypatch.setattr("cli.comic_geeks.fetch_issue", lambda url: dict(_FETCHED_INFO))
     monkeypatch.setattr("library.covers.get_with_retry", lambda *a, **k: FakeCoverResponse())
 
-    result = CliRunner().invoke(main, ["add-comic", "https://leagueofcomicgeeks.com/comic/6297209/absolute-batman-16", "--physical", "--config", str(config_path)])
+    result = CliRunner().invoke(main, ["add-comic", "https://leagueofcomicgeeks.com/comic/6297209/absolute-batman-16", "--physical", "--config", str(config_path)], input="y\n")
 
     assert result.exit_code == 0
     library = (tmp_path / "data" / "library_comics.json").read_text()
     assert '"print"' in library
     assert '"digital"' not in library
+
+
+def test_add_comic_declining_confirmation_makes_no_changes(tmp_path: Path, monkeypatch):
+    config_path = _write_config(tmp_path)
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr("cli.comic_geeks.fetch_issue", lambda url: dict(_FETCHED_INFO))
+    monkeypatch.setattr("library.covers.get_with_retry", lambda *a, **k: FakeCoverResponse())
+
+    result = CliRunner().invoke(main, ["add-comic", "https://leagueofcomicgeeks.com/comic/6297209/absolute-batman-16", "--config", str(config_path)], input="n\n")
+
+    assert result.exit_code == 0
+    assert "Cancelled" in result.output
+    assert not (tmp_path / "data" / "library_comics.json").exists()
 
 
 def test_add_comic_adds_format_to_already_existing_record(tmp_path: Path, monkeypatch):
@@ -88,7 +102,7 @@ def test_add_comic_adds_format_to_already_existing_record(tmp_path: Path, monkey
     monkeypatch.setattr("cli.comic_geeks.fetch_issue", lambda url: dict(_FETCHED_INFO))
     monkeypatch.setattr("library.covers.get_with_retry", lambda *a, **k: FakeCoverResponse())
 
-    result = CliRunner().invoke(main, ["add-comic", "https://leagueofcomicgeeks.com/comic/6297209/absolute-batman-16", "--config", str(config_path)])
+    result = CliRunner().invoke(main, ["add-comic", "https://leagueofcomicgeeks.com/comic/6297209/absolute-batman-16", "--config", str(config_path)], input="y\n")
 
     assert result.exit_code == 0
     library = (tmp_path / "data" / "library_comics.json").read_text()
@@ -104,7 +118,7 @@ def test_add_comic_falls_back_to_cgeeks_id_when_no_upc(tmp_path: Path, monkeypat
     monkeypatch.setattr("cli.comic_geeks.fetch_issue", lambda url: dict(info_without_upc))
     monkeypatch.setattr("library.covers.get_with_retry", lambda *a, **k: FakeCoverResponse())
 
-    result = CliRunner().invoke(main, ["add-comic", "https://leagueofcomicgeeks.com/comic/6297209/absolute-batman-16", "--config", str(config_path)])
+    result = CliRunner().invoke(main, ["add-comic", "https://leagueofcomicgeeks.com/comic/6297209/absolute-batman-16", "--config", str(config_path)], input="y\n")
 
     assert result.exit_code == 0
     library = (tmp_path / "data" / "library_comics.json").read_text()
@@ -127,7 +141,7 @@ def test_add_comic_merges_into_record_with_different_id_via_series_and_issue(tmp
     monkeypatch.setattr("cli.comic_geeks.fetch_issue", lambda url: dict(_FETCHED_INFO))
     monkeypatch.setattr("library.covers.get_with_retry", lambda *a, **k: FakeCoverResponse())
 
-    result = CliRunner().invoke(main, ["add-comic", "https://leagueofcomicgeeks.com/comic/6297209/absolute-batman-16", "--physical", "--config", str(config_path)])
+    result = CliRunner().invoke(main, ["add-comic", "https://leagueofcomicgeeks.com/comic/6297209/absolute-batman-16", "--physical", "--config", str(config_path)], input="y\n")
 
     assert result.exit_code == 0
     library = (tmp_path / "data" / "library_comics.json").read_text()

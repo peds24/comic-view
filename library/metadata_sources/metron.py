@@ -105,19 +105,11 @@ class MetronSource:
         the one whose year range contains `year`. Only falls back to
         Metron's own top relevance match when no exact name match exists at
         all."""
-        resp = get_with_retry(
-            f"{_BASE_URL}/series/",
-            params={"name": title},
-            auth=self._auth,
-            timeout=10,
-        )
-        resp.raise_for_status()
-        results = resp.json().get("results", [])
+        results = self._fetch_series_results(title)
         if not results:
             return None
 
-        target = title.strip().lower()
-        exact = [s for s in results if normalize_series(s.get("series", "")).lower() == target]
+        exact = self._filter_exact_matches(results, title)
         if not exact:
             return results[0]
         if len(exact) == 1 or not year:
@@ -128,6 +120,80 @@ class MetronSource:
             if began and began <= year <= ended:
                 return s
         return exact[0]
+
+    def find_issue_confident(
+        self, series: str, number: str, year: int | None = None
+    ) -> tuple[dict | None, str, list[dict]]:
+        """Like find_issue_by_series_and_number, but never guesses when a
+        series name is genuinely ambiguous. Checks every series exactly
+        named `series` for an actual issue #`number` — not just the
+        year-narrowed pick `_find_series` would make — since two same-named
+        series (an ended run and its relaunch) both existing doesn't
+        matter unless both also happen to have reached that same issue
+        number. `year`, when given, breaks a remaining tie the same way
+        `_find_series` does.
+
+        Returns (issue_detail, status, candidates):
+          "ok"        -> exactly one exact-name series has issue #number; issue_detail is its full detail.
+          "not_found" -> no exact-name series has issue #number; issue_detail is None.
+          "ambiguous" -> more than one exact-name series has issue #number (even after a year
+                         tie-break, if one was possible); issue_detail is None, candidates lists
+                         each match's {"series_id", "series_name", "publisher", "year_began", "year_end"}.
+        """
+        results = self._fetch_series_results(series)
+        exact = self._filter_exact_matches(results, series)
+        if not exact:
+            return None, "not_found", []
+
+        hits = []
+        for candidate in exact:
+            resp = get_with_retry(
+                f"{_BASE_URL}/issue/",
+                params={"series_id": candidate["id"], "number": number},
+                auth=self._auth,
+                timeout=10,
+            )
+            resp.raise_for_status()
+            issue_results = resp.json().get("results", [])
+            if issue_results:
+                hits.append((candidate, issue_results[0]["id"]))
+
+        if not hits:
+            return None, "not_found", []
+
+        if len(hits) > 1 and year:
+            year_matches = [
+                h for h in hits
+                if h[0].get("year_began") and h[0]["year_began"] <= year <= (h[0].get("year_end") or 9999)
+            ]
+            if len(year_matches) == 1:
+                hits = year_matches
+
+        if len(hits) > 1:
+            candidates = [
+                {
+                    "series_id": c["id"],
+                    "series_name": c.get("series", ""),
+                    "publisher": c.get("publisher", {}).get("name") if isinstance(c.get("publisher"), dict) else None,
+                    "year_began": c.get("year_began"),
+                    "year_end": c.get("year_end"),
+                }
+                for c, _ in hits
+            ]
+            return None, "ambiguous", candidates
+
+        _, issue_id = hits[0]
+        return self._issue_detail(issue_id), "ok", []
+
+    def _fetch_series_results(self, title: str) -> list[dict]:
+        resp = get_with_retry(f"{_BASE_URL}/series/", params={"name": title}, auth=self._auth, timeout=10)
+        resp.raise_for_status()
+        return resp.json().get("results", [])
+
+    @staticmethod
+    def _filter_exact_matches(results: list[dict], title: str) -> list[dict]:
+        target = title.strip().lower()
+        return [s for s in results if normalize_series(s.get("series", "")).lower() == target]
 
     def _find_issue(self, series_id: int, year: int | None) -> dict | None:
         params = {"series_id": series_id}

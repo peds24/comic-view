@@ -139,3 +139,103 @@ def test_year_from_issue_returns_none_when_missing():
     assert year_from_issue({"store_date": None}) is None
 
 
+def test_find_issue_confident_ok_when_only_one_series_has_the_issue(monkeypatch):
+    def fake_get(url, params=None, auth=None, timeout=None):
+        if url.endswith("/series/"):
+            assert params == {"name": "Batman"}
+            return FakeResponse({"results": [
+                {"id": 2481, "series": "Batman (1940)", "year_began": 1940, "year_end": 2011},
+                {"id": 12829, "series": "Batman (2025)", "year_began": 2025, "year_end": None},
+            ]})
+        if url.endswith("/issue/") and params.get("series_id") == 2481:
+            return FakeResponse({"results": []})
+        if url.endswith("/issue/") and params.get("series_id") == 12829:
+            return FakeResponse({"results": [{"id": 999}]})
+        assert url.endswith("/issue/999/")
+        return FakeResponse({"id": 999, "number": "13"})
+
+    monkeypatch.setattr("library.http_utils.requests.get", fake_get)
+    source = MetronSource("user", "pass")
+
+    issue, status, candidates = source.find_issue_confident("Batman", "13")
+
+    assert status == "ok"
+    assert issue["id"] == 999
+    assert candidates == []
+
+
+def test_find_issue_confident_ambiguous_when_two_series_both_have_the_issue(monkeypatch):
+    """Regression test for the reported real failure: an ended 'Batman'
+    run and the current 'Batman (2025)' relaunch both existing only
+    matters if both also happen to have reached the same issue number —
+    here they both have a #13, so neither should be silently chosen."""
+    def fake_get(url, params=None, auth=None, timeout=None):
+        if url.endswith("/series/"):
+            return FakeResponse({"results": [
+                {"id": 2481, "series": "Batman (1940)", "year_began": 1940, "year_end": 2011,
+                 "publisher": {"name": "DC Comics"}},
+                {"id": 12829, "series": "Batman (2025)", "year_began": 2025, "year_end": None,
+                 "publisher": {"name": "DC Comics"}},
+            ]})
+        assert url.endswith("/issue/")
+        return FakeResponse({"results": [{"id": params["series_id"] * 10}]})
+
+    monkeypatch.setattr("library.http_utils.requests.get", fake_get)
+    source = MetronSource("user", "pass")
+
+    issue, status, candidates = source.find_issue_confident("Batman", "13")
+
+    assert status == "ambiguous"
+    assert issue is None
+    assert {c["series_id"] for c in candidates} == {2481, 12829}
+    assert all(c["publisher"] == "DC Comics" for c in candidates)
+
+
+def test_find_issue_confident_uses_year_to_break_ambiguity(monkeypatch):
+    def fake_get(url, params=None, auth=None, timeout=None):
+        if url.endswith("/series/"):
+            return FakeResponse({"results": [
+                {"id": 2481, "series": "Batman (1940)", "year_began": 1940, "year_end": 2011},
+                {"id": 12829, "series": "Batman (2025)", "year_began": 2025, "year_end": None},
+            ]})
+        if url.endswith("/issue/") and params.get("series_id") == 2481:
+            return FakeResponse({"results": [{"id": 111}]})
+        if url.endswith("/issue/") and params.get("series_id") == 12829:
+            return FakeResponse({"results": [{"id": 999}]})
+        assert url.endswith("/issue/999/")
+        return FakeResponse({"id": 999, "number": "13"})
+
+    monkeypatch.setattr("library.http_utils.requests.get", fake_get)
+    source = MetronSource("user", "pass")
+
+    issue, status, candidates = source.find_issue_confident("Batman", "13", year=2026)
+
+    assert status == "ok"
+    assert issue["id"] == 999
+
+
+def test_find_issue_confident_not_found_when_no_series_has_the_issue(monkeypatch):
+    def fake_get(url, params=None, auth=None, timeout=None):
+        if url.endswith("/series/"):
+            return FakeResponse({"results": [{"id": 12829, "series": "Batman (2025)", "year_began": 2025}]})
+        return FakeResponse({"results": []})
+
+    monkeypatch.setattr("library.http_utils.requests.get", fake_get)
+    source = MetronSource("user", "pass")
+
+    issue, status, candidates = source.find_issue_confident("Batman", "999")
+
+    assert status == "not_found"
+    assert issue is None
+    assert candidates == []
+
+
+def test_find_issue_confident_not_found_when_series_name_unknown(monkeypatch):
+    monkeypatch.setattr("library.http_utils.requests.get", lambda *a, **k: FakeResponse({"results": []}))
+    source = MetronSource("user", "pass")
+
+    issue, status, candidates = source.find_issue_confident("Nonexistent Series", "1")
+
+    assert status == "not_found"
+
+

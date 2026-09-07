@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import functools
 import http.server
+from datetime import date
 
 import click
 
@@ -12,6 +13,8 @@ from library.metadata_sources.google_books import GoogleBooksSource
 from library.metadata_sources.metron import MetronSource
 from library.metadata_sources.open_library import OpenLibrarySource
 from library.physical_importer import count_rows, import_physical_xlsx
+from library.pull_calendar import fetch_pulled_items, load_state, save_state
+from library.pull_resolver import resolve_and_add
 from library.scanner import list_archives, scan_roots
 from library.store import load_library, merge_record, save_library
 from library.viewer_server import ViewerRequestHandler
@@ -152,6 +155,59 @@ def import_physical_cmd(config_path: str, excel_path: str) -> None:
         f"{stats['skipped_duplicate']} duplicate."
     )
     click.echo(f"Total library size: {len(records)}.")
+
+
+@main.command("check-pulls")
+@click.option("--config", "config_path", default="config.yaml", help="Path to config.yaml")
+def check_pulls_cmd(config_path: str) -> None:
+    """Fetches the configured League of Comic Geeks pull-list calendar,
+    resolves every not-yet-processed already-released item via Metron, and
+    adds each as a new physical record (or merges it into a matching
+    digital one). Never touches git — run this from the weekly scheduled
+    routine, which reviews the output and commits."""
+    config = load_config(config_path)
+    if not config.pull_list.calendar_url:
+        click.echo("No pull_list.calendar_url configured in config.yaml.")
+        return
+    if not config.metron.is_configured:
+        click.echo("Metron not configured — check-pulls requires it (fill in config.yaml).")
+        return
+
+    metron = MetronSource(config.metron.username, config.metron.password)
+    library_path = config.data_dir / "library_comics.json"
+    covers_dir = config.data_dir / "covers"
+    state_path = config.data_dir / "pull_state.json"
+
+    records = load_library(library_path)
+    state = load_state(state_path)
+
+    items = fetch_pulled_items(config.pull_list.calendar_url)
+    today = date.today()
+    pending = [
+        item for item in items
+        if item.event_uid not in state["processed_uids"] and item.release_date <= today
+    ]
+
+    added = merged = flagged = 0
+    flag_lines: list[str] = []
+    for item in pending:
+        result = resolve_and_add(item, records, metron, covers_dir)
+        state["processed_uids"].append(item.event_uid)
+        if result.outcome == "added":
+            added += 1
+        elif result.outcome == "merged":
+            merged += 1
+        else:
+            flagged += 1
+            flag_lines.append(f"{item.title}: {result.reason}")
+
+    save_library(library_path, records)
+    save_state(state_path, state)
+
+    click.echo(f"Checked {len(items)} pull-list item(s), {len(pending)} new.")
+    click.echo(f"Added {added}, merged {merged} into existing digital records, flagged {flagged}.")
+    for line in flag_lines:
+        click.echo(f"  FLAGGED: {line}")
 
 
 @main.command()

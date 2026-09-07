@@ -19,3 +19,9 @@ metron:
 # for higher rate limits.
 google_books:
   api_key: ""
+
+# Optional — only needed for `comic-library check-pulls`.
+# Your League of Comic Geeks pull-list ICS feed:
+# https://leagueofcomicgeeks.com/member/calendar_ics/<your-username>
+pull_list:
+  calendar_url: ""

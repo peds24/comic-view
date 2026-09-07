@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from library.config import Config, GoogleBooksConfig, MetronConfig, RootConfig
+from library.config import Config, GoogleBooksConfig, MetronConfig, PullListConfig, RootConfig
 from library.models import ComicRecord
 from library import scanner
 
@@ -11,6 +11,7 @@ def _config(tmp_path: Path, roots: list[RootConfig]) -> Config:
         metron=MetronConfig(),
         google_books=GoogleBooksConfig(),
         data_dir=tmp_path / "data",
+        pull_list=PullListConfig(),
     )
 
 

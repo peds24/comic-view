@@ -29,11 +29,17 @@ class GoogleBooksConfig:
 
 
 @dataclass
+class PullListConfig:
+    calendar_url: str = ""
+
+
+@dataclass
 class Config:
     roots: list[RootConfig]
     metron: MetronConfig
     google_books: GoogleBooksConfig
     data_dir: Path
+    pull_list: PullListConfig
 
 
 def load_config(config_path: str | Path, data_dir: str | Path = "data") -> Config:
@@ -56,6 +62,7 @@ def load_config(config_path: str | Path, data_dir: str | Path = "data") -> Confi
 
     metron_raw = raw.get("metron", {}) or {}
     google_raw = raw.get("google_books", {}) or {}
+    pull_list_raw = raw.get("pull_list", {}) or {}
 
     return Config(
         roots=roots,
@@ -65,4 +72,5 @@ def load_config(config_path: str | Path, data_dir: str | Path = "data") -> Confi
         ),
         google_books=GoogleBooksConfig(api_key=google_raw.get("api_key", "")),
         data_dir=Path(data_dir),
+        pull_list=PullListConfig(calendar_url=pull_list_raw.get("calendar_url", "")),
     )

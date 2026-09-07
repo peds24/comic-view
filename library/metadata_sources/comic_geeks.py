@@ -16,14 +16,10 @@ import re
 
 from bs4 import BeautifulSoup
 
-from library.http_utils import get_with_retry
+from library import browser_fetch
 from library.matching import extract_issue
 
 _BASE_URL = "https://leagueofcomicgeeks.com"
-_USER_AGENT = (
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
-    "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-)
 _ISSUE_SUFFIX_RE = re.compile(r"\s*#\d+\s*$")
 
 
@@ -98,13 +94,11 @@ def fetch_issue(url_or_id: str) -> dict:
     plus '_image_url' if a cover is available), or {} if the page can't be
     read."""
     resolved_url = _resolve_url(url_or_id)
-    try:
-        resp = get_with_retry(resolved_url, headers={"User-Agent": _USER_AGENT}, timeout=10)
-        resp.raise_for_status()
-    except Exception:
+    html = browser_fetch.fetch_html(resolved_url)
+    if not html:
         return {}
 
-    soup = BeautifulSoup(resp.text, "html.parser")
+    soup = BeautifulSoup(html, "html.parser")
     result: dict = {}
 
     h1 = soup.find("h1")

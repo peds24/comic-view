@@ -41,14 +41,6 @@ _PAGE_HTML = """
 """
 
 
-class FakeResponse:
-    def __init__(self, text):
-        self.text = text
-
-    def raise_for_status(self):
-        pass
-
-
 def test_is_comic_geeks_url():
     assert is_comic_geeks_url("https://leagueofcomicgeeks.com/comic/6297209/absolute-batman-16") is True
     assert is_comic_geeks_url("https://metron.cloud/issue/absolute-batman-2024-16/") is False
@@ -57,8 +49,8 @@ def test_is_comic_geeks_url():
 def test_fetch_issue_parses_all_fields(monkeypatch):
     calls = []
     monkeypatch.setattr(
-        "library.metadata_sources.comic_geeks.get_with_retry",
-        lambda url, **kwargs: calls.append((url, kwargs)) or FakeResponse(_PAGE_HTML),
+        "library.metadata_sources.comic_geeks.browser_fetch.fetch_html",
+        lambda url, **kwargs: calls.append(url) or _PAGE_HTML,
     )
 
     result = fetch_issue("https://leagueofcomicgeeks.com/comic/6297209/absolute-batman-16")
@@ -71,35 +63,29 @@ def test_fetch_issue_parses_all_fields(monkeypatch):
     assert result["author"] == "Scott Snyder, Nick Dragotta"  # colorist excluded
     assert result["upc"] == "76194138584601611"
     assert result["_image_url"] == "https://s3.amazonaws.com/comicgeeks/comics/covers/large-6297209.jpg"
-
-    # sends a browser-shaped User-Agent — the site 403s a bare/default one
-    url, kwargs = calls[0]
-    assert "User-Agent" in kwargs.get("headers", {})
+    assert calls[0] == "https://leagueofcomicgeeks.com/comic/6297209/absolute-batman-16"
 
 
 def test_fetch_issue_accepts_bare_numeric_id(monkeypatch):
     calls = []
     monkeypatch.setattr(
-        "library.metadata_sources.comic_geeks.get_with_retry",
-        lambda url, **kwargs: calls.append(url) or FakeResponse(_PAGE_HTML),
+        "library.metadata_sources.comic_geeks.browser_fetch.fetch_html",
+        lambda url, **kwargs: calls.append(url) or _PAGE_HTML,
     )
     fetch_issue("6297209")
     assert calls[0] == "https://leagueofcomicgeeks.com/comic/6297209"
 
 
-def test_fetch_issue_returns_empty_dict_on_request_failure(monkeypatch):
-    def raise_error(*a, **k):
-        raise ConnectionError("network down")
-
-    monkeypatch.setattr("library.metadata_sources.comic_geeks.get_with_retry", raise_error)
+def test_fetch_issue_returns_empty_dict_when_page_unreadable(monkeypatch):
+    monkeypatch.setattr("library.metadata_sources.comic_geeks.browser_fetch.fetch_html", lambda url, **kwargs: "")
     assert fetch_issue("https://leagueofcomicgeeks.com/comic/6297209/absolute-batman-16") == {}
 
 
 def test_fetch_issue_falls_back_to_og_image_when_no_cover_gallery_link(monkeypatch):
     html_without_gallery = re.sub(r'<div class="cover-art">.*?</div>', "", _PAGE_HTML, flags=re.DOTALL)
     monkeypatch.setattr(
-        "library.metadata_sources.comic_geeks.get_with_retry",
-        lambda url, **kwargs: FakeResponse(html_without_gallery),
+        "library.metadata_sources.comic_geeks.browser_fetch.fetch_html",
+        lambda url, **kwargs: html_without_gallery,
     )
     result = fetch_issue("https://leagueofcomicgeeks.com/comic/6297209/absolute-batman-16")
     assert result["_image_url"] == "https://s3.amazonaws.com/comicgeeks/comics/covers/medium-6297209.jpg"

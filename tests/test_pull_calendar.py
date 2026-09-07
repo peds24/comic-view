@@ -78,3 +78,9 @@ def test_save_state_then_load_state_round_trips(tmp_path: Path):
     path = tmp_path / "nested" / "pull_state.json"
     save_state(path, {"processed_uids": ["a@cg", "b@cg"]})
     assert load_state(path) == {"processed_uids": ["a@cg", "b@cg"]}
+
+
+def test_load_state_fills_in_missing_processed_uids_key(tmp_path: Path):
+    path = tmp_path / "pull_state.json"
+    path.write_text("{}")
+    assert load_state(path) == {"processed_uids": []}

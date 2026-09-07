@@ -18,7 +18,7 @@ from library.metadata_sources.open_library import OpenLibrarySource
 from library.models import ComicRecord
 from library.physical_importer import count_rows, import_physical_xlsx
 from library.pull_calendar import fetch_pulled_items, load_state, save_state
-from library.pull_resolver import resolve_and_add
+from library.pull_resolver import ResolveResult, resolve_and_add
 from library.scanner import list_archives, scan_roots
 from library.store import load_library, merge_record, save_library
 from library.viewer_server import ViewerRequestHandler
@@ -195,7 +195,10 @@ def check_pulls_cmd(config_path: str) -> None:
     added = merged = flagged = 0
     flag_lines: list[str] = []
     for item in pending:
-        result = resolve_and_add(item, records, metron, covers_dir)
+        try:
+            result = resolve_and_add(item, records, metron, covers_dir)
+        except Exception as e:
+            result = ResolveResult("flagged", item.title, reason=f"lookup failed: {e}")
         state["processed_uids"].append(item.event_uid)
         if result.outcome == "added":
             added += 1
@@ -209,7 +212,7 @@ def check_pulls_cmd(config_path: str) -> None:
     save_state(state_path, state)
 
     click.echo(f"Checked {len(items)} pull-list item(s), {len(pending)} new.")
-    click.echo(f"Added {added}, merged {merged} into existing digital records, flagged {flagged}.")
+    click.echo(f"Added {added}, merged {merged} into existing records, flagged {flagged}.")
     for line in flag_lines:
         click.echo(f"  FLAGGED: {line}")
 
@@ -240,6 +243,8 @@ def add_comic_cmd(url: str, config_path: str, physical: bool) -> None:
         record_id = f"upc-{info['upc']}"
     else:
         comic_id = comic_geeks.extract_comic_id(url)
+        if comic_id is None:
+            raise click.ClickException("Couldn't determine a Comic Geeks id from that URL.")
         record_id = f"cgeeks-{comic_id}"
 
     existing = records.get(record_id)
@@ -249,11 +254,17 @@ def add_comic_cmd(url: str, config_path: str, physical: bool) -> None:
     if existing is not None:
         if new_format not in existing.formats:
             existing.formats.append(new_format)
+        if info.get("upc") and not existing.upc:
+            existing.upc = info["upc"]
         save_library(library_path, records)
         click.echo(f"Already in your library as {existing.id} — added '{new_format}' to its formats.")
         return
 
-    record = ComicRecord(id=record_id, title=info.get("series") or url, type="comic", formats=[new_format])
+    if info.get("series") and info.get("issue_number"):
+        title = f"{info['series']} #{info['issue_number']}"
+    else:
+        title = info.get("series") or url
+    record = ComicRecord(id=record_id, title=title, type="comic", formats=[new_format])
     for field in ("series", "issue_number", "publisher", "year", "description", "author", "upc"):
         if info.get(field):
             setattr(record, field, info[field])

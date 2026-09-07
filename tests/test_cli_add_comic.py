@@ -97,6 +97,20 @@ def test_add_comic_adds_format_to_already_existing_record(tmp_path: Path, monkey
     assert '"print"' in library
 
 
+def test_add_comic_falls_back_to_cgeeks_id_when_no_upc(tmp_path: Path, monkeypatch):
+    config_path = _write_config(tmp_path)
+    monkeypatch.chdir(tmp_path)
+    info_without_upc = {k: v for k, v in _FETCHED_INFO.items() if k != "upc"}
+    monkeypatch.setattr("cli.comic_geeks.fetch_issue", lambda url: dict(info_without_upc))
+    monkeypatch.setattr("library.covers.get_with_retry", lambda *a, **k: FakeCoverResponse())
+
+    result = CliRunner().invoke(main, ["add-comic", "https://leagueofcomicgeeks.com/comic/6297209/absolute-batman-16", "--config", str(config_path)])
+
+    assert result.exit_code == 0
+    library = (tmp_path / "data" / "library_comics.json").read_text()
+    assert '"id": "cgeeks-6297209"' in library
+
+
 def test_add_comic_merges_into_record_with_different_id_via_series_and_issue(tmp_path: Path, monkeypatch):
     """A digital scan has its own content-hash id, unrelated to the UPC a
     Comic Geeks link resolves to — the merge has to go by series+issue,

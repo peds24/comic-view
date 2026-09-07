@@ -76,7 +76,9 @@ def _parse_description(uid: str, release_date: date, description: str) -> list[P
 def load_state(path: Path) -> dict:
     if not path.exists():
         return {"processed_uids": []}
-    return json.loads(path.read_text())
+    state = json.loads(path.read_text())
+    state.setdefault("processed_uids", [])
+    return state
 
 
 def save_state(path: Path, state: dict) -> None:

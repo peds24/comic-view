@@ -1,10 +1,12 @@
 """League of Comic Geeks (leagueofcomicgeeks.com) issue-page scraper.
 
-No public API exists, and the site's Cloudflare rule blocks requests with
-no/suspicious User-Agent header (confirmed live: a bare curl gets a 403
-"Restricted" page, the same request with a normal browser User-Agent gets
-a real 200) — unlike Metron's site, there's no JS challenge behind it, so
-a plain GET with a browser-shaped User-Agent is enough to read the page.
+No public API exists, and the site now sits behind a real Cloudflare
+managed challenge — confirmed live: a plain HTTP GET gets a 403 even with
+a normal browser-shaped User-Agent header, since a suspicious/no User-Agent
+alone is no longer the whole story. Only a real (headless) browser that can
+execute the challenge's JS gets through, which is why this module fetches
+pages via `browser_fetch` (headless Playwright) rather than a plain
+requests-style GET.
 
 Used only for a specific issue URL the user already has open in their
 browser (see manual_attach.py) — there's no title/UPC search here, only

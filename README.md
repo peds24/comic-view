@@ -20,6 +20,19 @@ source .venv/bin/activate
 pip install -e ".[dev]"
 ```
 
+Then, once, install a headless browser for Playwright:
+
+```bash
+playwright install chromium
+```
+
+This is required, not optional: League of Comic Geeks added a Cloudflare
+managed challenge that blocks plain HTTP requests outright, so `add-comic`,
+`check-pulls`, and the viewer's manual "paste a League of Comic Geeks
+link" attach feature (see below) all fetch Comic Geeks pages through a
+real headless browser instead. Skip this step and those features fail with
+a generic "couldn't read that page" error and no clearer explanation.
+
 CBR support shells out to a system unrar tool. On macOS:
 
 ```bash
@@ -43,6 +56,14 @@ roots:
 Each root is scanned recursively — nested folders (e.g. `Comics/Batman/`)
 are searched too; everything found is flattened into one library regardless
 of subfolder layout.
+
+Optionally, add a shell alias so `add-comic <url>` (see below) works from
+any directory, not just this checkout — add this line to your shell rc
+(e.g. `~/.zshrc`):
+
+```bash
+alias add-comic="/path/to/comic-view-ui/bin/add-comic"
+```
 
 ## Usage
 
@@ -98,6 +119,40 @@ on an updated workbook is safe — a barcode already seen on a previous run
 (whether it ended up merged or as its own record) is skipped without
 hitting the network again.
 
+Add a single comic straight from its League of Comic Geeks issue page —
+digital by default, or physical with `--physical`:
+
+```bash
+add-comic "https://leagueofcomicgeeks.com/comic/6297209/absolute-batman-16"
+add-comic "https://leagueofcomicgeeks.com/comic/6297209/absolute-batman-16" --physical
+```
+
+(`add-comic` is the shell alias set up above; without it, run
+`comic-library add-comic <url>` from this checkout instead.) It resolves
+to an existing record by UPC or by series+issue-number match, adding the
+new format to it, or otherwise creates a new one. This is the manual
+counterpart to `check-pulls` — use it for a one-off digital buy, or a
+physical pickup outside your regular pull list.
+
+Fetch your pull-list calendar and auto-add anything newly released
+(optional, needs both Metron credentials and `pull_list.calendar_url` set
+in `config.yaml` — see `config.example.yaml`, which points at where to
+find your League of Comic Geeks pull-list ICS feed URL):
+
+```bash
+comic-library check-pulls
+```
+
+`check-pulls` resolves each new release via Metron and adds it as a
+physical record (merging into a matching existing record — digital or
+print — where possible), the same way `import-physical` does. An
+ambiguous or unresolvable title is flagged in the command's output rather
+than guessed at, for `add-comic` to sort out by hand. This command is
+meant to be run by a scheduled routine, not typically invoked directly —
+and it never touches git itself, so that routine can review its changes
+before committing. It tracks which calendar events it's already processed
+in `data/pull_state.json` (see below), so re-runs don't duplicate work.
+
 Serve `viewer.html` + `data/` over HTTP, so the browser can actually fetch
 `data/library.json` and cover images (opening `viewer.html` via `file://`
 blocks those fetches):
@@ -127,6 +182,10 @@ still missing a cover):
   personal collection)
 - `data/covers/<id>/` — extracted cover + preview page images per comic
   (gitignored)
+- `data/pull_state.json` — tracks which pull-list calendar events
+  `check-pulls` has already processed, so re-runs don't duplicate work
+  (git-tracked, like the library files, so state survives across
+  machines/branches)
 
 ## Tests
 

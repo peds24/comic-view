@@ -52,3 +52,75 @@ def test_comic_to_row_joins_multiple_formats():
     record = _record(formats=["digital", "print"])
     row = _comic_to_row(record)
     assert row[7] == "digital, print"
+
+
+from library.config import Config, GoogleSheetsConfig, MetronConfig, GoogleBooksConfig, PullListConfig
+from library.sheets_sync import sync_comics_to_sheet
+
+
+class _FakeWorksheet:
+    def __init__(self):
+        self.cleared = False
+        self.updated_with = None
+
+    def clear(self):
+        self.cleared = True
+
+    def update(self, rows):
+        self.updated_with = rows
+
+
+class _FakeSheet:
+    def __init__(self, worksheet):
+        self._worksheet = worksheet
+
+    def worksheet(self, name):
+        self._requested_name = name
+        return self._worksheet
+
+
+class _FakeClient:
+    def __init__(self, sheet):
+        self._sheet = sheet
+
+    def open_by_key(self, key):
+        self._requested_key = key
+        return self._sheet
+
+
+def _config(**sheets_overrides) -> Config:
+    sheets = GoogleSheetsConfig(
+        spreadsheet_id="abc123",
+        worksheet_name="Comics",
+        client_secret_path="secrets/google_client_secret.json",
+        token_path="secrets/google_token.json",
+    )
+    for key, value in sheets_overrides.items():
+        setattr(sheets, key, value)
+    return Config(
+        roots=[],
+        metron=MetronConfig(),
+        google_books=GoogleBooksConfig(),
+        data_dir=".",
+        pull_list=PullListConfig(),
+        google_sheets=sheets,
+    )
+
+
+def test_sync_comics_to_sheet_clears_and_writes_header_plus_rows(monkeypatch):
+    worksheet = _FakeWorksheet()
+    client = _FakeClient(_FakeSheet(worksheet))
+    monkeypatch.setattr("library.sheets_sync._authorize", lambda config: client)
+
+    older = _record(id="a", added_date="2026-01-01", series="Older", issue_number="1")
+    newer = _record(id="b", added_date="2026-09-01", series="Newer", issue_number="2")
+    records = {"a": older, "b": newer}
+
+    sync_comics_to_sheet(records, _config())
+
+    assert worksheet.cleared is True
+    assert worksheet.updated_with[0] == _HEADER
+    assert worksheet.updated_with[1][1] == "Newer"  # sorted by added_date descending
+    assert worksheet.updated_with[2][1] == "Older"
+    assert client._requested_key == "abc123"
+    assert client._sheet._requested_name == "Comics"

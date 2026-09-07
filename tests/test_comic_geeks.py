@@ -1,6 +1,6 @@
 import re
 
-from library.metadata_sources.comic_geeks import fetch_issue, is_comic_geeks_url
+from library.metadata_sources.comic_geeks import extract_comic_id, fetch_issue, is_comic_geeks_url
 
 # A trimmed real fragment of a League of Comic Geeks issue page's
 # structure, matching what was confirmed against the live site.
@@ -89,3 +89,19 @@ def test_fetch_issue_falls_back_to_og_image_when_no_cover_gallery_link(monkeypat
     )
     result = fetch_issue("https://leagueofcomicgeeks.com/comic/6297209/absolute-batman-16")
     assert result["_image_url"] == "https://s3.amazonaws.com/comicgeeks/comics/covers/medium-6297209.jpg"
+
+
+def test_extract_comic_id_from_full_url():
+    assert extract_comic_id("https://leagueofcomicgeeks.com/comic/6297209/absolute-batman-16") == "6297209"
+
+
+def test_extract_comic_id_from_bare_url():
+    assert extract_comic_id("https://leagueofcomicgeeks.com/comic/6437939") == "6437939"
+
+
+def test_extract_comic_id_from_bare_numeric_id():
+    assert extract_comic_id("6297209") == "6297209"
+
+
+def test_extract_comic_id_returns_none_for_unrecognized_url():
+    assert extract_comic_id("https://leagueofcomicgeeks.com/pulls") is None

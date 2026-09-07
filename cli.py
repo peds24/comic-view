@@ -8,10 +8,14 @@ from datetime import date
 import click
 
 from library.config import load_config
+from library.covers import download_cover
 from library.enrichment import enrich_all, refetch_physical_covers
+from library.matching import find_matching_record, is_matchable
+from library.metadata_sources import comic_geeks
 from library.metadata_sources.google_books import GoogleBooksSource
 from library.metadata_sources.metron import MetronSource
 from library.metadata_sources.open_library import OpenLibrarySource
+from library.models import ComicRecord
 from library.physical_importer import count_rows, import_physical_xlsx
 from library.pull_calendar import fetch_pulled_items, load_state, save_state
 from library.pull_resolver import resolve_and_add
@@ -208,6 +212,58 @@ def check_pulls_cmd(config_path: str) -> None:
     click.echo(f"Added {added}, merged {merged} into existing digital records, flagged {flagged}.")
     for line in flag_lines:
         click.echo(f"  FLAGGED: {line}")
+
+
+@main.command("add-comic")
+@click.argument("url")
+@click.option("--config", "config_path", default="config.yaml", help="Path to config.yaml")
+@click.option("--physical", is_flag=True, help="Add as a physical copy instead of digital (default).")
+def add_comic_cmd(url: str, config_path: str, physical: bool) -> None:
+    """Adds a single comic from its League of Comic Geeks issue page —
+    the manual counterpart to check-pulls, for a digital buy (default) or
+    a one-off physical add outside the weekly pull-list flow."""
+    if not comic_geeks.is_comic_geeks_url(url):
+        raise click.ClickException(f"Only leagueofcomicgeeks.com links are supported: {url!r}")
+
+    info = comic_geeks.fetch_issue(url)
+    if not info:
+        raise click.ClickException("Couldn't read that Comic Geeks page — check the URL, or the site may be unreachable.")
+
+    config = load_config(config_path)
+    library_path = config.data_dir / "library_comics.json"
+    covers_dir = config.data_dir / "covers"
+    records = load_library(library_path)
+
+    new_format = "print" if physical else "digital"
+
+    if info.get("upc"):
+        record_id = f"upc-{info['upc']}"
+    else:
+        comic_id = comic_geeks.extract_comic_id(url)
+        record_id = f"cgeeks-{comic_id}"
+
+    existing = records.get(record_id)
+    if existing is None and info.get("series") and info.get("issue_number") and is_matchable(info["series"], info["issue_number"]):
+        existing = find_matching_record(records, info["series"], info["issue_number"])
+
+    if existing is not None:
+        if new_format not in existing.formats:
+            existing.formats.append(new_format)
+        save_library(library_path, records)
+        click.echo(f"Already in your library as {existing.id} — added '{new_format}' to its formats.")
+        return
+
+    record = ComicRecord(id=record_id, title=info.get("series") or url, type="comic", formats=[new_format])
+    for field in ("series", "issue_number", "publisher", "year", "description", "author", "upc"):
+        if info.get(field):
+            setattr(record, field, info[field])
+            record.metadata_source[field] = "comic_geeks"
+    if info.get("_image_url"):
+        download_cover(record, info["_image_url"], "comic_geeks", covers_dir)
+
+    records[record.id] = record
+    save_library(library_path, records)
+    click.echo(f"Added {record.series or record.title} #{record.issue_number or '?'} ({record.id}) as {new_format}.")
 
 
 @main.command()

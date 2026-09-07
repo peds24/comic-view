@@ -21,10 +21,22 @@ from library.matching import extract_issue
 
 _BASE_URL = "https://leagueofcomicgeeks.com"
 _ISSUE_SUFFIX_RE = re.compile(r"\s*#\d+\s*$")
+_COMIC_ID_RE = re.compile(r"/comic/(\d+)")
 
 
 def is_comic_geeks_url(url: str) -> bool:
     return "leagueofcomicgeeks.com" in url
+
+
+def extract_comic_id(url_or_id: str) -> str | None:
+    """The numeric Comic Geeks id from a full issue URL or a bare id
+    string — used to build a fallback record id for add-comic when the
+    page itself has no UPC."""
+    stripped = url_or_id.strip()
+    if stripped.isdigit():
+        return stripped
+    match = _COMIC_ID_RE.search(stripped)
+    return match.group(1) if match else None
 
 
 def _resolve_url(url_or_id: str) -> str:

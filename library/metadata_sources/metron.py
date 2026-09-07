@@ -5,8 +5,12 @@ comics; used as the first enrichment source.
 """
 from __future__ import annotations
 
+from pathlib import Path
+
+from library.covers import download_cover
 from library.matching import normalize_series
 from library.http_utils import get_with_retry
+from library.models import ComicRecord
 
 _BASE_URL = "https://metron.cloud/api"
 
@@ -19,6 +23,32 @@ def year_from_issue(issue: dict) -> int | None:
     if len(store_date) >= 4 and store_date[:4].isdigit():
         return int(store_date[:4])
     return None
+
+
+def apply_metron_issue(record: ComicRecord, issue: dict, covers_dir: Path, source_name: str = "metron") -> None:
+    """Fills any of record's currently-empty series/issue_number/publisher/
+    year/description/author fields from a Metron issue detail dict (as
+    returned by find_issue_confident, find_issue_by_upc, etc.), and
+    downloads its cover. Mirrors physical_importer._apply_metron_issue's
+    field mapping — used by pull_resolver.py, which needs the identical
+    behavior for pull-list-resolved issues."""
+    series = issue.get("series")
+    series_name = series.get("name") if isinstance(series, dict) else None
+    publisher = issue.get("publisher")
+    publisher_name = publisher.get("name") if isinstance(publisher, dict) else None
+    record.apply_partial(
+        {
+            "series": series_name,
+            "issue_number": issue.get("number"),
+            "publisher": publisher_name,
+            "year": year_from_issue(issue),
+            "description": issue.get("desc"),
+            "author": MetronSource._extract_writer(issue),
+        },
+        source_name,
+    )
+    if issue.get("image"):
+        download_cover(record, issue["image"], source_name, covers_dir)
 
 
 class MetronSource:

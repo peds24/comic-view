@@ -1,4 +1,7 @@
-from library.metadata_sources.metron import MetronSource, year_from_issue
+from pathlib import Path
+
+from library.metadata_sources.metron import MetronSource, apply_metron_issue, year_from_issue
+from library.models import ComicRecord
 
 
 class FakeResponse:
@@ -237,5 +240,47 @@ def test_find_issue_confident_not_found_when_series_name_unknown(monkeypatch):
     issue, status, candidates = source.find_issue_confident("Nonexistent Series", "1")
 
     assert status == "not_found"
+
+
+def test_apply_metron_issue_fills_empty_fields_and_downloads_cover(tmp_path: Path, monkeypatch):
+    class FakeCoverResponse:
+        content = b"fake-cover-bytes"
+
+        def raise_for_status(self):
+            pass
+
+    monkeypatch.setattr("library.covers.get_with_retry", lambda *a, **k: FakeCoverResponse())
+
+    record = ComicRecord(id="metron-999", title="Batman #13", type="comic", formats=["print"])
+    issue = {
+        "id": 999,
+        "series": {"name": "Batman"},
+        "number": "13",
+        "publisher": {"name": "DC Comics"},
+        "store_date": "2026-10-07",
+        "desc": "A synopsis.",
+        "credits": [{"creator": "Chip Zdarsky", "role": [{"name": "Writer"}]}],
+        "image": "https://example.com/batman-13.jpg",
+    }
+
+    apply_metron_issue(record, issue, tmp_path)
+
+    assert record.series == "Batman"
+    assert record.issue_number == "13"
+    assert record.publisher == "DC Comics"
+    assert record.year == 2026
+    assert record.description == "A synopsis."
+    assert record.author == "Chip Zdarsky"
+    assert record.metadata_source["series"] == "metron"
+    assert record.cover_path == "metron-999/cover.jpg"
+
+
+def test_apply_metron_issue_does_not_overwrite_existing_fields(tmp_path: Path, monkeypatch):
+    monkeypatch.setattr("library.covers.get_with_retry", lambda *a, **k: (_ for _ in ()).throw(AssertionError("should not fetch a cover")))
+
+    record = ComicRecord(id="metron-999", title="Batman #13", type="comic", formats=["print"], publisher="Already Set")
+    apply_metron_issue(record, {"id": 999, "publisher": {"name": "DC Comics"}}, tmp_path)
+
+    assert record.publisher == "Already Set"
 
 

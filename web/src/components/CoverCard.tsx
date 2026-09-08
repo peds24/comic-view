@@ -33,7 +33,6 @@ export function CoverCard({ record, offset, onClick }: CoverCardProps) {
           />
         )}
       </div>
-      <div className="halftone" />
       <div className="status-dot" />
       <div className="plate">
         <div className="series">{primaryLine}</div>

@@ -12,6 +12,9 @@ dependencies = [
     "beautifulsoup4>=4.12",
     "playwright>=1.40",
     "icalendar>=5.0",
+    "gspread>=6.1",
+    "google-auth>=2.29",
+    "google-auth-oauthlib>=1.2",
 ]
 
 [project.optional-dependencies]

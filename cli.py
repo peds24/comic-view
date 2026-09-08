@@ -21,6 +21,7 @@ from library.physical_importer import count_rows, import_physical_xlsx
 from library.pull_calendar import fetch_pulled_items, load_state, save_state
 from library.pull_resolver import ResolveResult, resolve_and_add
 from library.scanner import list_archives, scan_roots
+from library.sheets_sync import sync_comics_to_sheet
 from library.store import load_library, merge_record, save_library
 from library.viewer_server import ViewerRequestHandler
 
@@ -45,6 +46,20 @@ def _echo_comic_preview(*, title: str, year, author, description) -> None:
     if len(desc) > _DESCRIPTION_PREVIEW_LIMIT:
         desc = desc[:_DESCRIPTION_PREVIEW_LIMIT] + "..."
     click.echo(f"      Description: {desc or '(none)'}")
+
+
+def _sync_sheet_or_warn(records: dict[str, ComicRecord], config, *, on_success: str | None = None) -> None:
+    """Syncs to Google Sheets if configured; never raises — a failure
+    only prints a warning, matching the existing git-commit error
+    handling. No-ops silently if google_sheets isn't configured."""
+    if not config.google_sheets.is_configured:
+        return
+    try:
+        sync_comics_to_sheet(records, config)
+        if on_success:
+            click.echo(on_success)
+    except Exception as e:
+        click.echo(f"Warning: could not sync to Google Sheets: {e}")
 
 
 @main.command()
@@ -268,6 +283,9 @@ def check_pulls_cmd(config_path: str) -> None:
         except Exception as e:
             click.echo(f"Warning: could not commit to git: {e}")
 
+        if added or merged:
+            _sync_sheet_or_warn(records, config, on_success="Synced to Google Sheets.")
+
 
 @main.command("add-comic")
 @click.argument("url")
@@ -330,6 +348,7 @@ def add_comic_cmd(url: str, config_path: str, physical: bool) -> None:
                     click.echo("Committed to git.")
             except Exception as e:
                 click.echo(f"Warning: could not commit to git: {e}")
+            _sync_sheet_or_warn(records, config)
         return
 
     if info.get("series") and info.get("issue_number"):
@@ -347,6 +366,7 @@ def add_comic_cmd(url: str, config_path: str, physical: bool) -> None:
     records[record.id] = record
     save_library(library_path, records)
     click.echo(f"Added {record.series or record.title} #{record.issue_number or '?'} ({record.id}) as {new_format}.")
+    _sync_sheet_or_warn(records, config)
 
 
 @main.command()
@@ -376,6 +396,31 @@ def serve(config_path: str, port: int, comics_filename: str, manga_filename: str
             httpd.serve_forever()
         except KeyboardInterrupt:
             click.echo("\nStopped.")
+
+
+@main.command("sync-sheet")
+@click.option("--config", "config_path", default="config.yaml", help="Path to config.yaml")
+def sync_sheet_cmd(config_path: str) -> None:
+    """Pushes the current comics library to the configured Google Sheet
+    (full overwrite of the configured worksheet). Also the command to run
+    for the first-time OAuth consent flow. Unlike the automatic sync
+    add-comic/check-pulls trigger, errors here are not swallowed — this
+    command's whole purpose is the sync itself."""
+    config = load_config(config_path)
+    if not config.google_sheets.is_configured:
+        raise click.ClickException(
+            "google_sheets not configured — fill in config.yaml "
+            "(see docs/superpowers/specs/2026-09-07-google-sheets-sync-design.md)."
+        )
+    library_path = config.data_dir / "library_comics.json"
+    if not library_path.exists():
+        raise click.ClickException(
+            f"No comics library at {library_path} — run sync-sheet from the repo root. "
+            "Refusing to overwrite the sheet with an empty library."
+        )
+    records = load_library(library_path)
+    sync_comics_to_sheet(records, config)
+    click.echo(f"Synced {len(records)} comic(s) to the '{config.google_sheets.worksheet_name}' worksheet.")
 
 
 if __name__ == "__main__":

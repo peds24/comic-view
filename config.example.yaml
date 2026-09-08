@@ -25,3 +25,15 @@ google_books:
 # https://leagueofcomicgeeks.com/member/calendar_ics/<your-username>
 pull_list:
   calendar_url: ""
+
+# Optional — only needed for `comic-library sync-sheet` (and the
+# automatic sync add-comic/check-pulls trigger). Set up a Google Cloud
+# OAuth client (Desktop app type) with the Sheets API enabled, share
+# nothing (this uses your own account via OAuth, not a service account),
+# and download client_secret.json into secrets/. See
+# docs/superpowers/specs/2026-09-07-google-sheets-sync-design.md.
+google_sheets:
+  spreadsheet_id: "your-spreadsheet-id-from-the-sheet-url"
+  worksheet_name: "Comics"
+  client_secret_path: "secrets/google_client_secret.json"
+  token_path: "secrets/google_token.json"

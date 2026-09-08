@@ -34,12 +34,25 @@ class PullListConfig:
 
 
 @dataclass
+class GoogleSheetsConfig:
+    spreadsheet_id: str = ""
+    worksheet_name: str = "Comics"
+    client_secret_path: str = "secrets/google_client_secret.json"
+    token_path: str = "secrets/google_token.json"
+
+    @property
+    def is_configured(self) -> bool:
+        return bool(self.spreadsheet_id)
+
+
+@dataclass
 class Config:
     roots: list[RootConfig]
     metron: MetronConfig
     google_books: GoogleBooksConfig
     data_dir: Path
     pull_list: PullListConfig
+    google_sheets: GoogleSheetsConfig
 
 
 def load_config(config_path: str | Path, data_dir: str | Path = "data") -> Config:
@@ -63,6 +76,7 @@ def load_config(config_path: str | Path, data_dir: str | Path = "data") -> Confi
     metron_raw = raw.get("metron", {}) or {}
     google_raw = raw.get("google_books", {}) or {}
     pull_list_raw = raw.get("pull_list", {}) or {}
+    sheets_raw = raw.get("google_sheets", {}) or {}
 
     return Config(
         roots=roots,
@@ -73,4 +87,10 @@ def load_config(config_path: str | Path, data_dir: str | Path = "data") -> Confi
         google_books=GoogleBooksConfig(api_key=google_raw.get("api_key", "")),
         data_dir=Path(data_dir),
         pull_list=PullListConfig(calendar_url=pull_list_raw.get("calendar_url", "")),
+        google_sheets=GoogleSheetsConfig(
+            spreadsheet_id=sheets_raw.get("spreadsheet_id", ""),
+            worksheet_name=sheets_raw.get("worksheet_name", "Comics"),
+            client_secret_path=sheets_raw.get("client_secret_path", "secrets/google_client_secret.json"),
+            token_path=sheets_raw.get("token_path", "secrets/google_token.json"),
+        ),
     )

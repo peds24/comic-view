@@ -198,10 +198,40 @@ runs).
 
 - Syncing `library_manga.json` — comics only, per the decision above.
 - Any UI in the Sheet itself (formatting, conditional formatting, charts)
-  — this only ever writes plain row data.
+  — this only ever writes plain row data (plus the one formula column
+  described below).
 - Handling the case where the user renames/deletes the worksheet tab or
   the spreadsheet itself out of band; the next sync will simply fail with
   a Sheets API error, surfaced per the error-handling rules above.
 - Migrating existing manual edits already in the live Sheet — the first
   sync overwrites whatever is there today with a fresh mirror of
   `library_comics.json`.
+
+## Update (2026-09-08): the sheet became a native Google Sheets Table
+
+The user converted the "Comics" worksheet into a native Sheets Table
+(banded rows, a dropdown-validated `Status` and `Formats` column, a header
+row styled by the Table) and inserted a `Helper` column between `Title`
+and `Series` containing, per row, `=VALUE(REGEXEXTRACT(A{row}, "#(\d+)"))`
+— pulling the issue number out of the Title cell as a real number for use
+elsewhere in the sheet.
+
+Two things this broke that are now handled in `library/sheets_sync.py`:
+
+- **Column alignment**: `_HEADER`/`_comic_to_row` now include `Helper` as
+  the second column, matching the Table's actual column order. Without
+  this, `Series` and everything after it would land one column off.
+- **Table range**: full-overwrite sync always re-sorts every row (newest
+  `added_date` first), so a *value* pasted into `Helper` would end up next
+  to the wrong comic after the next sync. Because the formula is
+  self-referential (reads its own row's `Title` cell), `sync_comics_to_sheet`
+  re-templates and rewrites it for every row on every sync — it stays
+  correct regardless of how rows get reshuffled. `_resize_table_to_fit`
+  then extends (or shrinks) the Table's defined row range to match the
+  data just written via an `UpdateTableRequest`, so new comics land inside
+  the Table's formatting instead of as plain rows below it. Both are
+  no-ops if the worksheet isn't (or is no longer) a Table.
+
+This is still scoped to *this* sheet's current shape — if the user
+reorders/removes columns again, the hardcoded `_HEADER`/`_HELPER_FORMULA`
+in `sheets_sync.py` need a matching update, same as before.

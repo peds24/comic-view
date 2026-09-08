@@ -6,9 +6,12 @@ from click.testing import CliRunner
 from cli import main
 
 
-def _write_config(tmp_path: Path) -> Path:
+def _write_config(tmp_path: Path, google_sheets: dict | None = None) -> Path:
     config_path = tmp_path / "config.yaml"
-    config_path.write_text(yaml.dump({"roots": [{"path": str(tmp_path), "type": "comic"}]}))
+    data = {"roots": [{"path": str(tmp_path), "type": "comic"}]}
+    if google_sheets:
+        data["google_sheets"] = google_sheets
+    config_path.write_text(yaml.dump(data))
     return config_path
 
 
@@ -149,3 +152,79 @@ def test_add_comic_merges_into_record_with_different_id_via_series_and_issue(tmp
     assert '"abcd1234-scanned"' in library
     assert "upc-76194138584601611" not in library
     assert '"digital"' in library and '"print"' in library
+
+
+_SHEETS_CONFIG = {
+    "spreadsheet_id": "abc123",
+    "worksheet_name": "Comics",
+    "client_secret_path": "secrets/google_client_secret.json",
+    "token_path": "secrets/google_token.json",
+}
+
+
+def test_add_comic_syncs_new_record_to_sheets_when_configured(tmp_path: Path, monkeypatch):
+    config_path = _write_config(tmp_path, google_sheets=_SHEETS_CONFIG)
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr("cli.comic_geeks.fetch_issue", lambda url: dict(_FETCHED_INFO))
+    monkeypatch.setattr("library.covers.get_with_retry", lambda *a, **k: FakeCoverResponse())
+    synced_with = []
+    monkeypatch.setattr("cli.sync_comics_to_sheet", lambda records, config: synced_with.append(records))
+
+    result = CliRunner().invoke(main, ["add-comic", "https://leagueofcomicgeeks.com/comic/6297209/absolute-batman-16", "--config", str(config_path)], input="y\n")
+
+    assert result.exit_code == 0
+    assert len(synced_with) == 1
+
+
+def test_add_comic_syncs_merged_record_to_sheets_when_configured(tmp_path: Path, monkeypatch):
+    config_path = _write_config(tmp_path, google_sheets=_SHEETS_CONFIG)
+    monkeypatch.chdir(tmp_path)
+    data_dir = tmp_path / "data"
+    data_dir.mkdir()
+    (data_dir / "library_comics.json").write_text(
+        '[{"id": "upc-76194138584601611", "title": "Absolute Batman #16", "type": "comic", '
+        '"series": "Absolute Batman", "issue_number": "16", "formats": ["print"], "metadata_source": {}, '
+        '"preview_pages": [], "status": "unread", "added_date": "2026-01-01"}]'
+    )
+    monkeypatch.setattr("cli.comic_geeks.fetch_issue", lambda url: dict(_FETCHED_INFO))
+    monkeypatch.setattr("library.covers.get_with_retry", lambda *a, **k: FakeCoverResponse())
+    synced_with = []
+    monkeypatch.setattr("cli.sync_comics_to_sheet", lambda records, config: synced_with.append(records))
+
+    result = CliRunner().invoke(main, ["add-comic", "https://leagueofcomicgeeks.com/comic/6297209/absolute-batman-16", "--config", str(config_path)], input="y\n")
+
+    assert result.exit_code == 0
+    assert len(synced_with) == 1
+
+
+def test_add_comic_reports_sheets_sync_failure_as_warning(tmp_path: Path, monkeypatch):
+    config_path = _write_config(tmp_path, google_sheets=_SHEETS_CONFIG)
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr("cli.comic_geeks.fetch_issue", lambda url: dict(_FETCHED_INFO))
+    monkeypatch.setattr("library.covers.get_with_retry", lambda *a, **k: FakeCoverResponse())
+
+    def _boom(records, config):
+        raise RuntimeError("network down")
+    monkeypatch.setattr("cli.sync_comics_to_sheet", _boom)
+
+    result = CliRunner().invoke(main, ["add-comic", "https://leagueofcomicgeeks.com/comic/6297209/absolute-batman-16", "--config", str(config_path)], input="y\n")
+
+    assert result.exit_code == 0
+    assert "Warning: could not sync to Google Sheets: network down" in result.output
+    library = (tmp_path / "data" / "library_comics.json").read_text()
+    assert "Absolute Batman" in library  # local library still updated despite sync failure
+
+
+def test_add_comic_skips_sync_when_not_configured(tmp_path: Path, monkeypatch):
+    config_path = _write_config(tmp_path)  # no google_sheets block
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr("cli.comic_geeks.fetch_issue", lambda url: dict(_FETCHED_INFO))
+    monkeypatch.setattr("library.covers.get_with_retry", lambda *a, **k: FakeCoverResponse())
+
+    def _fail_if_called(records, config):
+        raise AssertionError("sync_comics_to_sheet should not be called when not configured")
+    monkeypatch.setattr("cli.sync_comics_to_sheet", _fail_if_called)
+
+    result = CliRunner().invoke(main, ["add-comic", "https://leagueofcomicgeeks.com/comic/6297209/absolute-batman-16", "--config", str(config_path)], input="y\n")
+
+    assert result.exit_code == 0

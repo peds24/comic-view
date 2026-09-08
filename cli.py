@@ -348,6 +348,7 @@ def add_comic_cmd(url: str, config_path: str, physical: bool) -> None:
                     click.echo("Committed to git.")
             except Exception as e:
                 click.echo(f"Warning: could not commit to git: {e}")
+            _sync_sheet_or_warn(records, config)
         return
 
     if info.get("series") and info.get("issue_number"):
@@ -365,6 +366,7 @@ def add_comic_cmd(url: str, config_path: str, physical: bool) -> None:
     records[record.id] = record
     save_library(library_path, records)
     click.echo(f"Added {record.series or record.title} #{record.issue_number or '?'} ({record.id}) as {new_format}.")
+    _sync_sheet_or_warn(records, config)
 
 
 @main.command()

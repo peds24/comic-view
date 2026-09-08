@@ -4,8 +4,8 @@
 
 .stage {
   position: relative;
-  height: clamp(360px, 46vw, 460px);
-  perspective: 1400px;
+  height: clamp(460px, 52vw, 620px);
+  perspective: 1600px;
   background:
     radial-gradient(ellipse 60% 70% at 50% 42%, rgba(255, 255, 255, 0.035), transparent 65%),
     radial-gradient(ellipse 90% 60% at 50% 105%, rgba(0, 0, 0, 0.5), transparent 60%),
@@ -24,9 +24,9 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 168px;
-  height: 252px;
-  margin: -126px 0 0 -84px;
+  width: 240px;
+  height: 360px;
+  margin: -180px 0 0 -120px;
   border-radius: 1px;
   cursor: pointer;
   border: none;
@@ -35,10 +35,15 @@
   opacity: var(--op, 1);
   filter: blur(var(--bl, 0px));
   box-shadow: 0 22px 30px -12px var(--shadow), 0 4px 10px rgba(0, 0, 0, 0.35);
+  /* Short, not the old 0.55s: position now updates every animation frame
+     from the physics engine itself (see useScrollPhysics/CoverShelf), so a
+     long CSS transition would keep chasing a moving target and lag behind
+     the motion. This just smooths sub-frame jitter and gives click-to-jump
+     a soft landing. */
   transition:
-    transform 0.55s cubic-bezier(0.22, 0.9, 0.32, 1),
-    opacity 0.55s ease,
-    filter 0.55s ease;
+    transform 0.12s linear,
+    opacity 0.12s linear,
+    filter 0.12s linear;
   z-index: var(--z, 0);
   background: var(--surface-raised);
   overflow: hidden;
@@ -78,7 +83,7 @@
 .cover-card .plate .series {
   font-family: var(--font-display);
   font-weight: 800;
-  font-size: 14.5px;
+  font-size: 17px;
   line-height: 1.05;
   color: var(--text);
   text-wrap: balance;

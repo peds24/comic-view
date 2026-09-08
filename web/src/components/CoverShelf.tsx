@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import type { ComicRecord } from '../types/comic'
 import { useVirtualizedWindow } from '../hooks/useVirtualizedWindow'
 import { useScrollPhysics } from '../hooks/useScrollPhysics'
@@ -13,24 +13,52 @@ interface CoverShelfProps {
 }
 
 export function CoverShelf({ records, currentIndex, onIndexChange, onSelect }: CoverShelfProps) {
-  const visibleIndices = useVirtualizedWindow(records.length, currentIndex, 6)
-  const { handleWheel } = useScrollPhysics(records.length, currentIndex, onIndexChange)
+  const { position, handleWheel, handleArrowKey } = useScrollPhysics(records.length, currentIndex, onIndexChange)
+  // The virtualization window follows the live (possibly mid-fling) position,
+  // not just the last settled index, so cards are already mounted by the
+  // time the glide reaches them instead of popping in at the end.
+  const visibleIndices = useVirtualizedWindow(records.length, Math.round(position), 6)
   const containerRef = useRef<HTMLDivElement>(null)
   const current = records[currentIndex]
 
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === 'ArrowRight') {
+        e.preventDefault()
+        handleArrowKey(1, e.repeat)
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault()
+        handleArrowKey(-1, e.repeat)
+      }
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [handleArrowKey])
+
   return (
     <>
-      <div ref={containerRef} className="stage" data-testid="cover-shelf" onWheel={(e) => handleWheel(e.deltaY)}>
+      <div
+        ref={containerRef}
+        className="stage"
+        data-testid="cover-shelf"
+        onWheel={(e) => {
+          e.preventDefault()
+          handleWheel(e.deltaX, e.deltaY)
+        }}
+      >
         <div className="track">
           {visibleIndices.map((i) => {
             const record = records[i]
-            const offset = i - currentIndex
+            // Continuous, possibly-fractional offset from the live physics
+            // position — this is what makes the shelf glide frame-by-frame
+            // instead of sitting still until the fling settles.
+            const offset = i - position
             return (
               <CoverCard
                 key={record.id}
                 record={record}
                 offset={offset}
-                onClick={() => (offset === 0 ? onSelect(record) : onIndexChange(i))}
+                onClick={() => (i === currentIndex ? onSelect(record) : onIndexChange(i))}
               />
             )
           })}

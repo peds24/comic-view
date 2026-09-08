@@ -2,7 +2,12 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { snapToNearest, stepPhysics, type PhysicsState } from './scrollPhysics'
 
 const FRICTION = 0.92
-const WHEEL_TO_VELOCITY = 0.05
+const WHEEL_Y_TO_VELOCITY = 0.05
+// Horizontal scroll (trackpad swipe / shift+wheel) tends to report larger
+// deltas than vertical for a comparable physical gesture, and this shelf
+// is a horizontal carousel where that axis is the primary way to browse —
+// so it gets its own, weaker scaling rather than sharing deltaY's.
+const WHEEL_X_TO_VELOCITY = 0.01
 const ARROW_KEY_IMPULSE = 0.05
 // Bounds how fast the shelf can ever move, regardless of input source.
 // Without this, a sustained stream of impulses (a real trackpad swipe, or
@@ -11,7 +16,7 @@ const ARROW_KEY_IMPULSE = 0.05
 // velocity that's barely decayed — velocity (and therefore speed) keeps
 // climbing for as long as the input continues, rocketing across the whole
 // shelf in well under a second instead of coasting at a controllable pace.
-const MAX_VELOCITY = 0.6
+const MAX_VELOCITY = 0.25
 
 export function useScrollPhysics(itemCount: number, currentIndex: number, onIndexChange: (index: number) => void) {
   const [position, setPosition] = useState(0)
@@ -48,7 +53,7 @@ export function useScrollPhysics(itemCount: number, currentIndex: number, onInde
   )
 
   const handleWheel = useCallback(
-    (deltaX: number, deltaY: number) => applyImpulse((deltaX + deltaY) * WHEEL_TO_VELOCITY),
+    (deltaX: number, deltaY: number) => applyImpulse(deltaX * WHEEL_X_TO_VELOCITY + deltaY * WHEEL_Y_TO_VELOCITY),
     [applyImpulse],
   )
 

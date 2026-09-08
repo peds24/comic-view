@@ -233,5 +233,56 @@ Two things this broke that are now handled in `library/sheets_sync.py`:
   no-ops if the worksheet isn't (or is no longer) a Table.
 
 This is still scoped to *this* sheet's current shape — if the user
-reorders/removes columns again, the hardcoded `_HEADER`/`_HELPER_FORMULA`
-in `sheets_sync.py` need a matching update, same as before.
+reorders/removes columns again, the hardcoded `_HEADER` in
+`sheets_sync.py` needs a matching update, same as before.
+
+## Update (2026-09-08): removed the Helper column; switched to incremental upsert
+
+The user removed the `Helper` column from the live sheet again (the
+`Series`/`Year`/etc. columns didn't need it after all), so `_HEADER` and
+`_comic_to_row` dropped it and the row-templated `_HELPER_FORMULA` was
+deleted entirely — `_comic_to_row` no longer needs a `sheet_row` argument
+since nothing it writes is row-position-dependent anymore.
+
+Separately, the original "full overwrite mirror" decision (see above) is
+reversed: `sync_comics_to_sheet` no longer clears the worksheet and
+rewrites every row on every sync. Instead it upserts:
+
+- Reads the sheet's current rows via `get_all_values()` and matches each
+  local record to an existing row by its **Title** cell (the same string
+  `_comic_to_row` generates — stable across a sync even if `status` or
+  `formats` change).
+- A matched row is rewritten in place (a single targeted `update()` to
+  that row's range) only if its content actually differs — e.g. the
+  "merge new format into an existing comic" path in `add_comic_cmd` now
+  updates just that one row instead of the whole sheet.
+- A record with no matching Title is treated as new and inserted as a
+  fresh row at row 2 (via `insertDimension`, shifting everything else
+  down), preserving the newest-`added_date`-first ordering without
+  re-sorting rows that are already there.
+- The worksheet is never `clear()`-ed. Rows that don't need to change are
+  never touched, so any manual formatting, extra columns, or edits the
+  user makes directly in the Sheet survive future syncs instead of being
+  clobbered — the opposite trade-off from the original decision, made
+  because that clobbering turned out to be the more frequent annoyance in
+  practice (this is the second time a manually-added column had to be
+  special-cased in this file).
+- `_resize_table_to_fit` is unchanged in spirit — still extends the
+  native Table's range to match the new total row count — but now runs
+  against `len(existing_values) + len(new_records)` instead of a
+  freshly-rewritten row count.
+- A bootstrap path (`get_all_values()` returns nothing) still does a
+  one-time full write of header + every record, sorted newest-first —
+  used the first time `sync-sheet` runs against a brand-new empty
+  worksheet.
+
+Trade-off accepted: if a record's Title stays the same but a field other
+than `status`/`formats`/etc. is edited out-of-band in a way that isn't
+reflected via `add_comic_cmd`/`check_pulls_cmd` (there is no such path
+today), the row still gets diffed and corrected on the next sync — this
+is a strict improvement over full-overwrite, not a regression, since
+every record is still compared. The only real risk is two distinct
+records producing the same Title string (e.g. two different printings
+with identical series+issue); the second one would win the row instead
+of getting its own — an accepted edge case, same kind of hardcoded
+assumption as the header layout itself.

@@ -21,42 +21,37 @@ def _record(**overrides) -> ComicRecord:
 
 
 def test_header_matches_row_length():
-    assert len(_HEADER) == len(_comic_to_row(_record(), sheet_row=2))
+    assert len(_HEADER) == len(_comic_to_row(_record()))
 
 
 def test_comic_to_row_uses_series_and_issue_for_title():
-    row = _comic_to_row(_record(), sheet_row=2)
+    row = _comic_to_row(_record())
     assert row == [
-        "Absolute Batman #16", '=VALUE(REGEXEXTRACT(A2, "#(\\d+)"))', "Absolute Batman", "16",
+        "Absolute Batman #16", "Absolute Batman", "16",
         "Scott Snyder", "2026", "DC Comics", "unread", "digital", "2026-09-07",
     ]
 
 
-def test_comic_to_row_helper_formula_references_own_row():
-    row = _comic_to_row(_record(), sheet_row=48)
-    assert row[1] == '=VALUE(REGEXEXTRACT(A48, "#(\\d+)"))'
-
-
 def test_comic_to_row_falls_back_to_title_without_series_or_issue():
     record = _record(title="Some One-Shot", series=None, issue_number=None)
-    row = _comic_to_row(record, sheet_row=2)
+    row = _comic_to_row(record)
     assert row[0] == "Some One-Shot"
+    assert row[1] == ""
     assert row[2] == ""
-    assert row[3] == ""
 
 
 def test_comic_to_row_blanks_missing_optional_fields():
     record = _record(author=None, year=None, publisher=None)
-    row = _comic_to_row(record, sheet_row=2)
-    assert row[4] == ""  # author
-    assert row[5] == ""  # year
-    assert row[6] == ""  # publisher
+    row = _comic_to_row(record)
+    assert row[3] == ""  # author
+    assert row[4] == ""  # year
+    assert row[5] == ""  # publisher
 
 
 def test_comic_to_row_joins_multiple_formats():
     record = _record(formats=["digital", "print"])
-    row = _comic_to_row(record, sheet_row=2)
-    assert row[8] == "digital, print"
+    row = _comic_to_row(record)
+    assert row[7] == "digital, print"
 
 
 from library.config import Config, GoogleSheetsConfig, MetronConfig, GoogleBooksConfig, PullListConfig
@@ -64,18 +59,27 @@ from library.sheets_sync import sync_comics_to_sheet, _authorize
 
 
 class _FakeWorksheet:
-    def __init__(self, sheet_id=0):
+    def __init__(self, sheet_id=0, rows=None):
         self.id = sheet_id
-        self.cleared = False
-        self.updated_with = None
-        self.update_kwargs = None
+        self._rows = rows or []  # includes header as _rows[0] when non-empty
+        self.update_calls = []  # list of (values, range_name, kwargs)
 
-    def clear(self):
-        self.cleared = True
+    def get_all_values(self):
+        return [list(row) for row in self._rows]
 
-    def update(self, rows, **kwargs):
-        self.updated_with = rows
-        self.update_kwargs = kwargs
+    def update(self, values, range_name=None, **kwargs):
+        self.update_calls.append((values, range_name, kwargs))
+        # Apply the write to our in-memory grid so later assertions/inserts
+        # see a consistent state, mirroring what the real API would do.
+        if range_name is None or range_name == "A1":
+            self._rows = [list(r) for r in values]
+        else:
+            start_row = int("".join(c for c in range_name if c.isdigit())) - 1
+            for offset, row in enumerate(values):
+                idx = start_row + offset
+                while len(self._rows) <= idx:
+                    self._rows.append([])
+                self._rows[idx] = list(row)
 
 
 class _FakeSheet:
@@ -100,6 +104,12 @@ class _FakeSheet:
 
     def batch_update(self, body):
         self.batch_update_calls.append(body)
+        for request in body["requests"]:
+            insert = request.get("insertDimension")
+            if insert:
+                count = insert["range"]["endIndex"] - insert["range"]["startIndex"]
+                start = insert["range"]["startIndex"]
+                self._worksheet._rows[start:start] = [[] for _ in range(count)]
 
 
 class _FakeClient:
@@ -130,7 +140,7 @@ def _config(**sheets_overrides) -> Config:
     )
 
 
-def test_sync_comics_to_sheet_clears_and_writes_header_plus_rows(monkeypatch):
+def test_sync_comics_to_sheet_bootstraps_empty_sheet_with_header_plus_rows(monkeypatch):
     worksheet = _FakeWorksheet()
     client = _FakeClient(_FakeSheet(worksheet))
     monkeypatch.setattr("library.sheets_sync._authorize", lambda config: client)
@@ -141,43 +151,93 @@ def test_sync_comics_to_sheet_clears_and_writes_header_plus_rows(monkeypatch):
 
     sync_comics_to_sheet(records, _config())
 
-    assert worksheet.cleared is True
-    assert worksheet.updated_with[0] == _HEADER
-    assert worksheet.updated_with[1][2] == "Newer"  # sorted by added_date descending
-    assert worksheet.updated_with[2][2] == "Older"
-    assert worksheet.updated_with[1][1] == '=VALUE(REGEXEXTRACT(A2, "#(\\d+)"))'
-    assert worksheet.updated_with[2][1] == '=VALUE(REGEXEXTRACT(A3, "#(\\d+)"))'
-    assert worksheet.update_kwargs == {"raw": False}  # formulas must be parsed, not stored as literal text
+    assert worksheet._rows[0] == _HEADER
+    assert worksheet._rows[1][1] == "Newer"  # sorted by added_date descending
+    assert worksheet._rows[2][1] == "Older"
     assert client._requested_key == "abc123"
     assert client._sheet._requested_name == "Comics"
 
 
+def test_sync_comics_to_sheet_leaves_unchanged_rows_untouched(monkeypatch):
+    existing_row = _comic_to_row(_record(id="a"))
+    worksheet = _FakeWorksheet(rows=[_HEADER, existing_row])
+    client = _FakeClient(_FakeSheet(worksheet))
+    monkeypatch.setattr("library.sheets_sync._authorize", lambda config: client)
+
+    sync_comics_to_sheet({"a": _record(id="a")}, _config())
+
+    assert worksheet.update_calls == []  # no-op: content already matches
+
+
+def test_sync_comics_to_sheet_updates_changed_row_in_place(monkeypatch):
+    existing_row = _comic_to_row(_record(id="a", status="unread"))
+    worksheet = _FakeWorksheet(rows=[_HEADER, existing_row])
+    client = _FakeClient(_FakeSheet(worksheet))
+    monkeypatch.setattr("library.sheets_sync._authorize", lambda config: client)
+
+    sync_comics_to_sheet({"a": _record(id="a", status="read")}, _config())
+
+    assert len(worksheet.update_calls) == 1
+    values, range_name, kwargs = worksheet.update_calls[0]
+    assert range_name == "A2"
+    assert values == [_comic_to_row(_record(id="a", status="read"))]
+    assert kwargs == {"raw": False}
+    assert worksheet._rows[1][6] == "read"
+
+
+def test_sync_comics_to_sheet_inserts_new_comic_at_top_without_touching_existing_rows(monkeypatch):
+    existing_row = _comic_to_row(_record(id="a", added_date="2026-01-01"))
+    worksheet = _FakeWorksheet(rows=[_HEADER, existing_row])
+    fake_sheet = _FakeSheet(worksheet)
+    client = _FakeClient(fake_sheet)
+    monkeypatch.setattr("library.sheets_sync._authorize", lambda config: client)
+
+    new_comic = _record(id="b", series="Brand New", issue_number="1", added_date="2026-09-08")
+    sync_comics_to_sheet({"a": _record(id="a", added_date="2026-01-01"), "b": new_comic}, _config())
+
+    assert len(fake_sheet.batch_update_calls) == 1  # the insertDimension request
+    insert_request = fake_sheet.batch_update_calls[0]["requests"][0]["insertDimension"]
+    assert insert_request["range"] == {"sheetId": 0, "dimension": "ROWS", "startIndex": 1, "endIndex": 2}
+
+    values, range_name, kwargs = worksheet.update_calls[0]
+    assert range_name == "A2"
+    assert values == [_comic_to_row(new_comic)]
+    assert kwargs == {"raw": False}
+
+    # Existing row is preserved (just shifted down beneath the new one).
+    assert worksheet._rows[2] == existing_row
+
+
 def test_sync_comics_to_sheet_resizes_native_table_to_fit_row_count(monkeypatch):
-    worksheet = _FakeWorksheet(sheet_id=42)
+    worksheet = _FakeWorksheet(sheet_id=42, rows=[_HEADER])
     existing_table = {
         "tableId": "T1",
-        "range": {"startRowIndex": 0, "endRowIndex": 3, "startColumnIndex": 0, "endColumnIndex": 10},
+        "range": {"startRowIndex": 0, "endRowIndex": 1, "startColumnIndex": 0, "endColumnIndex": 9},
     }
     fake_sheet = _FakeSheet(worksheet, tables=[existing_table])
     client = _FakeClient(fake_sheet)
     monkeypatch.setattr("library.sheets_sync._authorize", lambda config: client)
 
-    records = {"a": _record(id="a"), "b": _record(id="b"), "c": _record(id="c")}
+    records = {"a": _record(id="a"), "b": _record(id="b", series="Other", issue_number="2")}
     sync_comics_to_sheet(records, _config())
 
-    assert len(fake_sheet.batch_update_calls) == 1
-    request = fake_sheet.batch_update_calls[0]["requests"][0]["updateTable"]
+    resize_calls = [
+        c for c in fake_sheet.batch_update_calls if "updateTable" in c["requests"][0]
+    ]
+    assert len(resize_calls) == 1
+    request = resize_calls[0]["requests"][0]["updateTable"]
     assert request["table"]["tableId"] == "T1"
-    assert request["table"]["range"]["endRowIndex"] == 4  # header + 3 comics
+    assert request["table"]["range"]["endRowIndex"] == 3  # header + 2 comics
     assert request["table"]["range"]["sheetId"] == 42
     assert request["fields"] == "range"
 
 
 def test_sync_comics_to_sheet_skips_table_resize_when_already_the_right_size(monkeypatch):
-    worksheet = _FakeWorksheet()
+    existing_row = _comic_to_row(_record(id="a"))
+    worksheet = _FakeWorksheet(rows=[_HEADER, existing_row])
     existing_table = {
         "tableId": "T1",
-        "range": {"startRowIndex": 0, "endRowIndex": 2, "startColumnIndex": 0, "endColumnIndex": 10},
+        "range": {"startRowIndex": 0, "endRowIndex": 2, "startColumnIndex": 0, "endColumnIndex": 9},
     }
     fake_sheet = _FakeSheet(worksheet, tables=[existing_table])
     client = _FakeClient(fake_sheet)
@@ -189,7 +249,8 @@ def test_sync_comics_to_sheet_skips_table_resize_when_already_the_right_size(mon
 
 
 def test_sync_comics_to_sheet_skips_table_resize_when_no_table_exists(monkeypatch):
-    worksheet = _FakeWorksheet()
+    existing_row = _comic_to_row(_record(id="a"))
+    worksheet = _FakeWorksheet(rows=[_HEADER, existing_row])
     fake_sheet = _FakeSheet(worksheet, tables=[])
     client = _FakeClient(fake_sheet)
     monkeypatch.setattr("library.sheets_sync._authorize", lambda config: client)

@@ -1,8 +1,9 @@
 """Mirrors data/library_comics.json to a live Google Sheet.
 
-Full-overwrite sync only: every sync_comics_to_sheet call clears the
-target worksheet and rewrites it from the current library contents.
-Deliberately not incremental — see
+Incremental upsert: sync_comics_to_sheet reads the sheet's current rows,
+updates in place only the rows whose content actually changed, and inserts
+brand-new comics as new rows at the top (newest `added_date` first) —
+it never clears or rewrites rows that don't need to change. See
 docs/superpowers/specs/2026-09-07-google-sheets-sync-design.md.
 """
 from __future__ import annotations
@@ -18,26 +19,17 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from library.config import Config
 from library.models import ComicRecord
 
-# Matches the live sheet's "Comics" table, which the user converted to a
-# native Sheets Table and extended with a "Helper" column (a formula, not
-# library data — see _HELPER_FORMULA below).
-_HEADER = ["Title", "Helper", "Series", "Issue #", "Author", "Year", "Publisher", "Status", "Formats", "Added Date"]
-
-# The user added this to every row so a QUERY/sort elsewhere on the sheet
-# can pull out the issue number as a real number. It references the row's
-# own Title cell, so re-templating it per row on every full-overwrite sync
-# keeps it correct even though rows get resorted (new comics land on top).
-_HELPER_FORMULA = '=VALUE(REGEXEXTRACT(A{row}, "#(\\d+)"))'
+# Matches the live sheet's "Comics" table.
+_HEADER = ["Title", "Series", "Issue #", "Author", "Year", "Publisher", "Status", "Formats", "Added Date"]
 
 
-def _comic_to_row(record: ComicRecord, sheet_row: int) -> list[str]:
+def _comic_to_row(record: ComicRecord) -> list[str]:
     if record.series and record.issue_number:
         title = f"{record.series} #{record.issue_number}"
     else:
         title = record.title
     return [
         title,
-        _HELPER_FORMULA.format(row=sheet_row),
         record.series or "",
         record.issue_number or "",
         record.author or "",
@@ -102,16 +94,61 @@ def _resize_table_to_fit(sheet: gspread.Spreadsheet, worksheet: gspread.Workshee
             })
 
 
+def _insert_new_rows_at_top(sheet: gspread.Spreadsheet, worksheet: gspread.Worksheet, rows: list[list[str]]) -> None:
+    """Shifts existing data rows down and writes `rows` into the freshly
+    opened space starting at row 2, so newly added comics keep landing at
+    the top (newest first) without touching any existing row."""
+    sheet.batch_update({
+        "requests": [{
+            "insertDimension": {
+                "range": {
+                    "sheetId": worksheet.id,
+                    "dimension": "ROWS",
+                    "startIndex": 1,
+                    "endIndex": 1 + len(rows),
+                },
+                "inheritFromBefore": False,
+            }
+        }]
+    })
+    worksheet.update(rows, "A2", raw=False)
+
+
 def sync_comics_to_sheet(records: dict[str, ComicRecord], config: Config) -> None:
-    """Clears the configured worksheet and rewrites it from `records` —
-    a full mirror, not an incremental update. See module docstring."""
+    """Upserts `records` into the configured worksheet: a comic already
+    present (matched by its Title cell) has its row updated in place only
+    if the content actually changed; a comic not yet in the sheet is
+    inserted as a new row at the top (newest `added_date` first). Existing
+    rows that don't need to change are left completely alone — this never
+    clears or regenerates the sheet, so manual formatting/columns/Table
+    setup on the sheet survive every sync. See module docstring."""
     client = _authorize(config)
     sheet = client.open_by_key(config.google_sheets.spreadsheet_id)
     worksheet = sheet.worksheet(config.google_sheets.worksheet_name)
 
-    ordered = sorted(records.values(), key=lambda r: (r.added_date, r.id), reverse=True)
-    rows = [_HEADER] + [_comic_to_row(r, sheet_row=i + 2) for i, r in enumerate(ordered)]
+    existing_values = worksheet.get_all_values()
 
-    worksheet.clear()
-    worksheet.update(rows, raw=False)
-    _resize_table_to_fit(sheet, worksheet, len(rows))
+    if not existing_values:
+        ordered = sorted(records.values(), key=lambda r: (r.added_date, r.id), reverse=True)
+        rows = [_HEADER] + [_comic_to_row(r) for r in ordered]
+        worksheet.update(rows, raw=False)
+        _resize_table_to_fit(sheet, worksheet, len(rows))
+        return
+
+    existing_rows = existing_values[1:]
+    title_to_row_index = {row[0]: i for i, row in enumerate(existing_rows) if row}
+
+    new_records = []
+    for record in records.values():
+        row = _comic_to_row(record)
+        idx = title_to_row_index.get(row[0])
+        if idx is None:
+            new_records.append(record)
+        elif existing_rows[idx] != row:
+            worksheet.update([row], f"A{idx + 2}", raw=False)
+
+    if new_records:
+        new_records.sort(key=lambda r: (r.added_date, r.id), reverse=True)
+        _insert_new_rows_at_top(sheet, worksheet, [_comic_to_row(r) for r in new_records])
+
+    _resize_table_to_fit(sheet, worksheet, len(existing_values) + len(new_records))

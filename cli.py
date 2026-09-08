@@ -401,9 +401,10 @@ def serve(config_path: str, port: int, comics_filename: str, manga_filename: str
 @main.command("sync-sheet")
 @click.option("--config", "config_path", default="config.yaml", help="Path to config.yaml")
 def sync_sheet_cmd(config_path: str) -> None:
-    """Pushes the current comics library to the configured Google Sheet
-    (full overwrite of the configured worksheet). Also the command to run
-    for the first-time OAuth consent flow. Unlike the automatic sync
+    """Upserts the current comics library into the configured Google Sheet:
+    updates rows in place only where content changed, and appends any
+    comics not yet in the sheet. Also the command to run for the
+    first-time OAuth consent flow. Unlike the automatic sync
     add-comic/check-pulls trigger, errors here are not swallowed — this
     command's whole purpose is the sync itself."""
     config = load_config(config_path)
@@ -415,8 +416,7 @@ def sync_sheet_cmd(config_path: str) -> None:
     library_path = config.data_dir / "library_comics.json"
     if not library_path.exists():
         raise click.ClickException(
-            f"No comics library at {library_path} — run sync-sheet from the repo root. "
-            "Refusing to overwrite the sheet with an empty library."
+            f"No comics library at {library_path} — run sync-sheet from the repo root."
         )
     records = load_library(library_path)
     sync_comics_to_sheet(records, config)

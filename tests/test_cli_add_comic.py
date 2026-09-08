@@ -220,11 +220,11 @@ def test_add_comic_skips_sync_when_not_configured(tmp_path: Path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     monkeypatch.setattr("cli.comic_geeks.fetch_issue", lambda url: dict(_FETCHED_INFO))
     monkeypatch.setattr("library.covers.get_with_retry", lambda *a, **k: FakeCoverResponse())
-
-    def _fail_if_called(records, config):
-        raise AssertionError("sync_comics_to_sheet should not be called when not configured")
-    monkeypatch.setattr("cli.sync_comics_to_sheet", _fail_if_called)
+    calls = []
+    monkeypatch.setattr("cli.sync_comics_to_sheet", lambda records, config: calls.append(records))
 
     result = CliRunner().invoke(main, ["add-comic", "https://leagueofcomicgeeks.com/comic/6297209/absolute-batman-16", "--config", str(config_path)], input="y\n")
 
     assert result.exit_code == 0
+    assert calls == []
+    assert "Google Sheets" not in result.output

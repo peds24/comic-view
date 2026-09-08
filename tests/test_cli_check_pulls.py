@@ -244,11 +244,11 @@ def test_check_pulls_skips_sync_when_not_configured(tmp_path: Path, monkeypatch)
         lambda self, series, number, year=None: ({"id": 999, "series": {"name": "Batman"}, "number": "13"}, "ok", []),
     )
 
-    def _fail_if_called(records, config):
-        raise AssertionError("sync_comics_to_sheet should not be called when not configured")
-    monkeypatch.setattr("cli.sync_comics_to_sheet", _fail_if_called)
+    calls = []
+    monkeypatch.setattr("cli.sync_comics_to_sheet", lambda records, config: calls.append(records))
 
     result = CliRunner().invoke(main, ["check-pulls", "--config", str(config_path)], input="y\n")
 
     assert result.exit_code == 0
-    assert "Synced to Google Sheets." not in result.output
+    assert calls == []
+    assert "Google Sheets" not in result.output

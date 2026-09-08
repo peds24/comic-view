@@ -50,45 +50,71 @@ export function AddItemForm() {
   const placeholder = type === 'comic' ? 'UPC, ISBN, or League of Comic Geeks link' : 'Title or ISBN'
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h1>Add to collection</h1>
-      <label>
-        <input type="radio" checked={type === 'comic'} onChange={() => setType('comic')} />
-        Comic
-      </label>
-      <label>
-        <input type="radio" checked={type === 'manga'} onChange={() => setType('manga')} />
-        Manga
-      </label>
+    <div className="admin-page">
+      <form className="admin-frame" onSubmit={handleSubmit}>
+        <h1>Add to the longbox</h1>
+        <p className="sub">Comics: UPC, ISBN, or a League of Comic Geeks link. Manga: title or ISBN.</p>
 
-      <input
-        type="text"
-        placeholder={placeholder}
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-      />
-
-      <label>
-        <input type="checkbox" checked={digital} onChange={(e) => setDigital(e.target.checked)} />
-        Digital
-      </label>
-      <label>
-        <input type="checkbox" checked={print} onChange={(e) => setPrint(e.target.checked)} />
-        Physical
-      </label>
-
-      <button type="submit" disabled={!canSubmit}>
-        {submitting ? 'Adding…' : 'Add'}
-      </button>
-
-      {error && <div role="alert">{error}</div>}
-      {result && (
-        <div>
-          {result.merged ? 'Merged into existing record: ' : 'Added: '}
-          {result.record.title}
-          {result.record.cover_path && <img src={`/data/covers/${result.record.cover_path}`} alt={result.record.title} />}
+        <div className="toggle-row">
+          <label className={`toggle${type === 'comic' ? ' active' : ''}`}>
+            <input type="radio" name="item-type" checked={type === 'comic'} onChange={() => setType('comic')} />
+            Comic
+          </label>
+          <label className={`toggle${type === 'manga' ? ' active' : ''}`}>
+            <input type="radio" name="item-type" checked={type === 'manga'} onChange={() => setType('manga')} />
+            Manga
+          </label>
         </div>
-      )}
-    </form>
+
+        <div className="field">
+          <label className="sr-only" htmlFor="quick-add-input">
+            {placeholder}
+          </label>
+          <input
+            id="quick-add-input"
+            type="text"
+            placeholder={placeholder}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+          />
+        </div>
+
+        <div className="check-row">
+          <label className={`check${digital ? ' on' : ''}`}>
+            <input type="checkbox" checked={digital} onChange={(e) => setDigital(e.target.checked)} />
+            <span className="box" />
+            Digital
+          </label>
+          <label className={`check${print ? ' on' : ''}`}>
+            <input type="checkbox" checked={print} onChange={(e) => setPrint(e.target.checked)} />
+            <span className="box" />
+            Physical
+          </label>
+        </div>
+
+        <button className="submit" type="submit" disabled={!canSubmit}>
+          {submitting ? 'Adding…' : 'Add'}
+        </button>
+
+        {error && (
+          <div className="inline-error" role="alert">
+            {error}
+          </div>
+        )}
+        {result && (
+          <div className="result-preview">
+            {result.record.cover_path && (
+              <img src={`/data/covers/${result.record.cover_path}`} alt={result.record.title} />
+            )}
+            <div className="txt">
+              <div>
+                <span className="status-word">{result.merged ? 'Merged' : 'Added'}</span> — {result.record.title}
+              </div>
+              <div className="meta">{formats.join(', ')}</div>
+            </div>
+          </div>
+        )}
+      </form>
+    </div>
   )
 }

@@ -26,18 +26,23 @@ function BrowsingView() {
     [currentIndex, visible.length],
   )
 
-  if (loading) return <div>Loading…</div>
-  if (error) return <div>Error: {error}</div>
+  if (loading) return <div className="page">Loading…</div>
+  if (error) return <div className="page">Error: {error}</div>
 
   return (
-    <div>
-      <FilterBar
-        records={records}
-        sortMode={sortMode}
-        onSortModeChange={setSortMode}
-        publisher={publisher}
-        onPublisherChange={setPublisher}
-      />
+    <div className="page">
+      <div className="masthead">
+        <div className="wordmark">
+          The <span>Longbox</span>
+        </div>
+        <FilterBar
+          records={records}
+          sortMode={sortMode}
+          onSortModeChange={setSortMode}
+          publisher={publisher}
+          onPublisherChange={setPublisher}
+        />
+      </div>
       <TimelineScrubber
         records={visible}
         currentIndex={safeIndex}

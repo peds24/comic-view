@@ -17,8 +17,8 @@ function currentLabel(records: ComicRecord[], currentIndex: number, sortMode: So
 
 export function TimelineScrubber({ records, currentIndex, sortMode, onScrub }: TimelineScrubberProps) {
   return (
-    <div data-testid="timeline-scrubber">
-      <span>{currentLabel(records, currentIndex, sortMode)}</span>
+    <div className="timeline" data-testid="timeline-scrubber">
+      <span className="label">{currentLabel(records, currentIndex, sortMode)}</span>
       <input
         type="range"
         min={0}

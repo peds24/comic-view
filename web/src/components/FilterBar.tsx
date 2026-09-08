@@ -13,20 +13,24 @@ export function FilterBar({ records, sortMode, onSortModeChange, publisher, onPu
   const publishers = distinctPublishers(records)
 
   return (
-    <div data-testid="filter-bar">
-      <select value={sortMode} onChange={(e) => onSortModeChange(e.target.value as SortMode)}>
-        <option value="year">Year Published</option>
-        <option value="az">A → Z</option>
-        <option value="za">Z → A</option>
-      </select>
-      <select value={publisher ?? ''} onChange={(e) => onPublisherChange(e.target.value || null)}>
-        <option value="">All publishers</option>
-        {publishers.map((p) => (
-          <option key={p} value={p}>
-            {p}
-          </option>
-        ))}
-      </select>
+    <div className="filter-bar" data-testid="filter-bar">
+      <div className="field-select">
+        <select value={sortMode} onChange={(e) => onSortModeChange(e.target.value as SortMode)}>
+          <option value="year">Year Published</option>
+          <option value="az">A → Z</option>
+          <option value="za">Z → A</option>
+        </select>
+      </div>
+      <div className="field-select">
+        <select value={publisher ?? ''} onChange={(e) => onPublisherChange(e.target.value || null)}>
+          <option value="">All publishers</option>
+          {publishers.map((p) => (
+            <option key={p} value={p}>
+              {p}
+            </option>
+          ))}
+        </select>
+      </div>
     </div>
   )
 }

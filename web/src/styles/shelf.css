@@ -61,16 +61,6 @@
   display: block;
 }
 
-.cover-card .halftone {
-  position: absolute;
-  inset: 0;
-  background-image: radial-gradient(rgba(0, 0, 0, 0.35) 1px, transparent 1.3px);
-  background-size: 5px 5px;
-  mix-blend-mode: multiply;
-  opacity: 0.35;
-  pointer-events: none;
-}
-
 .cover-card .plate {
   position: absolute;
   left: 0;

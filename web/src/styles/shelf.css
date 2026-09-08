@@ -1,0 +1,138 @@
+/* The 3D shelf/carousel — perspective stage and per-card transform. Card
+   positioning itself is computed in lib/shelfTransform.ts and applied as
+   inline CSS custom properties; this file only reads those properties. */
+
+.stage {
+  position: relative;
+  height: clamp(360px, 46vw, 460px);
+  perspective: 1400px;
+  background:
+    radial-gradient(ellipse 60% 70% at 50% 42%, rgba(255, 255, 255, 0.035), transparent 65%),
+    radial-gradient(ellipse 90% 60% at 50% 105%, rgba(0, 0, 0, 0.5), transparent 60%),
+    var(--stage);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.stage .track {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+}
+
+.cover-card {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 168px;
+  height: 252px;
+  margin: -126px 0 0 -84px;
+  border-radius: 1px;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+  transform: translate3d(var(--tx, 0px), 0, var(--tz, 0px)) rotateY(var(--ry, 0deg)) scale(var(--sc, 1));
+  opacity: var(--op, 1);
+  filter: blur(var(--bl, 0px));
+  box-shadow: 0 22px 30px -12px var(--shadow), 0 4px 10px rgba(0, 0, 0, 0.35);
+  transition:
+    transform 0.55s cubic-bezier(0.22, 0.9, 0.32, 1),
+    opacity 0.55s ease,
+    filter 0.55s ease;
+  z-index: var(--z, 0);
+  background: var(--surface-raised);
+  overflow: hidden;
+}
+
+.cover-card .art {
+  position: absolute;
+  inset: 0;
+}
+
+.cover-card .art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.cover-card .halftone {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(0, 0, 0, 0.35) 1px, transparent 1.3px);
+  background-size: 5px 5px;
+  mix-blend-mode: multiply;
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.cover-card .plate {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 10px 11px 11px;
+  background: linear-gradient(to top, rgba(6, 6, 5, 0.9), transparent);
+}
+
+.cover-card .plate .series {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 14.5px;
+  line-height: 1.05;
+  color: var(--text);
+  text-wrap: balance;
+}
+
+.cover-card .plate .issue {
+  margin-top: 2px;
+  font-size: 10.5px;
+  color: var(--text-muted);
+}
+
+.cover-card .status-dot {
+  position: absolute;
+  top: 9px;
+  right: 9px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: transparent;
+  border: 1px solid rgba(245, 243, 236, 0.45);
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.5);
+}
+
+.cover-card[data-status='read'] .status-dot {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.shelf-caption {
+  text-align: center;
+  margin-top: 26px;
+}
+
+.shelf-caption .title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(26px, 4vw, 40px);
+  line-height: 1;
+  text-wrap: balance;
+}
+
+.shelf-caption .meta {
+  margin-top: 8px;
+  color: var(--text-muted);
+  font-size: 13px;
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.shelf-caption .meta .item .lbl {
+  display: block;
+  color: var(--text-faint);
+  font-size: 10.5px;
+  margin-bottom: 2px;
+}

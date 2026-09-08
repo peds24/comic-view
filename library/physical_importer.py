@@ -139,7 +139,7 @@ def _enrich_comic_by_title(record: ComicRecord, metron: MetronSource, covers_dir
         download_cover(record, cover_url, "metron", covers_dir)
 
 
-def _enrich_comic(record: ComicRecord, upc: str, metron: MetronSource | None, covers_dir: Path) -> None:
+def enrich_comic_by_upc(record: ComicRecord, upc: str, metron: MetronSource | None, covers_dir: Path) -> None:
     if metron is None:
         return
     try:
@@ -152,7 +152,7 @@ def _enrich_comic(record: ComicRecord, upc: str, metron: MetronSource | None, co
     _apply_metron_issue(record, issue, covers_dir)
 
 
-def _enrich_isbn(
+def enrich_isbn(
     record: ComicRecord,
     isbn: str,
     google_books: GoogleBooksSource,
@@ -194,7 +194,7 @@ def _enrich_isbn(
         download_cover(record, cover_url, cover_source, covers_dir)
 
 
-def _is_isbn_shaped(code: str) -> bool:
+def is_isbn_shaped(code: str) -> bool:
     """ISBN-13 always starts with the 978/979 prefix — a Diamond UPC for a
     single comic issue never does. Both prefixes start with "9", which is
     enough to distinguish the two in this dataset (Diamond UPCs seen here
@@ -202,7 +202,7 @@ def _is_isbn_shaped(code: str) -> bool:
     return code.startswith("9")
 
 
-def _truncate_isbn(code: str) -> str:
+def truncate_isbn(code: str) -> str:
     """A print book's barcode is sometimes an 18-digit EAN — ISBN-13 plus a
     5-digit price add-on, a common convention — rather than a bare 13-digit
     ISBN-13. Only the first 13 digits are the actual ISBN; the rest doesn't
@@ -234,9 +234,9 @@ def _import_comic_row(
         stats["skipped_blank_code"] += 1
         return
 
-    is_isbn = _is_isbn_shaped(code)
+    is_isbn = is_isbn_shaped(code)
     if is_isbn:
-        code = _truncate_isbn(code)
+        code = truncate_isbn(code)
     seen = seen_isbns if is_isbn else seen_upcs
     if code in seen:
         stats["skipped_duplicate"] += 1
@@ -248,9 +248,9 @@ def _import_comic_row(
         **({"isbn": code} if is_isbn else {"upc": code}),
     )
     if is_isbn:
-        _enrich_isbn(record, code, google_books, open_library, covers_dir)
+        enrich_isbn(record, code, google_books, open_library, covers_dir)
     else:
-        _enrich_comic(record, code, metron, covers_dir)
+        enrich_comic_by_upc(record, code, metron, covers_dir)
 
     match = None
     if record.series and record.issue_number and is_matchable(record.title, record.issue_number):
@@ -292,7 +292,7 @@ def _import_manga_row(
     if not code:
         stats["skipped_blank_code"] += 1
         return
-    code = _truncate_isbn(code)
+    code = truncate_isbn(code)
     if code in seen_isbns:
         stats["skipped_duplicate"] += 1
         return
@@ -303,7 +303,7 @@ def _import_manga_row(
         series=strip_manga_volume_suffix(title) if issue_number else None,
         issue_number=issue_number, isbn=code, formats=["print"],
     )
-    _enrich_isbn(record, code, google_books, open_library, covers_dir)
+    enrich_isbn(record, code, google_books, open_library, covers_dir)
 
     match = None
     if record.series and record.issue_number:

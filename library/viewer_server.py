@@ -21,6 +21,7 @@ import json
 from pathlib import Path
 from typing import Callable
 
+from library.config import Config
 from library.covers import delete_cover_dir
 from library.manual_attach import (
     LinkAttachError,
@@ -31,7 +32,11 @@ from library.manual_attach import (
     set_title,
     set_year,
 )
+from library.metadata_sources.google_books import GoogleBooksSource
+from library.metadata_sources.metron import MetronSource
+from library.metadata_sources.open_library import OpenLibrarySource
 from library.models import ComicRecord
+from library.quick_add import QuickAddError, add_comic, add_manga
 from library.store import delete_record, load_library, save_library
 
 _VALID_FORMATS = ("digital", "print")
@@ -45,11 +50,13 @@ class ViewerRequestHandler(http.server.SimpleHTTPRequestHandler):
         comics_path: Path,
         manga_path: Path,
         covers_dir: Path,
+        config: Config,
         **kwargs,
     ) -> None:
         self.comics_path = comics_path
         self.manga_path = manga_path
         self.covers_dir = covers_dir
+        self.config = config
         super().__init__(*args, **kwargs)
 
     def do_GET(self) -> None:
@@ -82,6 +89,8 @@ class ViewerRequestHandler(http.server.SimpleHTTPRequestHandler):
             "/api/update-formats": self._update_formats,
             "/api/update-status": self._update_status,
             "/api/delete-record": self._delete_record,
+            "/api/add-comic": self._add_comic,
+            "/api/add-manga": self._add_manga,
         }
         route = routes.get(self.path)
         if route is None:
@@ -163,19 +172,24 @@ class ViewerRequestHandler(http.server.SimpleHTTPRequestHandler):
         save_library(path, records)
         return 200, {"ok": True, "record": record.to_dict()}
 
+    def _validate_formats(self, body: dict) -> list[str] | None:
+        formats = body.get("formats")
+        if not isinstance(formats, list) or not formats:
+            return None
+        if any(f not in _VALID_FORMATS for f in formats):
+            return None
+        return list(dict.fromkeys(formats))
+
     def _update_formats(self, body: dict) -> tuple[int, dict]:
         record, records, path = self._find_record(body["id"])
         if record is None:
             return 404, {"error": f"No record with id {body['id']!r}"}
 
-        formats = body.get("formats")
-        if not isinstance(formats, list) or not formats:
-            return 400, {"error": "formats must be a non-empty list"}
-        invalid = [f for f in formats if f not in _VALID_FORMATS]
-        if invalid:
-            return 400, {"error": f"invalid format(s): {invalid}"}
+        formats = self._validate_formats(body)
+        if formats is None:
+            return 400, {"error": "formats must be a non-empty list of 'digital'/'print'"}
 
-        set_formats(record, list(dict.fromkeys(formats)))
+        set_formats(record, formats)
         save_library(path, records)
         return 200, {"ok": True, "record": record.to_dict()}
 
@@ -201,6 +215,49 @@ class ViewerRequestHandler(http.server.SimpleHTTPRequestHandler):
         delete_cover_dir(record.id, self.covers_dir)
         save_library(path, records)
         return 200, {"ok": True}
+
+    def _add_comic(self, body: dict) -> tuple[int, dict]:
+        formats = self._validate_formats(body)
+        if formats is None:
+            return 400, {"error": "formats must be a non-empty list of 'digital'/'print'"}
+
+        config = self.config
+        metron = MetronSource(config.metron.username, config.metron.password) if config.metron.is_configured else None
+        google_books = GoogleBooksSource(config.google_books.api_key)
+        open_library = OpenLibrarySource()
+
+        records = load_library(self.comics_path)
+        try:
+            result = add_comic(
+                records, body["input"], formats,
+                metron=metron, google_books=google_books, open_library=open_library, covers_dir=self.covers_dir,
+            )
+        except QuickAddError as e:
+            return 422, {"error": str(e)}
+
+        save_library(self.comics_path, records)
+        return 200, {"ok": True, "merged": result.merged, "record": result.record.to_dict()}
+
+    def _add_manga(self, body: dict) -> tuple[int, dict]:
+        formats = self._validate_formats(body)
+        if formats is None:
+            return 400, {"error": "formats must be a non-empty list of 'digital'/'print'"}
+
+        config = self.config
+        google_books = GoogleBooksSource(config.google_books.api_key)
+        open_library = OpenLibrarySource()
+
+        records = load_library(self.manga_path)
+        try:
+            result = add_manga(
+                records, body["input"], formats,
+                google_books=google_books, open_library=open_library, covers_dir=self.covers_dir,
+            )
+        except QuickAddError as e:
+            return 422, {"error": str(e)}
+
+        save_library(self.manga_path, records)
+        return 200, {"ok": True, "merged": result.merged, "record": result.record.to_dict()}
 
     def _respond_json(self, status: int, payload: dict) -> None:
         body = json.dumps(payload).encode()

@@ -7,6 +7,7 @@ import threading
 
 import pytest
 
+from library.config import Config, GoogleBooksConfig, MetronConfig
 from library.models import ComicRecord
 from library.store import load_library, save_library
 from library.viewer_server import ViewerRequestHandler
@@ -39,6 +40,7 @@ def server(tmp_path, monkeypatch):
         comics_path=comics_path,
         manga_path=manga_path,
         covers_dir=covers_dir,
+        config=Config(roots=[], metron=MetronConfig(), google_books=GoogleBooksConfig(), data_dir=tmp_path),
     )
     httpd = http.server.ThreadingHTTPServer(("127.0.0.1", 0), handler)
     thread = threading.Thread(target=httpd.serve_forever, daemon=True)
@@ -315,3 +317,65 @@ def test_unknown_route_returns_404(server):
     resp.read()
     conn.close()
     assert resp.status == 404
+
+
+def test_add_comic_endpoint_creates_new_record(server, monkeypatch):
+    monkeypatch.setattr(
+        "library.metadata_sources.comic_geeks.fetch_issue",
+        lambda url: {"series": "Absolute Batman", "issue_number": "17", "publisher": "DC Comics"},
+    )
+    httpd, comics_path, _ = server
+    port = httpd.server_address[1]
+
+    status, data = _post(port, "/api/add-comic", {
+        "input": "https://leagueofcomicgeeks.com/comic/1/absolute-batman-17",
+        "formats": ["print"],
+    })
+
+    assert status == 200
+    assert data["ok"] is True
+    assert data["merged"] is False
+    assert data["record"]["title"] == "Absolute Batman #17"
+    records = load_library(comics_path)
+    assert any(r.title == "Absolute Batman #17" for r in records.values())
+
+
+def test_add_comic_endpoint_rejects_unrecognized_input(server):
+    httpd, _, _ = server
+    port = httpd.server_address[1]
+
+    status, data = _post(port, "/api/add-comic", {"input": "not an identifier", "formats": ["print"]})
+
+    assert status == 422
+    assert "error" in data
+
+
+def test_add_comic_endpoint_rejects_invalid_formats(server):
+    httpd, _, _ = server
+    port = httpd.server_address[1]
+
+    status, data = _post(port, "/api/add-comic", {"input": "76194138584601011", "formats": ["ebook"]})
+
+    assert status == 400
+    assert "error" in data
+
+
+def test_add_manga_endpoint_creates_new_record_in_manga_file(server, monkeypatch):
+    monkeypatch.setattr(
+        "library.metadata_sources.google_books.GoogleBooksSource.search",
+        lambda self, title, year=None: {"author": "Hajime Isayama"},
+    )
+    monkeypatch.setattr(
+        "library.metadata_sources.google_books.GoogleBooksSource.cover_image_url",
+        lambda self, title, year=None: None,
+    )
+    httpd, comics_path, manga_path = server
+    port = httpd.server_address[1]
+
+    status, data = _post(port, "/api/add-manga", {"input": "Some New Series, Vol. 1", "formats": ["digital"]})
+
+    assert status == 200
+    assert data["ok"] is True
+    records = load_library(manga_path)
+    assert any(r.title == "Some New Series, Vol. 1" for r in records.values())
+    assert load_library(comics_path).keys() == {"upc-1"}  # comics file untouched

@@ -413,6 +413,11 @@ def sync_sheet_cmd(config_path: str) -> None:
             "(see docs/superpowers/specs/2026-09-07-google-sheets-sync-design.md)."
         )
     library_path = config.data_dir / "library_comics.json"
+    if not library_path.exists():
+        raise click.ClickException(
+            f"No comics library at {library_path} — run sync-sheet from the repo root. "
+            "Refusing to overwrite the sheet with an empty library."
+        )
     records = load_library(library_path)
     sync_comics_to_sheet(records, config)
     click.echo(f"Synced {len(records)} comic(s) to the '{config.google_sheets.worksheet_name}' worksheet.")

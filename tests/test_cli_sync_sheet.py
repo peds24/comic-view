@@ -47,3 +47,27 @@ def test_sync_sheet_syncs_library_when_configured(tmp_path: Path, monkeypatch):
     assert result.exit_code == 0
     assert "Synced 1 comic(s)" in result.output
     assert "a" in synced_with[0]
+
+
+def test_sync_sheet_refuses_when_library_file_missing(tmp_path: Path, monkeypatch):
+    """If data/library_comics.json can't be found, sync-sheet must refuse
+    rather than overwrite the live sheet with an (effectively) empty
+    library — load_library returns {} silently for a missing path, and
+    sync_comics_to_sheet does a full clear+rewrite."""
+    config_path = _write_config(tmp_path, google_sheets={
+        "spreadsheet_id": "abc123",
+        "worksheet_name": "Comics",
+        "client_secret_path": "secrets/google_client_secret.json",
+        "token_path": "secrets/google_token.json",
+    })
+    monkeypatch.chdir(tmp_path)
+    # deliberately do not create data/library_comics.json
+
+    def _fail_if_called(records, config):
+        raise AssertionError("sync_comics_to_sheet must not be called when the library file is missing")
+    monkeypatch.setattr("cli.sync_comics_to_sheet", _fail_if_called)
+
+    result = CliRunner().invoke(main, ["sync-sheet", "--config", str(config_path)])
+
+    assert result.exit_code != 0
+    assert "library_comics.json" in result.output or "No comics library" in result.output

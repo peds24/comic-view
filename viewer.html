@@ -38,6 +38,11 @@
   .card .desc { color: #999; font-size: 10px; margin-top: 2px; max-height: 3.2em; overflow: hidden; }
   .status-read { color: #6f6; }
   .status-unread { color: #ff6; }
+  .card .status-dot {
+    cursor: pointer; font-size: 13px; margin-left: 6px; user-select: none;
+    transition: opacity 0.15s;
+  }
+  .card .status-dot:hover { opacity: 0.7; }
   .flag { color: #f66; font-weight: bold; }
   #dupes .grid { border: 1px solid #633; padding: 8px; margin-bottom: 8px; background: #2a1f1f; }
   #missing .grid { border: 1px solid #654; padding: 8px; margin-bottom: 8px; background: #2a2519; }
@@ -149,7 +154,9 @@ function cardHtml(r) {
       (<input class="year-input" data-id="${r.id}" value="${r.year || ''}" placeholder="year?" size="4">)
     </div>
     <div class="meta">${r.publisher || '?'} · ${r.type}${r.author ? ' · ' + r.author : ''}</div>
-    <div class="formats-row">${formatCheckboxes(r)} <span class="status-${r.status}">${r.status}</span></div>
+    <div class="formats-row">${formatCheckboxes(r)}
+      <span class="status-dot status-${r.status}" data-id="${r.id}" title="Click to mark ${r.status === 'read' ? 'unread' : 'read'}">● ${r.status}</span>
+    </div>
     <div class="id">${r.id}</div>
     <div class="code">${codeText(r)}</div>
     <div class="cover-path">${r.cover_path || '(none)'}</div>
@@ -545,6 +552,33 @@ document.addEventListener('click', async (e) => {
       }
       btn.disabled = false;
       btn.textContent = 'Delete permanently';
+    }
+    return;
+  }
+
+  if (e.target.classList.contains('status-dot')) {
+    const dot = e.target;
+    const id = dot.dataset.id;
+    const record = allRecords.find(r => r.id === id);
+    if (!record) return;
+    const newStatus = record.status === 'read' ? 'unread' : 'read';
+
+    dot.style.pointerEvents = 'none';
+    try {
+      await postJson('/api/update-status', { id, status: newStatus });
+      record.status = newStatus;
+      dot.classList.remove('status-read', 'status-unread');
+      dot.classList.add(`status-${newStatus}`);
+      dot.textContent = `● ${newStatus}`;
+      dot.title = `Click to mark ${newStatus === 'read' ? 'unread' : 'read'}`;
+    } catch (err) {
+      const statusEl = statusElFor(id);
+      if (statusEl) {
+        statusEl.className = 'attach-status error';
+        statusEl.textContent = 'Error updating status: ' + err.message;
+      }
+    } finally {
+      dot.style.pointerEvents = '';
     }
     return;
   }

@@ -23,11 +23,28 @@ from urllib.parse import urlparse
 
 import requests
 
-from library.matching import is_matchable
+from library.matching import is_matchable, normalize_issue
 from library.metadata_sources.base import MetadataSource
 from library.models import ComicRecord
 
 _DEFAULT_COVER_EXT = ".jpg"
+
+
+def _search_query_title(record: ComicRecord) -> str:
+    """Title text sent to a source's search(). A manga record's series name
+    alone ("Berserk") is ambiguous across dozens of editions/languages — a
+    live Google Books check confirmed the bare series query surfaces
+    whatever edition ranks first (often a foreign-language one with no
+    author/description), while adding the volume number ("Berserk Vol. 1")
+    reliably surfaces the intended English volume. Comics don't get this
+    treatment here: Metron's title search already disambiguates by
+    series+year internally (see MetronSource._find_series), and an
+    individual issue's exact-number lookup is handled separately via UPC in
+    the physical importer, not through this generic search path."""
+    base = record.series or record.title
+    if record.type == "manga" and record.issue_number:
+        return f"{base} Vol. {normalize_issue(record.issue_number)}"
+    return base
 
 
 def enrich_record(
@@ -42,7 +59,7 @@ def enrich_record(
     for source in sources:
         if not force and not record.missing_fields():
             break
-        query_title = record.series or record.title
+        query_title = _search_query_title(record)
         try:
             partial = source.search(query_title, record.year)
         except Exception:

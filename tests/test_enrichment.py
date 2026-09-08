@@ -12,8 +12,10 @@ class FakeSource:
     def __init__(self, text_fields: dict | None = None, cover_url: str | None = None):
         self._text_fields = text_fields or {}
         self._cover_url = cover_url
+        self.search_calls: list[str] = []
 
     def search(self, title: str, year=None) -> dict:
+        self.search_calls.append(title)
         return dict(self._text_fields)
 
     def cover_image_url(self, title: str, year=None) -> str | None:
@@ -70,6 +72,35 @@ def test_no_op_when_record_fully_complete(tmp_path: Path):
     source = FakeSource()
     changed = enrich_record(record, [source], tmp_path)
     assert changed is False
+
+
+def test_manga_search_query_includes_volume_number(tmp_path: Path):
+    """A bare series-name query ("Berserk") is ambiguous across many
+    editions/languages — including the volume number disambiguates it,
+    per the live Google Books check that motivated this."""
+    record = ComicRecord(
+        id="m1", title="Berserk #1", type="manga", series="Berserk",
+        issue_number="01", cover_path="m1/cover.jpg", formats=["digital"],
+    )
+    source = FakeSource(text_fields={"author": "Kentaro Miura"})
+
+    enrich_record(record, [source], tmp_path)
+
+    assert source.search_calls == ["Berserk Vol. 1"]
+
+
+def test_comic_search_query_is_series_name_only(tmp_path: Path):
+    """Comics don't get the volume-number treatment — Metron's own
+    search already disambiguates by series+year internally."""
+    record = ComicRecord(
+        id="c1", title="Kingdom Come #1", type="comic", series="Kingdom Come",
+        issue_number="1", cover_path="c1/cover.jpg", formats=["digital"],
+    )
+    source = FakeSource(text_fields={"author": "Mark Waid"})
+
+    enrich_record(record, [source], tmp_path)
+
+    assert source.search_calls == ["Kingdom Come"]
 
 
 def test_cover_fetch_failure_is_swallowed_gracefully(tmp_path: Path, monkeypatch):

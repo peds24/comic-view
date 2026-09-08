@@ -2,6 +2,7 @@
 import { useMemo, useState } from 'react'
 import { useLibrary } from './data/useLibrary'
 import { sortRecords, filterByPublisher, type SortMode } from './lib/sort'
+import { useScrollPhysics } from './hooks/useScrollPhysics'
 import { CoverShelf } from './components/CoverShelf'
 import { FilterBar } from './components/FilterBar'
 import { SearchBox } from './components/SearchBox'
@@ -30,6 +31,12 @@ function BrowsingView() {
     [currentIndex, visible.length],
   )
 
+  // Lifted above CoverShelf so TimelineScrubber can track the same live,
+  // possibly-fractional scroll position — otherwise it only ever sees the
+  // settled index and its year/letter label and track appear frozen for
+  // the whole length of a scroll or held key, then jump once it settles.
+  const { position, handleWheel, handleArrowKey } = useScrollPhysics(visible.length, safeIndex, setCurrentIndex)
+
   if (loading) return <div className="page">Loading…</div>
   if (error) return <div className="page">Error: {error}</div>
 
@@ -50,15 +57,18 @@ function BrowsingView() {
       </div>
       <TimelineScrubber
         records={visible}
-        currentIndex={safeIndex}
+        position={position}
         sortMode={sortMode}
         onScrub={setCurrentIndex}
       />
       <CoverShelf
         records={visible}
         currentIndex={safeIndex}
+        position={position}
         onIndexChange={setCurrentIndex}
         onSelect={setSelected}
+        onWheel={handleWheel}
+        onArrowKey={handleArrowKey}
       />
       {selected && <DetailOverlay record={selected} onClose={() => setSelected(null)} />}
     </div>

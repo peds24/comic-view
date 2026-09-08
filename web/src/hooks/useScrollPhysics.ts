@@ -7,16 +7,19 @@ const WHEEL_Y_TO_VELOCITY = 0.05
 // deltas than vertical for a comparable physical gesture, and this shelf
 // is a horizontal carousel where that axis is the primary way to browse —
 // so it gets its own, weaker scaling rather than sharing deltaY's.
-const WHEEL_X_TO_VELOCITY = 0.01
+const WHEEL_X_TO_VELOCITY = 0.006
 const ARROW_KEY_IMPULSE = 0.05
-// Bounds how fast the shelf can ever move, regardless of input source.
-// Without this, a sustained stream of impulses (a real trackpad swipe, or
-// a held arrow key firing OS auto-repeat) arrives faster than one frame's
-// friction decay can dissipate it, so each new impulse lands on top of
-// velocity that's barely decayed — velocity (and therefore speed) keeps
-// climbing for as long as the input continues, rocketing across the whole
-// shelf in well under a second instead of coasting at a controllable pace.
-const MAX_VELOCITY = 0.25
+// Bounds how fast the shelf can ever move — without this, a sustained
+// stream of impulses (a real trackpad swipe, or a held arrow key firing OS
+// auto-repeat) arrives faster than one frame's friction decay can
+// dissipate it, so each new impulse lands on top of velocity that's barely
+// decayed — velocity (and therefore speed) keeps climbing for as long as
+// the input continues, rocketing across the whole shelf in well under a
+// second instead of coasting at a controllable pace. Scroll gets its own,
+// lower ceiling than arrow keys since sustained scroll gestures are the
+// easiest way to keep feeding impulses faster than they can decay.
+const WHEEL_MAX_VELOCITY = 0.12
+const ARROW_MAX_VELOCITY = 0.25
 
 export function useScrollPhysics(itemCount: number, currentIndex: number, onIndexChange: (index: number) => void) {
   const [position, setPosition] = useState(0)
@@ -43,9 +46,9 @@ export function useScrollPhysics(itemCount: number, currentIndex: number, onInde
   // is the acceleration: keep scrolling/holding and each new impulse lands
   // on top of motion that hasn't decayed away yet.
   const applyImpulse = useCallback(
-    (delta: number) => {
+    (delta: number, maxVelocity: number) => {
       const nextVelocity = stateRef.current.velocity + delta
-      const clamped = Math.max(-MAX_VELOCITY, Math.min(MAX_VELOCITY, nextVelocity))
+      const clamped = Math.max(-maxVelocity, Math.min(maxVelocity, nextVelocity))
       stateRef.current = { ...stateRef.current, velocity: clamped }
       if (rafRef.current === null) rafRef.current = requestAnimationFrame(tick)
     },
@@ -53,7 +56,8 @@ export function useScrollPhysics(itemCount: number, currentIndex: number, onInde
   )
 
   const handleWheel = useCallback(
-    (deltaX: number, deltaY: number) => applyImpulse(deltaX * WHEEL_X_TO_VELOCITY + deltaY * WHEEL_Y_TO_VELOCITY),
+    (deltaX: number, deltaY: number) =>
+      applyImpulse(deltaX * WHEEL_X_TO_VELOCITY + deltaY * WHEEL_Y_TO_VELOCITY, WHEEL_MAX_VELOCITY),
     [applyImpulse],
   )
 
@@ -65,7 +69,7 @@ export function useScrollPhysics(itemCount: number, currentIndex: number, onInde
   const handleArrowKey = useCallback(
     (direction: 1 | -1, isRepeat: boolean) => {
       if (isRepeat || rafRef.current !== null) {
-        applyImpulse(direction * ARROW_KEY_IMPULSE)
+        applyImpulse(direction * ARROW_KEY_IMPULSE, ARROW_MAX_VELOCITY)
       } else {
         onIndexChange(Math.min(itemCount - 1, Math.max(0, currentIndex + direction)))
       }

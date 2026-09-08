@@ -8,13 +8,16 @@ from cli import main
 from library.pull_calendar import PulledItem
 
 
-def _write_config(tmp_path: Path, calendar_url: str = "https://leagueofcomicgeeks.com/member/calendar_ics/peds24") -> Path:
+def _write_config(tmp_path: Path, calendar_url: str = "https://leagueofcomicgeeks.com/member/calendar_ics/peds24", google_sheets: dict | None = None) -> Path:
     config_path = tmp_path / "config.yaml"
-    config_path.write_text(yaml.dump({
+    data = {
         "roots": [{"path": str(tmp_path), "type": "comic"}],
         "metron": {"username": "user", "password": "pass"},
         "pull_list": {"calendar_url": calendar_url},
-    }))
+    }
+    if google_sheets:
+        data["google_sheets"] = google_sheets
+    config_path.write_text(yaml.dump(data))
     return config_path
 
 
@@ -176,3 +179,76 @@ def test_check_pulls_handles_metron_exception_without_crashing(tmp_path: Path, m
     state = (tmp_path / "data" / "pull_state.json").read_text()
     assert "good@cg" in state
     assert "bad@cg" in state  # flagged item's UID still recorded so it isn't retried forever
+
+
+_SHEETS_CONFIG = {
+    "spreadsheet_id": "abc123",
+    "worksheet_name": "Comics",
+    "client_secret_path": "secrets/google_client_secret.json",
+    "token_path": "secrets/google_token.json",
+}
+
+
+def test_check_pulls_syncs_to_sheets_when_configured(tmp_path: Path, monkeypatch):
+    config_path = _write_config(tmp_path, google_sheets=_SHEETS_CONFIG)
+    monkeypatch.chdir(tmp_path)
+
+    item = PulledItem(event_uid="uid@cg", release_date=date(2020, 1, 1), title="Batman #13", price="$4.99")
+    monkeypatch.setattr("cli.fetch_pulled_items", lambda url: [item])
+    monkeypatch.setattr(
+        "cli.MetronSource.find_issue_confident",
+        lambda self, series, number, year=None: ({"id": 999, "series": {"name": "Batman"}, "number": "13"}, "ok", []),
+    )
+    synced_with = []
+    monkeypatch.setattr("cli.sync_comics_to_sheet", lambda records, config: synced_with.append(records))
+
+    result = CliRunner().invoke(main, ["check-pulls", "--config", str(config_path)], input="y\n")
+
+    assert result.exit_code == 0
+    assert "Synced to Google Sheets." in result.output
+    assert len(synced_with) == 1
+    assert "metron-999" in synced_with[0]
+
+
+def test_check_pulls_reports_sheets_sync_failure_as_warning(tmp_path: Path, monkeypatch):
+    config_path = _write_config(tmp_path, google_sheets=_SHEETS_CONFIG)
+    monkeypatch.chdir(tmp_path)
+
+    item = PulledItem(event_uid="uid@cg", release_date=date(2020, 1, 1), title="Batman #13", price="$4.99")
+    monkeypatch.setattr("cli.fetch_pulled_items", lambda url: [item])
+    monkeypatch.setattr(
+        "cli.MetronSource.find_issue_confident",
+        lambda self, series, number, year=None: ({"id": 999, "series": {"name": "Batman"}, "number": "13"}, "ok", []),
+    )
+
+    def _boom(records, config):
+        raise RuntimeError("network down")
+    monkeypatch.setattr("cli.sync_comics_to_sheet", _boom)
+
+    result = CliRunner().invoke(main, ["check-pulls", "--config", str(config_path)], input="y\n")
+
+    assert result.exit_code == 0
+    assert "Warning: could not sync to Google Sheets: network down" in result.output
+    library = (tmp_path / "data" / "library_comics.json").read_text()
+    assert "metron-999" in library  # local library still updated despite sync failure
+
+
+def test_check_pulls_skips_sync_when_not_configured(tmp_path: Path, monkeypatch):
+    config_path = _write_config(tmp_path)  # no google_sheets block
+    monkeypatch.chdir(tmp_path)
+
+    item = PulledItem(event_uid="uid@cg", release_date=date(2020, 1, 1), title="Batman #13", price="$4.99")
+    monkeypatch.setattr("cli.fetch_pulled_items", lambda url: [item])
+    monkeypatch.setattr(
+        "cli.MetronSource.find_issue_confident",
+        lambda self, series, number, year=None: ({"id": 999, "series": {"name": "Batman"}, "number": "13"}, "ok", []),
+    )
+
+    def _fail_if_called(records, config):
+        raise AssertionError("sync_comics_to_sheet should not be called when not configured")
+    monkeypatch.setattr("cli.sync_comics_to_sheet", _fail_if_called)
+
+    result = CliRunner().invoke(main, ["check-pulls", "--config", str(config_path)], input="y\n")
+
+    assert result.exit_code == 0
+    assert "Synced to Google Sheets." not in result.output

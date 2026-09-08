@@ -48,6 +48,20 @@ def _echo_comic_preview(*, title: str, year, author, description) -> None:
     click.echo(f"      Description: {desc or '(none)'}")
 
 
+def _sync_sheet_or_warn(records: dict[str, ComicRecord], config, *, on_success: str | None = None) -> None:
+    """Syncs to Google Sheets if configured; never raises — a failure
+    only prints a warning, matching the existing git-commit error
+    handling. No-ops silently if google_sheets isn't configured."""
+    if not config.google_sheets.is_configured:
+        return
+    try:
+        sync_comics_to_sheet(records, config)
+        if on_success:
+            click.echo(on_success)
+    except Exception as e:
+        click.echo(f"Warning: could not sync to Google Sheets: {e}")
+
+
 @main.command()
 @click.option("--config", "config_path", default="config.yaml", help="Path to config.yaml")
 @click.option("--data", "data_filename", default="library_digital.json", help="Library JSON filename under data/ to update — scan only ever produces digital-format records.")
@@ -268,6 +282,9 @@ def check_pulls_cmd(config_path: str) -> None:
                 click.echo("Committed to git.")
         except Exception as e:
             click.echo(f"Warning: could not commit to git: {e}")
+
+        if added or merged:
+            _sync_sheet_or_warn(records, config, on_success="Synced to Google Sheets.")
 
 
 @main.command("add-comic")

@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd "/Users/pedrosh/personal_projects/comic-view-ui"
+exec .venv/bin/comic-library add-comic "$@"

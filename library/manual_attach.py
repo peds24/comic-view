@@ -10,7 +10,7 @@ from pathlib import Path
 
 from library.covers import download_cover, save_cover_bytes
 from library.metadata_sources import comic_geeks
-from library.models import ComicRecord
+from library.models import ComicRecord, ReadStatus
 
 _OVERWRITE_FIELDS = ("series", "issue_number", "publisher", "year", "description", "author")
 
@@ -44,6 +44,12 @@ def set_formats(record: ComicRecord, formats: list[str]) -> None:
     """Overwrites this record's formats (e.g. correcting a digital scan
     that's actually also owned in print, or vice versa)."""
     record.formats = formats
+
+
+def set_status(record: ComicRecord, status: ReadStatus) -> None:
+    """Overwrites this record's read/unread status (the viewer's read-dot
+    toggle)."""
+    record.status = status
 
 
 def _overwrite(record: ComicRecord, field: str, value, source_name: str) -> None:

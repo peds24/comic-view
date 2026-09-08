@@ -19,3 +19,9 @@ data/archive/*.xlsx
 
 # Real credentials — copy config.example.yaml to config.yaml and fill in
 config.yaml
+
+# OAuth client secret + cached token for Google Sheets sync — personal, never commit
+secrets/
+
+# Local git worktrees for isolated feature work
+.worktrees/

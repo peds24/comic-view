@@ -8,6 +8,7 @@ from library.manual_attach import (
     attach_cover_bytes,
     attach_from_link,
     set_formats,
+    set_status,
     set_title,
     set_year,
 )
@@ -131,3 +132,18 @@ def test_set_formats_overwrites_formats():
     record = _record(formats=["digital"])
     set_formats(record, ["digital", "print"])
     assert record.formats == ["digital", "print"]
+
+
+# --- set_status ---
+
+
+def test_set_status_overwrites_status():
+    record = _record(status="unread")
+    set_status(record, "read")
+    assert record.status == "read"
+
+
+def test_set_status_toggles_back_to_unread():
+    record = _record(status="read")
+    set_status(record, "unread")
+    assert record.status == "unread"

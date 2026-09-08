@@ -9,6 +9,7 @@ from library.models import ComicRecord
 
 _TRAILING_PAREN_RE = re.compile(r"\s*\([^()]*\)\s*$")
 _ISSUE_RE = re.compile(r"#(\d+)")
+_ISSUE_SUFFIX_RE = re.compile(r"\s*#\d+\s*$")
 _TRAILING_VOL_RE = re.compile(r",?\s*Vol(?:ume)?\.?\s*(\d+)\s*$", re.IGNORECASE)
 _TRAILING_NUMBER_RE = re.compile(r"\s+(\d{1,3})\s*$")
 
@@ -65,6 +66,12 @@ def strip_manga_volume_suffix(full_title: str) -> str:
     return stripped or title
 
 
+def strip_issue_suffix(full_title: str) -> str:
+    """Best-effort series name for a single-issue title with its '#N'
+    suffix removed, e.g. "Batman #14" -> "Batman"."""
+    return _ISSUE_SUFFIX_RE.sub("", full_title or "").strip()
+
+
 def is_matchable(full_title: str, issue_number: str | None) -> bool:
     if issue_number is None:
         return False
@@ -72,13 +79,13 @@ def is_matchable(full_title: str, issue_number: str | None) -> bool:
     return not any(keyword in lowered for keyword in _NON_MATCHABLE_KEYWORDS)
 
 
-def find_digital_match(
-    records: dict[str, ComicRecord], series: str, issue_number: str
+def _find_match(
+    records: dict[str, ComicRecord], series: str, issue_number: str, required_format: str | None = None
 ) -> ComicRecord | None:
     target_series = (series or "").lower()
     target_issue = normalize_issue(issue_number)
     for record in records.values():
-        if "digital" not in record.formats:
+        if required_format and required_format not in record.formats:
             continue
         if (record.series or "").lower() != target_series:
             continue
@@ -88,3 +95,20 @@ def find_digital_match(
             continue
         return record
     return None
+
+
+def find_digital_match(
+    records: dict[str, ComicRecord], series: str, issue_number: str
+) -> ComicRecord | None:
+    return _find_match(records, series, issue_number, required_format="digital")
+
+
+def find_matching_record(
+    records: dict[str, ComicRecord], series: str, issue_number: str
+) -> ComicRecord | None:
+    """Like find_digital_match, but matches a record regardless of its
+    current formats — used when adding a new format (digital or print) to
+    a comic that might already exist in the *other* format, so a new add
+    can merge into it instead of creating a duplicate id for the same
+    issue."""
+    return _find_match(records, series, issue_number)

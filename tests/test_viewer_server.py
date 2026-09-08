@@ -246,6 +246,33 @@ def test_update_formats_endpoint_rejects_invalid_format(server):
     assert "error" in data
 
 
+def test_update_status_endpoint(server):
+    httpd, comics_path, _ = server
+    port = httpd.server_address[1]
+
+    status, data = _post(port, "/api/update-status", {"id": "upc-1", "status": "read"})
+
+    assert status == 200
+    assert data["record"]["status"] == "read"
+    assert load_library(comics_path)["upc-1"].status == "read"
+
+
+def test_update_status_endpoint_rejects_invalid_status(server):
+    httpd, _, _ = server
+    port = httpd.server_address[1]
+    status, data = _post(port, "/api/update-status", {"id": "upc-1", "status": "reading"})
+    assert status == 400
+    assert "error" in data
+
+
+def test_update_status_endpoint_unknown_id_returns_404(server):
+    httpd, _, _ = server
+    port = httpd.server_address[1]
+    status, data = _post(port, "/api/update-status", {"id": "nope", "status": "read"})
+    assert status == 404
+    assert "error" in data
+
+
 def test_delete_record_endpoint_removes_record_and_cover(server, tmp_path):
     httpd, comics_path, _ = server
     port = httpd.server_address[1]

@@ -1,10 +1,12 @@
 """League of Comic Geeks (leagueofcomicgeeks.com) issue-page scraper.
 
-No public API exists, and the site's Cloudflare rule blocks requests with
-no/suspicious User-Agent header (confirmed live: a bare curl gets a 403
-"Restricted" page, the same request with a normal browser User-Agent gets
-a real 200) — unlike Metron's site, there's no JS challenge behind it, so
-a plain GET with a browser-shaped User-Agent is enough to read the page.
+No public API exists, and the site now sits behind a real Cloudflare
+managed challenge — confirmed live: a plain HTTP GET gets a 403 even with
+a normal browser-shaped User-Agent header, since a suspicious/no User-Agent
+alone is no longer the whole story. Only a real (headless) browser that can
+execute the challenge's JS gets through, which is why this module fetches
+pages via `browser_fetch` (headless Playwright) rather than a plain
+requests-style GET.
 
 Used only for a specific issue URL the user already has open in their
 browser (see manual_attach.py) — there's no title/UPC search here, only
@@ -16,19 +18,27 @@ import re
 
 from bs4 import BeautifulSoup
 
-from library.http_utils import get_with_retry
+from library import browser_fetch
 from library.matching import extract_issue
 
 _BASE_URL = "https://leagueofcomicgeeks.com"
-_USER_AGENT = (
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
-    "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-)
 _ISSUE_SUFFIX_RE = re.compile(r"\s*#\d+\s*$")
+_COMIC_ID_RE = re.compile(r"/comic/(\d+)")
 
 
 def is_comic_geeks_url(url: str) -> bool:
     return "leagueofcomicgeeks.com" in url
+
+
+def extract_comic_id(url_or_id: str) -> str | None:
+    """The numeric Comic Geeks id from a full issue URL or a bare id
+    string — used to build a fallback record id for add-comic when the
+    page itself has no UPC."""
+    stripped = url_or_id.strip()
+    if stripped.isdigit():
+        return stripped
+    match = _COMIC_ID_RE.search(stripped)
+    return match.group(1) if match else None
 
 
 def _resolve_url(url_or_id: str) -> str:
@@ -98,13 +108,11 @@ def fetch_issue(url_or_id: str) -> dict:
     plus '_image_url' if a cover is available), or {} if the page can't be
     read."""
     resolved_url = _resolve_url(url_or_id)
-    try:
-        resp = get_with_retry(resolved_url, headers={"User-Agent": _USER_AGENT}, timeout=10)
-        resp.raise_for_status()
-    except Exception:
+    html = browser_fetch.fetch_html(resolved_url)
+    if not html:
         return {}
 
-    soup = BeautifulSoup(resp.text, "html.parser")
+    soup = BeautifulSoup(html, "html.parser")
     result: dict = {}
 
     h1 = soup.find("h1")

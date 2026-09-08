@@ -23,7 +23,15 @@ from typing import Callable
 
 from library.config import Config
 from library.covers import delete_cover_dir
-from library.manual_attach import LinkAttachError, attach_cover_bytes, attach_from_link, set_formats, set_title, set_year
+from library.manual_attach import (
+    LinkAttachError,
+    attach_cover_bytes,
+    attach_from_link,
+    set_formats,
+    set_status,
+    set_title,
+    set_year,
+)
 from library.metadata_sources.google_books import GoogleBooksSource
 from library.metadata_sources.metron import MetronSource
 from library.metadata_sources.open_library import OpenLibrarySource
@@ -32,6 +40,7 @@ from library.quick_add import QuickAddError, add_comic, add_manga
 from library.store import delete_record, load_library, save_library
 
 _VALID_FORMATS = ("digital", "print")
+_VALID_STATUSES = ("read", "unread")
 
 
 class ViewerRequestHandler(http.server.SimpleHTTPRequestHandler):
@@ -78,6 +87,7 @@ class ViewerRequestHandler(http.server.SimpleHTTPRequestHandler):
             "/api/update-title": self._update_title,
             "/api/update-year": self._update_year,
             "/api/update-formats": self._update_formats,
+            "/api/update-status": self._update_status,
             "/api/delete-record": self._delete_record,
             "/api/add-comic": self._add_comic,
             "/api/add-manga": self._add_manga,
@@ -180,6 +190,19 @@ class ViewerRequestHandler(http.server.SimpleHTTPRequestHandler):
             return 400, {"error": "formats must be a non-empty list of 'digital'/'print'"}
 
         set_formats(record, formats)
+        save_library(path, records)
+        return 200, {"ok": True, "record": record.to_dict()}
+
+    def _update_status(self, body: dict) -> tuple[int, dict]:
+        record, records, path = self._find_record(body["id"])
+        if record is None:
+            return 404, {"error": f"No record with id {body['id']!r}"}
+
+        status = body.get("status")
+        if status not in _VALID_STATUSES:
+            return 400, {"error": f"status must be one of {_VALID_STATUSES}"}
+
+        set_status(record, status)
         save_library(path, records)
         return 200, {"ok": True, "record": record.to_dict()}
 

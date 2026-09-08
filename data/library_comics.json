@@ -13,7 +13,7 @@
     "isbn": "9781799505242",
     "cover_path": "isbn-9781799505242/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "print"
     ],
@@ -40,7 +40,7 @@
     "isbn": null,
     "cover_path": "241208a-014c52160e301fa9/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -71,7 +71,7 @@
     "isbn": null,
     "cover_path": "upc-76194138584601011/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "print"
     ],
@@ -99,7 +99,7 @@
     "isbn": null,
     "cover_path": "upc-76194138584601111/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "print"
     ],
@@ -127,7 +127,7 @@
     "isbn": null,
     "cover_path": "upc-76194138584601211/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "print"
     ],
@@ -155,7 +155,7 @@
     "isbn": null,
     "cover_path": "upc-76194138584601311/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "print"
     ],
@@ -183,7 +183,7 @@
     "isbn": null,
     "cover_path": "upc-76194138584601411/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "print"
     ],
@@ -211,7 +211,7 @@
     "isbn": null,
     "cover_path": "upc-76194138584601511/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "print"
     ],
@@ -239,7 +239,7 @@
     "isbn": null,
     "cover_path": "upc-76194138584601612/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "print"
     ],
@@ -269,7 +269,7 @@
     "isbn": null,
     "cover_path": "upc-76194138584601711/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "print"
     ],
@@ -297,7 +297,7 @@
     "isbn": null,
     "cover_path": "upc-76194138584601811/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "print"
     ],
@@ -325,7 +325,7 @@
     "isbn": null,
     "cover_path": "upc-76194138584601911/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "print"
     ],
@@ -353,7 +353,7 @@
     "isbn": null,
     "cover_path": "212f01d-3ab73f2f34ed100e/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -384,7 +384,7 @@
     "isbn": null,
     "cover_path": "upc-76194138584602011/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "print"
     ],
@@ -412,7 +412,7 @@
     "isbn": null,
     "cover_path": "upc-76194138584602111/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "print"
     ],
@@ -440,7 +440,7 @@
     "isbn": null,
     "cover_path": "upc-76194138584602211/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "print"
     ],
@@ -468,9 +468,10 @@
     "isbn": null,
     "cover_path": "2c14f97-3686876a0b013a03/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
-      "digital"
+      "digital",
+      "print"
     ],
     "added_date": "2026-09-03",
     "metadata_source": {
@@ -499,7 +500,7 @@
     "isbn": null,
     "cover_path": "20fcd90-eff909a565eca944/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -530,7 +531,7 @@
     "isbn": null,
     "cover_path": "24a546d-8e51f74783de2f32/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -561,7 +562,7 @@
     "isbn": null,
     "cover_path": "2a157ed-9b5f035b7757c8d9/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -592,7 +593,7 @@
     "isbn": null,
     "cover_path": "26fe386-7e7e189e7274ec85/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -623,7 +624,7 @@
     "isbn": null,
     "cover_path": "26debe1-5147734b547abd09/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -654,7 +655,7 @@
     "isbn": null,
     "cover_path": "manual-absolute-batman-08/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital",
       "print"
@@ -685,7 +686,7 @@
     "isbn": null,
     "cover_path": "upc-76194138584600911/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "print"
     ],
@@ -713,7 +714,7 @@
     "isbn": null,
     "cover_path": "upc-76194139348300111/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "print"
     ],
@@ -741,7 +742,7 @@
     "isbn": null,
     "cover_path": "upc-76194139648400111/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "print"
     ],
@@ -769,7 +770,7 @@
     "isbn": null,
     "cover_path": "23ab460-704336cc6da8b517/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -800,7 +801,7 @@
     "isbn": null,
     "cover_path": "242ee00-4b7fe11fa496bd40/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -831,7 +832,7 @@
     "isbn": null,
     "cover_path": "1e054c6-ecaf1b7771e51594/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -862,7 +863,7 @@
     "isbn": null,
     "cover_path": "35dec39-f81d69e4492c2bad/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -893,7 +894,7 @@
     "isbn": null,
     "cover_path": "1da0715-62128c2d09634a89/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -924,7 +925,7 @@
     "isbn": "9781799505204",
     "cover_path": "isbn-9781799505204/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "print"
     ],
@@ -951,7 +952,7 @@
     "isbn": null,
     "cover_path": "upc-76194138585300139/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "print"
     ],
@@ -980,7 +981,7 @@
     "isbn": null,
     "cover_path": "upc-76194138585300211/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "print"
     ],
@@ -1132,7 +1133,7 @@
     "isbn": "9781401290832",
     "cover_path": "isbn-9781401290832/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "print"
     ],
@@ -1186,7 +1187,7 @@
     "isbn": null,
     "cover_path": "255069e-baaea97661054c87/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -1217,7 +1218,7 @@
     "isbn": null,
     "cover_path": "20ac40b-73e81d2d80b006e4/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -1248,7 +1249,7 @@
     "isbn": null,
     "cover_path": "upc-76194139163200106/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital",
       "print"
@@ -1310,7 +1311,7 @@
     "isbn": null,
     "cover_path": "manual-batman-2025-10/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital",
       "print"
@@ -1372,7 +1373,7 @@
     "isbn": null,
     "cover_path": "manual-batman-2025-11/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital",
       "print"
@@ -1434,7 +1435,7 @@
     "isbn": null,
     "cover_path": "manual-batman-2025-12/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital",
       "print"
@@ -1493,7 +1494,7 @@
     "isbn": null,
     "cover_path": "16e7937-628c512da5d650ab/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -1524,7 +1525,7 @@
     "isbn": null,
     "cover_path": "upc-76194139163200271/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital",
       "print"
@@ -1555,7 +1556,7 @@
     "isbn": null,
     "cover_path": "156775e-1f302872da8de7dc/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -1586,7 +1587,7 @@
     "isbn": null,
     "cover_path": "manual-batman-2025-03/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital",
       "print"
@@ -1617,7 +1618,7 @@
     "isbn": null,
     "cover_path": "1b5fe99-876ec37a2d5d75d7/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -1648,7 +1649,7 @@
     "isbn": null,
     "cover_path": "manual-batman-2025-04/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital",
       "print"
@@ -1679,7 +1680,7 @@
     "isbn": null,
     "cover_path": "1a48699-e552cae0316fc9b3/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -1710,7 +1711,7 @@
     "isbn": null,
     "cover_path": "manual-batman-2025-05/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital",
       "print"
@@ -1741,7 +1742,7 @@
     "isbn": null,
     "cover_path": "19eeffe-a035ffa33fa24d0a/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -1772,7 +1773,7 @@
     "isbn": null,
     "cover_path": "manual-batman-2025-06/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital",
       "print"
@@ -1803,7 +1804,7 @@
     "isbn": null,
     "cover_path": "1d21ba5-79408e4d19710b0b/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -1834,7 +1835,7 @@
     "isbn": null,
     "cover_path": "manual-batman-2025-07/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital",
       "print"
@@ -1865,7 +1866,7 @@
     "isbn": null,
     "cover_path": "2426996-43bb20cfd5e624d6/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -1896,7 +1897,7 @@
     "isbn": null,
     "cover_path": "manual-batman-2025-08/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital",
       "print"
@@ -1927,7 +1928,7 @@
     "isbn": null,
     "cover_path": "261c2df-6f65bf89356728d0/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -1958,7 +1959,7 @@
     "isbn": null,
     "cover_path": "manual-batman-2025-09/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital",
       "print"
@@ -1989,7 +1990,7 @@
     "isbn": null,
     "cover_path": "d1fbece-429a749edea5777f/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -2018,7 +2019,7 @@
     "isbn": null,
     "cover_path": "48bbc349-81e0477995d5424a/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -2047,7 +2048,7 @@
     "isbn": null,
     "cover_path": "3007a8fa-8d64229dd33c080f/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -2077,7 +2078,7 @@
     "isbn": null,
     "cover_path": "2af1dce2-7621f98b0eeb2126/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -2107,7 +2108,7 @@
     "isbn": null,
     "cover_path": "2ccdf4eb-de8b61897aaca621/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -2137,7 +2138,7 @@
     "isbn": null,
     "cover_path": "232e8480-bb80d0daf8332f86/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -2167,7 +2168,7 @@
     "isbn": null,
     "cover_path": "101c712f-fa99957864c6e651/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -2196,7 +2197,7 @@
     "isbn": null,
     "cover_path": "10a45b43-4647dc1e01fcc138/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -2286,7 +2287,7 @@
     "isbn": null,
     "cover_path": "218be5b-bc9969fddd44387c/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -2317,7 +2318,7 @@
     "isbn": null,
     "cover_path": "226b5ef-831f127c599b7b74/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -2348,7 +2349,7 @@
     "isbn": null,
     "cover_path": "236a79d-b97cf5a0501e6695/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -2379,7 +2380,7 @@
     "isbn": null,
     "cover_path": "24bf473-abf895a4e88508d0/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -2410,7 +2411,7 @@
     "isbn": null,
     "cover_path": "17ae29f-04f3d730c4e1d9b6/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -2441,7 +2442,7 @@
     "isbn": null,
     "cover_path": "21ab211-d7fda8f392a8fc0d/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -2472,7 +2473,7 @@
     "isbn": null,
     "cover_path": "1a857fd-614ee5818d73d955/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -2503,7 +2504,7 @@
     "isbn": null,
     "cover_path": "3071eb2-0b842436582aa9f6/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -2534,7 +2535,7 @@
     "isbn": null,
     "cover_path": "23a28bc-b93a3e85f94514d3/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -2565,7 +2566,7 @@
     "isbn": null,
     "cover_path": "1b81d4c-2c343215daf1f168/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -2596,7 +2597,7 @@
     "isbn": null,
     "cover_path": "1b2be8e-83f179e14eab5946/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -2627,7 +2628,7 @@
     "isbn": null,
     "cover_path": "21cc819-95f717e1bf8d263c/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -2658,7 +2659,7 @@
     "isbn": null,
     "cover_path": "1d3c198-f040a8624c7f0bec/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -2689,7 +2690,7 @@
     "isbn": null,
     "cover_path": "1c9f2d6-3238e4c534bef870/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -2720,7 +2721,7 @@
     "isbn": null,
     "cover_path": "1bc6d64-5d8b281d15b4e755/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -2751,7 +2752,7 @@
     "isbn": null,
     "cover_path": "2031059-aca06fc72a9cd057/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -2782,7 +2783,7 @@
     "isbn": null,
     "cover_path": "1d9eae4-0b6b1a058636708d/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -2813,7 +2814,7 @@
     "isbn": null,
     "cover_path": "1b050d7-3357eb2f0250337a/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -2844,7 +2845,7 @@
     "isbn": null,
     "cover_path": "1fa2cb3-00909dbb337c8e0c/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -2875,7 +2876,7 @@
     "isbn": null,
     "cover_path": "2244236-4b434a0cfe681ff2/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -2906,7 +2907,7 @@
     "isbn": null,
     "cover_path": "1f4fb4f-8042b4341a5b9e45/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -2937,7 +2938,7 @@
     "isbn": null,
     "cover_path": "1eaf08e-a43fba814995ab01/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -2968,7 +2969,7 @@
     "isbn": null,
     "cover_path": "20658fc-78fe4a706de8c961/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -2999,7 +3000,7 @@
     "isbn": null,
     "cover_path": "1b95fa6-128ae926b0a6f555/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -3030,7 +3031,7 @@
     "isbn": null,
     "cover_path": "1795193-78bae3d9e0134adc/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -3061,7 +3062,7 @@
     "isbn": null,
     "cover_path": "2576ead-ba609030944bf3d6/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -3092,7 +3093,7 @@
     "isbn": null,
     "cover_path": "182bf1a-2f77d5f9b9e78a0d/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -3123,7 +3124,7 @@
     "isbn": null,
     "cover_path": "249a2dd-6ae381cadf3414a5/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -3153,7 +3154,7 @@
     "isbn": null,
     "cover_path": "20be2bb-819fc0d78d76a01d/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -3184,7 +3185,7 @@
     "isbn": null,
     "cover_path": "1849afe-6876550d441e1a33/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -3215,7 +3216,7 @@
     "isbn": "9781779527516",
     "cover_path": "isbn-9781779527516/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "print"
     ],
@@ -3242,7 +3243,7 @@
     "isbn": "9781799502685",
     "cover_path": "isbn-9781799502685/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "print"
     ],
@@ -3269,7 +3270,7 @@
     "isbn": null,
     "cover_path": "f740dd4-dca0372f61333c2f/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -3296,7 +3297,7 @@
     "isbn": "9781401244019",
     "cover_path": "isbn-9781401244019/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "print"
     ],
@@ -3323,7 +3324,7 @@
     "isbn": "9781401297244",
     "cover_path": "isbn-9781401297244/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "print"
     ],
@@ -3350,7 +3351,7 @@
     "isbn": null,
     "cover_path": "15390516-15ed194c5c649c36/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -3378,7 +3379,7 @@
     "isbn": null,
     "cover_path": "18bacf27-e84f7e8e5434c45f/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -3437,7 +3438,7 @@
     "isbn": null,
     "cover_path": "137e1a0e-a9a093d1dce8d04f/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -3464,7 +3465,7 @@
     "isbn": null,
     "cover_path": "5f5bd3a-8effae9b58a16b84/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -3491,7 +3492,7 @@
     "isbn": "9781401232597",
     "cover_path": "isbn-9781401232597/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "print"
     ],
@@ -3518,7 +3519,7 @@
     "isbn": "9781401207526",
     "cover_path": "isbn-9781401207526/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "print"
     ],
@@ -3698,7 +3699,7 @@
     "isbn": null,
     "cover_path": "1f5cdadb-ea103b7feaf73082/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -3754,7 +3755,7 @@
     "isbn": null,
     "cover_path": "28dbdc63-fe94232d371e2842/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -3840,7 +3841,7 @@
     "isbn": null,
     "cover_path": "af99eb1-e0f85cba94b3c21a/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -3869,7 +3870,7 @@
     "isbn": "9781603093972",
     "cover_path": "isbn-9781603093972/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "print"
     ],
@@ -3896,7 +3897,7 @@
     "isbn": null,
     "cover_path": "2537d637-46fbddfafcf5138b/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -3973,10 +3974,10 @@
     "type": "comic",
     "series": "Hellboy Omnibus - Strange Places",
     "issue_number": "02",
-    "author": null,
+    "author": "Mike Mignola, Gary Gianni",
     "year": 2018,
-    "publisher": null,
-    "description": null,
+    "publisher": "Dark Horse Comics",
+    "description": "The four-volume Hellboy Omnibus series along with the two volumes of The Complete Short Stories collect all of Mignola\u2019s award-winning Hellboy stories in chronological order for a definitive reading experience.",
     "upc": null,
     "isbn": null,
     "cover_path": "1721015d-60155d648c78addf/cover.jpg",
@@ -3987,10 +3988,14 @@
     ],
     "added_date": "2026-09-03",
     "metadata_source": {
-      "year": "filename",
+      "year": "comic_geeks",
       "issue_number": "filename",
       "series": "filename",
-      "title": "manual"
+      "title": "manual",
+      "publisher": "comic_geeks",
+      "description": "comic_geeks",
+      "author": "comic_geeks",
+      "cover_path": "comic_geeks"
     }
   },
   {
@@ -3999,10 +4004,10 @@
     "type": "comic",
     "series": "Hellboy Omnibus - The Wild Hunt",
     "issue_number": "03",
-    "author": null,
+    "author": "Mike Mignola, Duncan Fegredo",
     "year": 2018,
-    "publisher": null,
-    "description": null,
+    "publisher": "Dark Horse Comics",
+    "description": "The basis for the upcoming feature film Hellboy: The Rise of the Blood Queen! Terrible powers determined to kill Hellboy force him strike a deal with the Russian witch, the Baba Yaga, and to confront the truth about his destiny. The human race hangs in the balance, as well as King Arthur's sword Excalibur, in a story that wipes England off the map and sets in motion the end of the world... Mike Mignola and Duncan Fegredo's complete trilogy is collected for the first time in this 512-page volume, reprinting Darkness Calls, The Wild Hunt, and The Storm and the Fury, and the short story \"The Mole.\"\u00a0 The four-volume Hellboy Omnibus series along with the two volumes of The Complete Short Stories collect all of Mignola's award-winning Hellboy stories in chronological order for a definitive reading experience.",
     "upc": null,
     "isbn": null,
     "cover_path": "47497dc6-16cb5a605eab1313/cover.jpg",
@@ -4013,10 +4018,14 @@
     ],
     "added_date": "2026-09-03",
     "metadata_source": {
-      "year": "filename",
+      "year": "comic_geeks",
       "issue_number": "filename",
       "series": "filename",
-      "title": "manual"
+      "title": "manual",
+      "publisher": "comic_geeks",
+      "description": "comic_geeks",
+      "author": "comic_geeks",
+      "cover_path": "comic_geeks"
     }
   },
   {
@@ -4025,10 +4034,10 @@
     "type": "comic",
     "series": "Invincible Compendium",
     "issue_number": "02",
-    "author": null,
+    "author": "Robert Kirkman",
     "year": 2013,
-    "publisher": null,
-    "description": null,
+    "publisher": "Image Comics",
+    "description": "It's here: the second massive paperback collection of the greatest superhero comic in the universe! Witness Invincible's transition from new kid on the block to established superhero!",
     "upc": null,
     "isbn": null,
     "cover_path": "12cc3ac07-c5a2329935f34dc6/cover.jpg",
@@ -4039,10 +4048,14 @@
     ],
     "added_date": "2026-09-03",
     "metadata_source": {
-      "year": "filename",
+      "year": "comic_geeks",
       "issue_number": "filename",
       "series": "filename",
-      "title": "filename"
+      "title": "filename",
+      "publisher": "comic_geeks",
+      "description": "comic_geeks",
+      "author": "comic_geeks",
+      "cover_path": "comic_geeks"
     }
   },
   {
@@ -4051,10 +4064,10 @@
     "type": "comic",
     "series": "Invincible Compendium",
     "issue_number": "03",
-    "author": null,
-    "year": null,
-    "publisher": null,
-    "description": null,
+    "author": "Robert Kirkman",
+    "year": 2018,
+    "publisher": "Image Comics",
+    "description": "It\u2019s here: the third massive paperback collection of the greatest comic in the universe. Witness the conclusion of Mark Grayson\u2019s epic adventures, from \u201cThe Death of Everyone\u201d to \u201cThe End of All Things.\u201d",
     "upc": null,
     "isbn": null,
     "cover_path": "7ac1fbaa-9ed2f3df4c1a80d3/cover.jpg",
@@ -4067,12 +4080,17 @@
     "metadata_source": {
       "issue_number": "filename",
       "series": "filename",
-      "title": "filename"
+      "title": "filename",
+      "publisher": "comic_geeks",
+      "year": "comic_geeks",
+      "description": "comic_geeks",
+      "author": "comic_geeks",
+      "cover_path": "comic_geeks"
     }
   },
   {
     "id": "isbn-9781607064114",
-    "title": "Invincible Compendium Vol. 1 TP Amazon Prime Cover Edition",
+    "title": "Invincible Compendium #1",
     "type": "comic",
     "series": null,
     "issue_number": null,
@@ -4084,7 +4102,7 @@
     "isbn": "9781607064114",
     "cover_path": "isbn-9781607064114/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital",
       "print"
@@ -4095,7 +4113,8 @@
       "publisher": "open_library",
       "year": "open_library",
       "description": "google_books",
-      "cover_path": "open_library"
+      "cover_path": "open_library",
+      "title": "manual"
     }
   },
   {
@@ -4103,25 +4122,30 @@
     "title": "JLA #43",
     "type": "comic",
     "series": "JLA",
-    "issue_number": "043",
-    "author": null,
+    "issue_number": "43",
+    "author": "Mark Waid",
     "year": 2000,
-    "publisher": null,
-    "description": null,
-    "upc": null,
+    "publisher": "DC Comics",
+    "description": "Mark Waid makes his debut as new writer for the World's Greatest Super-Heroes! What could scare the JLA now that they've faced the menace of Mageddon? Well, Ra's al Ghul's not exactly a piker...",
+    "upc": "76194120811404311",
     "isbn": null,
     "cover_path": "1c7329c-adcaaa82348485b0/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
     "added_date": "2026-09-03",
     "metadata_source": {
-      "year": "filename",
-      "issue_number": "filename",
-      "series": "filename",
-      "title": "filename"
+      "year": "comic_geeks",
+      "issue_number": "comic_geeks",
+      "series": "comic_geeks",
+      "title": "filename",
+      "publisher": "comic_geeks",
+      "description": "comic_geeks",
+      "author": "comic_geeks",
+      "upc": "comic_geeks",
+      "cover_path": "comic_geeks"
     }
   },
   {
@@ -4129,25 +4153,30 @@
     "title": "JLA #44",
     "type": "comic",
     "series": "JLA",
-    "issue_number": "044",
-    "author": null,
+    "issue_number": "44",
+    "author": "Mark Waid",
     "year": 2000,
-    "publisher": null,
-    "description": null,
-    "upc": null,
+    "publisher": "DC Comics",
+    "description": "Gripped by a mysterious malady that has destroyed all communication on Earth, the world enters an even greater state of panic as speech begins to fade into unintelligible gibberish. Meanwhile, the JLA falls victim to clever attacks tailored specifically to their individual powers!",
+    "upc": "76194120811404411",
     "isbn": null,
     "cover_path": "1d60128-c0d184b0f91322a4/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
     "added_date": "2026-09-03",
     "metadata_source": {
-      "year": "filename",
-      "issue_number": "filename",
-      "series": "filename",
-      "title": "filename"
+      "year": "comic_geeks",
+      "issue_number": "comic_geeks",
+      "series": "comic_geeks",
+      "title": "filename",
+      "publisher": "comic_geeks",
+      "description": "comic_geeks",
+      "author": "comic_geeks",
+      "upc": "comic_geeks",
+      "cover_path": "comic_geeks"
     }
   },
   {
@@ -4155,25 +4184,30 @@
     "title": "JLA #45",
     "type": "comic",
     "series": "JLA",
-    "issue_number": "045",
-    "author": null,
+    "issue_number": "45",
+    "author": "Mark Waid",
     "year": 2000,
-    "publisher": null,
-    "description": null,
-    "upc": null,
+    "publisher": "DC Comics",
+    "description": "The truth behind Ra's al Ghul's master plan surprises the JLA in part 3 of the 4-part 'Tower of Babel'! In a hidden Antarctic base, the JLA finally confronts its greatest enemy\u2014and it's not Ra's al Ghul\u2014and is forced to face a horrible secret kept by one of their own.",
+    "upc": "76194120811404511",
     "isbn": null,
     "cover_path": "1bd2b0d-67a7b6890084d3ad/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
     "added_date": "2026-09-03",
     "metadata_source": {
-      "year": "filename",
-      "issue_number": "filename",
-      "series": "filename",
-      "title": "filename"
+      "year": "comic_geeks",
+      "issue_number": "comic_geeks",
+      "series": "comic_geeks",
+      "title": "filename",
+      "publisher": "comic_geeks",
+      "description": "comic_geeks",
+      "author": "comic_geeks",
+      "upc": "comic_geeks",
+      "cover_path": "comic_geeks"
     }
   },
   {
@@ -4181,25 +4215,30 @@
     "title": "JLA #46",
     "type": "comic",
     "series": "JLA",
-    "issue_number": "046",
-    "author": null,
+    "issue_number": "46",
+    "author": "Mark Waid",
     "year": 2000,
-    "publisher": null,
-    "description": null,
-    "upc": null,
+    "publisher": "DC Comics",
+    "description": "In the utterly unexpected conclusion of 'Tower of Babel,' the League has suffered its worst defeat at the hands of Batman's most resourceful enemy. Now, the JLA must heal from a kind of damage that may spell the end of their team, beginning with a startling change to the roster.",
+    "upc": "76194120811404611",
     "isbn": null,
     "cover_path": "1c616ec-46013649ad238ab8/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
     "added_date": "2026-09-03",
     "metadata_source": {
-      "year": "filename",
-      "issue_number": "filename",
-      "series": "filename",
-      "title": "filename"
+      "year": "comic_geeks",
+      "issue_number": "comic_geeks",
+      "series": "comic_geeks",
+      "title": "filename",
+      "publisher": "comic_geeks",
+      "description": "comic_geeks",
+      "author": "comic_geeks",
+      "upc": "comic_geeks",
+      "cover_path": "comic_geeks"
     }
   },
   {
@@ -4216,7 +4255,7 @@
     "isbn": null,
     "cover_path": "1627f193-e13b1a03ab56fbbf/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -4303,7 +4342,7 @@
     "isbn": null,
     "cover_path": "19c20a91-bf465285ccf69c7f/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -4317,90 +4356,15 @@
     }
   },
   {
-    "id": "1d5e9dc-24648e61462f72e3",
-    "title": "Milo Manara - Butterscotch #1",
-    "type": "comic",
-    "series": "Milo Manara - Butterscotch",
-    "issue_number": "1",
-    "author": null,
-    "year": null,
-    "publisher": null,
-    "description": null,
-    "upc": null,
-    "isbn": null,
-    "cover_path": "1d5e9dc-24648e61462f72e3/cover.jpg",
-    "preview_pages": [],
-    "status": "unread",
-    "formats": [
-      "digital"
-    ],
-    "added_date": "2026-09-03",
-    "metadata_source": {
-      "issue_number": "filename",
-      "series": "filename",
-      "title": "filename"
-    }
-  },
-  {
-    "id": "1585239-d5596fb7f20aef6d",
-    "title": "Milo Manara - Butterscotch #2",
-    "type": "comic",
-    "series": "Milo Manara - Butterscotch",
-    "issue_number": "2",
-    "author": null,
-    "year": null,
-    "publisher": null,
-    "description": null,
-    "upc": null,
-    "isbn": null,
-    "cover_path": "1585239-d5596fb7f20aef6d/cover.jpg",
-    "preview_pages": [],
-    "status": "unread",
-    "formats": [
-      "digital"
-    ],
-    "added_date": "2026-09-03",
-    "metadata_source": {
-      "issue_number": "filename",
-      "series": "filename",
-      "title": "filename"
-    }
-  },
-  {
-    "id": "5b0c9f5-ecf08a66940f588c",
-    "title": "Milo Manara - Click",
-    "type": "comic",
-    "series": "Milo Manara - Click 1",
-    "issue_number": "3",
-    "author": null,
-    "year": null,
-    "publisher": null,
-    "description": null,
-    "upc": null,
-    "isbn": null,
-    "cover_path": "5b0c9f5-ecf08a66940f588c/cover.jpg",
-    "preview_pages": [],
-    "status": "unread",
-    "formats": [
-      "digital"
-    ],
-    "added_date": "2026-09-03",
-    "metadata_source": {
-      "issue_number": "filename",
-      "series": "filename",
-      "title": "manual"
-    }
-  },
-  {
     "id": "48a255c-083eea8fb61d758f",
-    "title": "Milo Manara - El Goucho",
+    "title": "Milo Manara - El Gaucho",
     "type": "comic",
     "series": "Milo Manara - El Goucho",
     "issue_number": null,
-    "author": null,
-    "year": null,
-    "publisher": null,
-    "description": null,
+    "author": "Hugo Pratt",
+    "year": 1995,
+    "publisher": "NBM",
+    "description": "In a compelling and beautifully illustrated story centered on the New World, Tom the English drummer boy, the beautiful lass of Ireland Molly Malone, Matthew the hunchback\u00a0 and the Argentinian girl Aureliana try to keep a certain semblance of right and wrong.",
     "upc": null,
     "isbn": null,
     "cover_path": "48a255c-083eea8fb61d758f/cover.jpg",
@@ -4412,324 +4376,12 @@
     "added_date": "2026-09-03",
     "metadata_source": {
       "series": "filename",
-      "title": "filename"
-    }
-  },
-  {
-    "id": "15f48b0-d40037432b13ddf2",
-    "title": "Milo Manara - Fatal Rendezvous",
-    "type": "comic",
-    "series": "Milo Manara - Fatal Rendezvous",
-    "issue_number": null,
-    "author": null,
-    "year": null,
-    "publisher": null,
-    "description": null,
-    "upc": null,
-    "isbn": null,
-    "cover_path": "15f48b0-d40037432b13ddf2/cover.jpg",
-    "preview_pages": [],
-    "status": "unread",
-    "formats": [
-      "digital"
-    ],
-    "added_date": "2026-09-03",
-    "metadata_source": {
-      "series": "filename",
-      "title": "filename"
-    }
-  },
-  {
-    "id": "173b33b-ad46586e5d8936a9",
-    "title": "Milo Manara - Hidden Camera",
-    "type": "comic",
-    "series": "Milo Manara - Hidden Camera",
-    "issue_number": null,
-    "author": null,
-    "year": null,
-    "publisher": null,
-    "description": null,
-    "upc": null,
-    "isbn": null,
-    "cover_path": "173b33b-ad46586e5d8936a9/cover.jpg",
-    "preview_pages": [],
-    "status": "unread",
-    "formats": [
-      "digital"
-    ],
-    "added_date": "2026-09-03",
-    "metadata_source": {
-      "series": "filename",
-      "title": "filename"
-    }
-  },
-  {
-    "id": "4d78ba7-ec8752dc9b0525d0",
-    "title": "Milo Manara - Indian Summer",
-    "type": "comic",
-    "series": "Milo Manara - Indian Summer",
-    "issue_number": null,
-    "author": null,
-    "year": null,
-    "publisher": null,
-    "description": null,
-    "upc": null,
-    "isbn": null,
-    "cover_path": "4d78ba7-ec8752dc9b0525d0/cover.jpg",
-    "preview_pages": [],
-    "status": "unread",
-    "formats": [
-      "digital"
-    ],
-    "added_date": "2026-09-03",
-    "metadata_source": {
-      "series": "filename",
-      "title": "filename"
-    }
-  },
-  {
-    "id": "1d54c71-2433523f879e71ba",
-    "title": "Milo Manara - Kama Sutra",
-    "type": "comic",
-    "series": "Milo Manara - Kama Sutra",
-    "issue_number": null,
-    "author": null,
-    "year": null,
-    "publisher": null,
-    "description": null,
-    "upc": null,
-    "isbn": null,
-    "cover_path": "1d54c71-2433523f879e71ba/cover.jpg",
-    "preview_pages": [],
-    "status": "unread",
-    "formats": [
-      "digital"
-    ],
-    "added_date": "2026-09-03",
-    "metadata_source": {
-      "series": "filename",
-      "title": "filename"
-    }
-  },
-  {
-    "id": "111b2e3-180b89e019d6960c",
-    "title": "Milo Manara - Piranese - The Prison Planet",
-    "type": "comic",
-    "series": "Milo Manara - Piranese - The Prison Planet",
-    "issue_number": null,
-    "author": null,
-    "year": null,
-    "publisher": null,
-    "description": null,
-    "upc": null,
-    "isbn": null,
-    "cover_path": "111b2e3-180b89e019d6960c/cover.jpg",
-    "preview_pages": [],
-    "status": "unread",
-    "formats": [
-      "digital"
-    ],
-    "added_date": "2026-09-03",
-    "metadata_source": {
-      "series": "filename",
-      "title": "filename"
-    }
-  },
-  {
-    "id": "2a7a23f-636cda2bdc175272",
-    "title": "Milo Manara - The Adventures Of Giuseppe Bergman - African P1 - An Author In Search Of Six Characters #2",
-    "type": "comic",
-    "series": "Milo Manara - The Adventures Of Giuseppe Bergman - African P1 - An Author In Search Of Six Characters",
-    "issue_number": "2",
-    "author": null,
-    "year": null,
-    "publisher": null,
-    "description": null,
-    "upc": null,
-    "isbn": null,
-    "cover_path": "2a7a23f-636cda2bdc175272/cover.jpg",
-    "preview_pages": [],
-    "status": "unread",
-    "formats": [
-      "digital"
-    ],
-    "added_date": "2026-09-03",
-    "metadata_source": {
-      "issue_number": "filename",
-      "series": "filename",
-      "title": "filename"
-    }
-  },
-  {
-    "id": "2e12643-e56d8f11a54a2aae",
-    "title": "Milo Manara - The Adventures Of Giuseppe Bergman - African P2 - Dies Irae #3",
-    "type": "comic",
-    "series": "Milo Manara - The Adventures Of Giuseppe Bergman - African P2 - Dies Irae",
-    "issue_number": "3",
-    "author": null,
-    "year": null,
-    "publisher": null,
-    "description": null,
-    "upc": null,
-    "isbn": null,
-    "cover_path": "2e12643-e56d8f11a54a2aae/cover.jpg",
-    "preview_pages": [],
-    "status": "unread",
-    "formats": [
-      "digital"
-    ],
-    "added_date": "2026-09-03",
-    "metadata_source": {
-      "issue_number": "filename",
-      "series": "filename",
-      "title": "filename"
-    }
-  },
-  {
-    "id": "37c414f-4df56eb7f918f1e9",
-    "title": "Milo Manara - The Adventures Of Giuseppe Bergman - Great - HP And Giuseppe Bergman #1",
-    "type": "comic",
-    "series": "Milo Manara - The Adventures Of Giuseppe Bergman - Great - HP And Giuseppe Bergman",
-    "issue_number": "1",
-    "author": null,
-    "year": null,
-    "publisher": null,
-    "description": null,
-    "upc": null,
-    "isbn": null,
-    "cover_path": "37c414f-4df56eb7f918f1e9/cover.jpg",
-    "preview_pages": [],
-    "status": "unread",
-    "formats": [
-      "digital"
-    ],
-    "added_date": "2026-09-03",
-    "metadata_source": {
-      "issue_number": "filename",
-      "series": "filename",
-      "title": "filename"
-    }
-  },
-  {
-    "id": "3dd8c5f-4f680a076f2265ab",
-    "title": "Milo Manara - The Adventures Of Giuseppe Bergman - Indian - Perchance To Dream #4",
-    "type": "comic",
-    "series": "Milo Manara - The Adventures Of Giuseppe Bergman - Indian - Perchance To Dream",
-    "issue_number": "4",
-    "author": null,
-    "year": null,
-    "publisher": null,
-    "description": null,
-    "upc": null,
-    "isbn": null,
-    "cover_path": "3dd8c5f-4f680a076f2265ab/cover.jpg",
-    "preview_pages": [],
-    "status": "unread",
-    "formats": [
-      "digital"
-    ],
-    "added_date": "2026-09-03",
-    "metadata_source": {
-      "issue_number": "filename",
-      "series": "filename",
-      "title": "filename"
-    }
-  },
-  {
-    "id": "1aa7b70-a672069cad2d389e",
-    "title": "Milo Manara - The Adventures Of Giuseppe Bergman - Urban - To See The Stars #5",
-    "type": "comic",
-    "series": "Milo Manara - The Adventures Of Giuseppe Bergman - Urban - To See The Stars",
-    "issue_number": "5",
-    "author": null,
-    "year": null,
-    "publisher": null,
-    "description": null,
-    "upc": null,
-    "isbn": null,
-    "cover_path": "1aa7b70-a672069cad2d389e/cover.jpg",
-    "preview_pages": [],
-    "status": "unread",
-    "formats": [
-      "digital"
-    ],
-    "added_date": "2026-09-03",
-    "metadata_source": {
-      "issue_number": "filename",
-      "series": "filename",
-      "title": "filename"
-    }
-  },
-  {
-    "id": "2a1fad2-6d603ffa45a637fe",
-    "title": "Milo Manara - The Ape",
-    "type": "comic",
-    "series": "Milo Manara - The Ape",
-    "issue_number": null,
-    "author": null,
-    "year": null,
-    "publisher": null,
-    "description": null,
-    "upc": null,
-    "isbn": null,
-    "cover_path": "2a1fad2-6d603ffa45a637fe/cover.jpg",
-    "preview_pages": [],
-    "status": "unread",
-    "formats": [
-      "digital"
-    ],
-    "added_date": "2026-09-03",
-    "metadata_source": {
-      "series": "filename",
-      "title": "filename"
-    }
-  },
-  {
-    "id": "1afab3c-8d075709facd7447",
-    "title": "Milo Manara - The Paper Man",
-    "type": "comic",
-    "series": "Milo Manara - The Paper Man",
-    "issue_number": null,
-    "author": null,
-    "year": null,
-    "publisher": null,
-    "description": null,
-    "upc": null,
-    "isbn": null,
-    "cover_path": "1afab3c-8d075709facd7447/cover.jpg",
-    "preview_pages": [],
-    "status": "unread",
-    "formats": [
-      "digital"
-    ],
-    "added_date": "2026-09-03",
-    "metadata_source": {
-      "series": "filename",
-      "title": "filename"
-    }
-  },
-  {
-    "id": "22fadea-a14726c04e63a4ea",
-    "title": "Milo Manara - WWW",
-    "type": "comic",
-    "series": "Milo Manara - WWW",
-    "issue_number": null,
-    "author": null,
-    "year": null,
-    "publisher": null,
-    "description": null,
-    "upc": null,
-    "isbn": null,
-    "cover_path": "22fadea-a14726c04e63a4ea/cover.jpg",
-    "preview_pages": [],
-    "status": "unread",
-    "formats": [
-      "digital"
-    ],
-    "added_date": "2026-09-03",
-    "metadata_source": {
-      "series": "filename",
-      "title": "filename"
+      "title": "manual",
+      "publisher": "comic_geeks",
+      "year": "comic_geeks",
+      "description": "comic_geeks",
+      "author": "comic_geeks",
+      "cover_path": "comic_geeks"
     }
   },
   {
@@ -4738,22 +4390,27 @@
     "type": "comic",
     "series": "Milo Manara's Gullivera",
     "issue_number": null,
-    "author": null,
-    "year": null,
-    "publisher": null,
-    "description": null,
+    "author": "Milo Manara",
+    "year": 2022,
+    "publisher": "Humanoids",
+    "description": "A loosely inspired adventures of Jonathan Swift\u2019s Gulliver\u2019s Travels, sensually revisited by an undisputed master of erotic comics.",
     "upc": null,
     "isbn": null,
     "cover_path": "6413d03-edf991148c50b201/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
     "added_date": "2026-09-03",
     "metadata_source": {
       "series": "filename",
-      "title": "filename"
+      "title": "filename",
+      "publisher": "comic_geeks",
+      "year": "comic_geeks",
+      "description": "comic_geeks",
+      "author": "comic_geeks",
+      "cover_path": "comic_geeks"
     }
   },
   {
@@ -4762,15 +4419,15 @@
     "type": "comic",
     "series": "New X-Men Modern Era Epic Collection - New Worlds",
     "issue_number": "02",
-    "author": null,
-    "year": null,
-    "publisher": null,
-    "description": null,
+    "author": "Grant Morrison",
+    "year": 2025,
+    "publisher": "Marvel Comics",
+    "description": "Continuing Grant Morrison\u2019s Eisner Award-winning run!",
     "upc": null,
     "isbn": null,
     "cover_path": "2626921c-a50441549a2407a8/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -4778,7 +4435,12 @@
     "metadata_source": {
       "issue_number": "filename",
       "series": "filename",
-      "title": "filename"
+      "title": "filename",
+      "publisher": "comic_geeks",
+      "year": "comic_geeks",
+      "description": "comic_geeks",
+      "author": "comic_geeks",
+      "cover_path": "comic_geeks"
     }
   },
   {
@@ -4814,12 +4476,12 @@
     "title": "Nightwing #8",
     "type": "comic",
     "series": "Nightwing",
-    "issue_number": "008",
-    "author": null,
+    "issue_number": "8",
+    "author": "Kyle Higgins",
     "year": 2012,
-    "publisher": null,
-    "description": null,
-    "upc": null,
+    "publisher": "DC Comics",
+    "description": "A lead-in to next month's thrilling \"Night of the Owls\" Batman event! With the Owls descending upon Gotham City, the fate of the city's leader rests on the shoulders of Nightwing! But as our hero embarks on a mission to rescue Mayor Hady, just how do Cameron Kane and turn-of-the-century Gotham City factor in? Plus: the untold story of William Cobb\u2014the Talon who's hunting Bruce Wayne!",
+    "upc": "76194130514100811",
     "isbn": null,
     "cover_path": "2c0cc20-6e78ae7cb11c59e6/cover.jpg",
     "preview_pages": [],
@@ -4829,10 +4491,15 @@
     ],
     "added_date": "2026-09-03",
     "metadata_source": {
-      "year": "filename",
-      "issue_number": "filename",
-      "series": "filename",
-      "title": "filename"
+      "year": "comic_geeks",
+      "issue_number": "comic_geeks",
+      "series": "comic_geeks",
+      "title": "filename",
+      "publisher": "comic_geeks",
+      "description": "comic_geeks",
+      "author": "comic_geeks",
+      "upc": "comic_geeks",
+      "cover_path": "comic_geeks"
     }
   },
   {
@@ -4840,12 +4507,12 @@
     "title": "Nightwing #9",
     "type": "comic",
     "series": "Nightwing",
-    "issue_number": "009",
-    "author": null,
+    "issue_number": "9",
+    "author": "Kyle Higgins",
     "year": 2012,
-    "publisher": null,
-    "description": null,
-    "upc": null,
+    "publisher": "DC Comics",
+    "description": "\"NIGHT OF THE OWLS\" continues here! NIGHTWING faces another villain claiming to be THE TALON at City Hall as the Court of Owls' plans go into action\u2014but will he be able to figure out what's going on before it's too late?",
+    "upc": "76194130514100911",
     "isbn": null,
     "cover_path": "26a27a0-c51f4f2dcc3cd8cc/cover.jpg",
     "preview_pages": [],
@@ -4855,10 +4522,15 @@
     ],
     "added_date": "2026-09-03",
     "metadata_source": {
-      "year": "filename",
-      "issue_number": "filename",
-      "series": "filename",
-      "title": "filename"
+      "year": "comic_geeks",
+      "issue_number": "comic_geeks",
+      "series": "comic_geeks",
+      "title": "filename",
+      "publisher": "comic_geeks",
+      "description": "comic_geeks",
+      "author": "comic_geeks",
+      "upc": "comic_geeks",
+      "cover_path": "comic_geeks"
     }
   },
   {
@@ -4893,12 +4565,12 @@
     "title": "Red Hood and the Outlaws #8",
     "type": "comic",
     "series": "Red Hood and the Outlaws",
-    "issue_number": "008",
-    "author": null,
+    "issue_number": "8",
+    "author": "Scott Lobdell",
     "year": 2012,
-    "publisher": null,
-    "description": null,
-    "upc": null,
+    "publisher": "DC Comics",
+    "description": "Suzie Su is back, and she's betting a hospital full of hostages will get Red Hood's attention! If that isn't enough to keep him and the Outlaws busy, there's someone waiting in the wings! It's Tim Drake knocking on Red Hood's door with a very special package for his estranged \"brother.\" Don't miss Red Robin's cameo this issue, as it ties directly into next month's \"Night of the Owls\" Batman event!",
+    "upc": "76194130516500811",
     "isbn": null,
     "cover_path": "7a61eb-9492792c4751c686/cover.jpg",
     "preview_pages": [],
@@ -4908,10 +4580,15 @@
     ],
     "added_date": "2026-09-03",
     "metadata_source": {
-      "year": "filename",
-      "issue_number": "filename",
-      "series": "filename",
-      "title": "filename"
+      "year": "comic_geeks",
+      "issue_number": "comic_geeks",
+      "series": "comic_geeks",
+      "title": "filename",
+      "publisher": "comic_geeks",
+      "description": "comic_geeks",
+      "author": "comic_geeks",
+      "upc": "comic_geeks",
+      "cover_path": "comic_geeks"
     }
   },
   {
@@ -4919,12 +4596,12 @@
     "title": "Red Hood and the Outlaws #9",
     "type": "comic",
     "series": "Red Hood and the Outlaws",
-    "issue_number": "009",
-    "author": null,
+    "issue_number": "9",
+    "author": "Scott Lobdell",
     "year": 2012,
-    "publisher": null,
-    "description": null,
-    "upc": null,
+    "publisher": "DC Comics",
+    "description": "\"NIGHT OF THE OWLS\" continues here! The Court of Owls is attacking, and the last person in the world you'd expect to answer Batman's call to arms is the RED HOOD! Also featuring MR. FREEZE!",
+    "upc": "76194130516500911",
     "isbn": null,
     "cover_path": "1a75383-7187057d996e9481/cover.jpg",
     "preview_pages": [],
@@ -4934,10 +4611,15 @@
     ],
     "added_date": "2026-09-03",
     "metadata_source": {
-      "year": "filename",
-      "issue_number": "filename",
-      "series": "filename",
-      "title": "filename"
+      "year": "comic_geeks",
+      "issue_number": "comic_geeks",
+      "series": "comic_geeks",
+      "title": "filename",
+      "publisher": "comic_geeks",
+      "description": "comic_geeks",
+      "author": "comic_geeks",
+      "upc": "comic_geeks",
+      "cover_path": "comic_geeks"
     }
   },
   {
@@ -4945,12 +4627,12 @@
     "title": "Ruins #1",
     "type": "comic",
     "series": "Ruins",
-    "issue_number": "01",
-    "author": null,
+    "issue_number": "1",
+    "author": "Warren Ellis",
     "year": 1995,
-    "publisher": null,
-    "description": null,
-    "upc": null,
+    "publisher": "Marvel Comics",
+    "description": "As a counterpoint to the legendary Marvels series, Warren Ellis explores a Marvel universe where absolutely everything that can go wrong, has gone wrong.",
+    "upc": "75960603213600111",
     "isbn": null,
     "cover_path": "520761b-0685aa670d08cd1e/cover.jpg",
     "preview_pages": [],
@@ -4960,10 +4642,15 @@
     ],
     "added_date": "2026-09-03",
     "metadata_source": {
-      "year": "filename",
-      "issue_number": "filename",
-      "series": "filename",
-      "title": "filename"
+      "year": "comic_geeks",
+      "issue_number": "comic_geeks",
+      "series": "comic_geeks",
+      "title": "filename",
+      "publisher": "comic_geeks",
+      "description": "comic_geeks",
+      "author": "comic_geeks",
+      "upc": "comic_geeks",
+      "cover_path": "comic_geeks"
     }
   },
   {
@@ -4971,12 +4658,12 @@
     "title": "Ruins #2",
     "type": "comic",
     "series": "Ruins",
-    "issue_number": "02",
-    "author": null,
+    "issue_number": "2",
+    "author": "Warren Ellis",
     "year": 1995,
-    "publisher": null,
-    "description": null,
-    "upc": null,
+    "publisher": "Marvel Comics",
+    "description": "Reporter Phil Sheldon continues to investigate his horrifying world, and tries to finish a book about his discoveries before he dies. As he uncovers more and more ghastly stories, however, it begins to look like he isn't going to succeed.",
+    "upc": "75960603213600211",
     "isbn": null,
     "cover_path": "49509e2-8afb617de91a6211/cover.jpg",
     "preview_pages": [],
@@ -4986,10 +4673,15 @@
     ],
     "added_date": "2026-09-03",
     "metadata_source": {
-      "year": "filename",
-      "issue_number": "filename",
-      "series": "filename",
-      "title": "filename"
+      "year": "comic_geeks",
+      "issue_number": "comic_geeks",
+      "series": "comic_geeks",
+      "title": "filename",
+      "publisher": "comic_geeks",
+      "description": "comic_geeks",
+      "author": "comic_geeks",
+      "upc": "comic_geeks",
+      "cover_path": "comic_geeks"
     }
   },
   {
@@ -4998,23 +4690,27 @@
     "type": "comic",
     "series": "Saga_of_the_Swamp_Thing_vol_01",
     "issue_number": null,
-    "author": null,
-    "year": 2012,
-    "publisher": null,
-    "description": null,
+    "author": "Alan Moore",
+    "year": 2013,
+    "publisher": "DC Comics",
+    "description": "Swamp Thing returns from his sojourn to hell, only to learn that his girlfriend Abby is being persecuted for their unnatural relations. When she skips town for Gotham City, he follows and runs afoul of Batman, Lex Luthor and the Gotham City Police Department.",
     "upc": null,
     "isbn": null,
     "cover_path": "11188481-04f6d695f861e643/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
     "added_date": "2026-09-03",
     "metadata_source": {
-      "year": "filename",
+      "year": "comic_geeks",
       "series": "filename",
-      "title": "manual"
+      "title": "manual",
+      "publisher": "comic_geeks",
+      "description": "comic_geeks",
+      "author": "comic_geeks",
+      "cover_path": "comic_geeks"
     }
   },
   {
@@ -5023,23 +4719,27 @@
     "type": "comic",
     "series": "Saga_of_the_Swamp_Thing_vol_02",
     "issue_number": null,
-    "author": null,
-    "year": 2012,
-    "publisher": null,
-    "description": null,
+    "author": "Alan Moore",
+    "year": 2013,
+    "publisher": "DC Comics",
+    "description": "A harbinger of doom has been released with the sole charge of waking an evil beyond comprehension, and Swamp Thing, John Constantine, Deadman, The Phantom Stranger, Etrigan the Demon, The Spectre and other masters of the occult must unite against the dark forces that threaten to eradicate Heaven\u2019s light.",
     "upc": null,
     "isbn": null,
     "cover_path": "1536f73a-b22342359c172fdb/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
     "added_date": "2026-09-03",
     "metadata_source": {
-      "year": "filename",
+      "year": "comic_geeks",
       "series": "filename",
-      "title": "manual"
+      "title": "manual",
+      "publisher": "comic_geeks",
+      "description": "comic_geeks",
+      "author": "comic_geeks",
+      "cover_path": "comic_geeks"
     }
   },
   {
@@ -5048,23 +4748,27 @@
     "type": "comic",
     "series": "Saga_of_the_Swamp_Thing_vol_03",
     "issue_number": null,
-    "author": null,
-    "year": 2013,
-    "publisher": null,
-    "description": null,
+    "author": "Alan Moore, Len Wein, Ramsey Campbell",
+    "year": 2012,
+    "publisher": "DC Comics",
+    "description": "Before WATCHMEN, Alan Moore made his debut in the U.S. comic book industry with the revitalization of the horror comic book THE SWAMP THING. His deconstruction of the classic monster stretched the creative boundaries of the medium and became one of the most spectacular series in comic book history.",
     "upc": null,
     "isbn": null,
     "cover_path": "1346cdc4-cd5245c6eff7f4b7/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
     "added_date": "2026-09-03",
     "metadata_source": {
-      "year": "filename",
+      "year": "comic_geeks",
       "series": "filename",
-      "title": "manual"
+      "title": "manual",
+      "publisher": "comic_geeks",
+      "description": "comic_geeks",
+      "author": "comic_geeks",
+      "cover_path": "comic_geeks"
     }
   },
   {
@@ -5073,23 +4777,27 @@
     "type": "comic",
     "series": "Saga_of_the_Swamp_Thing_vol_04",
     "issue_number": null,
-    "author": null,
-    "year": 2013,
-    "publisher": null,
-    "description": null,
+    "author": "Alan Moore, Rick Veitch, Stephen R. Bissette",
+    "year": 2014,
+    "publisher": "DC Comics",
+    "description": "Swamp Thing's consciousness has been hurled across the galaxy. Trying to find his way back to Earth, Swamp Thing stops over on Thanagar, home of Hawkman; Rann, home of Adam Strange; and encounters the Green Lantern of a world of sentient plants.",
     "upc": null,
     "isbn": null,
     "cover_path": "1ca2b9bc-b6cb42694cdc4e26/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
     "added_date": "2026-09-03",
     "metadata_source": {
-      "year": "filename",
+      "year": "comic_geeks",
       "series": "filename",
-      "title": "manual"
+      "title": "manual",
+      "publisher": "comic_geeks",
+      "description": "comic_geeks",
+      "author": "comic_geeks",
+      "cover_path": "comic_geeks"
     }
   },
   {
@@ -5098,23 +4806,27 @@
     "type": "comic",
     "series": "Saga_of_the_Swamp_Thing_vol_05",
     "issue_number": null,
-    "author": null,
+    "author": "Alan Moore, Stephen R. Bissette",
     "year": 2013,
-    "publisher": null,
-    "description": null,
+    "publisher": "DC Comics",
+    "description": "This third volume is brimming with visceral horrors including underwater vampires, a werewolf with an unusual curse, the hideous madman called Nukeface. Best of all, this volume features the comics debut of John Constantine, Hellblazer, who launches Swamp Thing on a voyage of self-discovery that will take him from the darkest corners of America to the roots of his own long-hidden heritage.",
     "upc": null,
     "isbn": null,
     "cover_path": "1547463d-f79a0fbb54aef41c/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
     "added_date": "2026-09-03",
     "metadata_source": {
-      "year": "filename",
+      "year": "comic_geeks",
       "series": "filename",
-      "title": "manual"
+      "title": "manual",
+      "publisher": "comic_geeks",
+      "description": "comic_geeks",
+      "author": "comic_geeks",
+      "cover_path": "comic_geeks"
     }
   },
   {
@@ -5123,23 +4835,27 @@
     "type": "comic",
     "series": "Saga_of_the_Swamp_Thing_vol_06",
     "issue_number": null,
-    "author": null,
-    "year": 2014,
-    "publisher": null,
-    "description": null,
+    "author": "Alan Moore, Len Wein, Jamie Delano, Neil Gaiman",
+    "year": 2012,
+    "publisher": "DC Comics",
+    "description": "The Swamp Thing says goodbye to the illusion of his own humanity after learning that he is 100% plant, meets a crew of benevolent alien invaders inspired by the classic comic strip Pogo (also set in the swamp), and consummates his relationship with Abigail Arcane as only he could.",
     "upc": null,
     "isbn": null,
     "cover_path": "15a8998b-8dec4460464fd83d/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
     "added_date": "2026-09-03",
     "metadata_source": {
-      "year": "filename",
+      "year": "comic_geeks",
       "series": "filename",
-      "title": "manual"
+      "title": "manual",
+      "publisher": "comic_geeks",
+      "description": "comic_geeks",
+      "author": "comic_geeks",
+      "cover_path": "comic_geeks"
     }
   },
   {
@@ -5156,7 +4872,7 @@
     "isbn": "9781302917333",
     "cover_path": "isbn-9781302917333/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "print"
     ],
@@ -5818,13 +5534,13 @@
     "type": "comic",
     "series": "Stoker's Dracula",
     "issue_number": null,
-    "author": null,
-    "year": 2021,
-    "publisher": null,
-    "description": null,
+    "author": "Roy Thomas",
+    "year": 2005,
+    "publisher": "Marvel Comics",
+    "description": "Thirty years later, comics legends Roy Thomas and Dick Giordano reunite to complete their unfinished adaptation of Bram Stoker's classic tale of vampire horror, Dracula! Originally serialized in Marvel horror magazines Vampire Tales and Legion of Monsters, their meticulous retelling of Bram Stoker's tale of Gothic horror has been found in the Marvel tombs, and will at last be unleashed upon the daylight! Collects Stoker's Dracula #1-4.",
     "upc": null,
     "isbn": null,
-    "cover_path": "1593d921-9e748c98b14c487c/cover.jpeg",
+    "cover_path": "1593d921-9e748c98b14c487c/cover.jpg",
     "preview_pages": [],
     "status": "unread",
     "formats": [
@@ -5832,9 +5548,13 @@
     ],
     "added_date": "2026-09-03",
     "metadata_source": {
-      "year": "filename",
+      "year": "comic_geeks",
       "series": "filename",
-      "title": "filename"
+      "title": "filename",
+      "publisher": "comic_geeks",
+      "description": "comic_geeks",
+      "author": "comic_geeks",
+      "cover_path": "comic_geeks"
     }
   },
   {
@@ -5851,7 +5571,7 @@
     "isbn": null,
     "cover_path": "upc-76194139116800111/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "print"
     ],
@@ -5879,7 +5599,7 @@
     "isbn": null,
     "cover_path": "upc-76194139116800211/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "print"
     ],
@@ -5907,7 +5627,7 @@
     "isbn": null,
     "cover_path": "upc-76194139116800311/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "print"
     ],
@@ -5935,7 +5655,7 @@
     "isbn": null,
     "cover_path": "upc-76194139116800411/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital",
       "print"
@@ -5956,11 +5676,11 @@
     "type": "comic",
     "series": "Teenage Mutant Ninja Turtles",
     "issue_number": "1",
-    "author": null,
-    "year": null,
-    "publisher": null,
-    "description": null,
-    "upc": null,
+    "author": "Jason Aaron",
+    "year": 2024,
+    "publisher": "IDW Publishing",
+    "description": "The Teenage Mutant Ninja Turtles have all left New York to pursue their own interests, but there are forces gathering that will pull them back together \u2014 whether the bad guys like it or not. First up: Raphael! But why is everyone's favorite brawler in prison?! When a surprise attack behind bars puts Raph's position in jeopardy, he needs to figure out how to get out of jail and warn his brothers that trouble is coming. Superstar writer Jason Aaron (The Mighty Thor,Batman: Off-World) teams up with Jo\u00eblle Jones (Lady Killer,Catwoman) for the first issue of a new TMNT series that will start a bold new era, celebrating the TMNT's 40th anniversary while setting them up for the next 40 years to come!",
+    "upc": "82771403315100111",
     "isbn": null,
     "cover_path": "54fb1d2-7deda018aafc39ff/cover.jpg",
     "preview_pages": [],
@@ -5970,9 +5690,15 @@
     ],
     "added_date": "2026-09-03",
     "metadata_source": {
-      "issue_number": "filename",
-      "series": "filename",
-      "title": "filename"
+      "issue_number": "comic_geeks",
+      "series": "comic_geeks",
+      "title": "filename",
+      "publisher": "comic_geeks",
+      "year": "comic_geeks",
+      "description": "comic_geeks",
+      "author": "comic_geeks",
+      "upc": "comic_geeks",
+      "cover_path": "comic_geeks"
     }
   },
   {
@@ -6009,11 +5735,11 @@
     "type": "comic",
     "series": "Teenage Mutant Ninja Turtles",
     "issue_number": "11",
-    "author": null,
-    "year": null,
-    "publisher": null,
-    "description": null,
-    "upc": null,
+    "author": "Jason Aaron",
+    "year": 2025,
+    "publisher": "IDW Publishing",
+    "description": "With the Ninja Turtles on trial for a murder they didn't commit, Casey Jones fighting for his life in a devastating coma, and the city overrun by Foot Patrol thugs, New York has but one hope to turn the tide: April O'Neil?",
+    "upc": "82771403315101111",
     "isbn": null,
     "cover_path": "57895a3-cfc99ddb4aca03d5/cover.jpg",
     "preview_pages": [],
@@ -6023,9 +5749,15 @@
     ],
     "added_date": "2026-09-03",
     "metadata_source": {
-      "issue_number": "filename",
-      "series": "filename",
-      "title": "filename"
+      "issue_number": "comic_geeks",
+      "series": "comic_geeks",
+      "title": "filename",
+      "publisher": "comic_geeks",
+      "year": "comic_geeks",
+      "description": "comic_geeks",
+      "author": "comic_geeks",
+      "upc": "comic_geeks",
+      "cover_path": "comic_geeks"
     }
   },
   {
@@ -6034,11 +5766,11 @@
     "type": "comic",
     "series": "Teenage Mutant Ninja Turtles",
     "issue_number": "12",
-    "author": null,
-    "year": null,
-    "publisher": null,
-    "description": null,
-    "upc": null,
+    "author": "Jason Aaron, Tim Seeley",
+    "year": 2025,
+    "publisher": "IDW Publishing",
+    "description": "After 12 issues of being ripped apart, accused of murder, and tried as villains, the Turtles fight to clear their names and heal their family. Nothing stands between them and freedom \u2014 except a threat unlike any they've faced!",
+    "upc": "82771403315101211",
     "isbn": null,
     "cover_path": "5f4055f-c2955aec8fcf0094/cover.jpg",
     "preview_pages": [],
@@ -6048,9 +5780,15 @@
     ],
     "added_date": "2026-09-03",
     "metadata_source": {
-      "issue_number": "filename",
-      "series": "filename",
-      "title": "filename"
+      "issue_number": "comic_geeks",
+      "series": "comic_geeks",
+      "title": "filename",
+      "publisher": "comic_geeks",
+      "year": "comic_geeks",
+      "description": "comic_geeks",
+      "author": "comic_geeks",
+      "upc": "comic_geeks",
+      "cover_path": "comic_geeks"
     }
   },
   {
@@ -6059,11 +5797,11 @@
     "type": "comic",
     "series": "Teenage Mutant Ninja Turtles",
     "issue_number": "2",
-    "author": null,
-    "year": null,
-    "publisher": null,
-    "description": null,
-    "upc": null,
+    "author": "Jason Aaron",
+    "year": 2024,
+    "publisher": "IDW Publishing",
+    "description": "Michelangelo is living in Tokyo, where he's become a big TV star. It's a pretty cool life, full of fame and fortune, but if he's being honest, Mikey misses his brothers and the sense of purpose they had together. Well, in a classic case of \"be careful what you wish for,\" that old life looks like it's coming to find him when ninjas show up in his apartment armed to the teeth!",
+    "upc": "82771403315100211",
     "isbn": null,
     "cover_path": "6a2065c-5708c99a723e2f1d/cover.jpg",
     "preview_pages": [],
@@ -6073,9 +5811,15 @@
     ],
     "added_date": "2026-09-03",
     "metadata_source": {
-      "issue_number": "filename",
-      "series": "filename",
-      "title": "filename"
+      "issue_number": "comic_geeks",
+      "series": "comic_geeks",
+      "title": "filename",
+      "publisher": "comic_geeks",
+      "year": "comic_geeks",
+      "description": "comic_geeks",
+      "author": "comic_geeks",
+      "upc": "comic_geeks",
+      "cover_path": "comic_geeks"
     }
   },
   {
@@ -6084,11 +5828,11 @@
     "type": "comic",
     "series": "Teenage Mutant Ninja Turtles",
     "issue_number": "3",
-    "author": null,
-    "year": null,
-    "publisher": null,
-    "description": null,
-    "upc": null,
+    "author": "Jason Aaron",
+    "year": 2024,
+    "publisher": "IDW Publishing",
+    "description": "Leonardo is traveling the world in search of peace. All the adventures \u2014 good and bad \u2014 he's had with his brothers have taken their toll, and he is seeking a new way to exist, leaving the life of New York far behind. On the banks of the Ganges, he has found a turtle colony that shows him a simpler way to be, but even these turtles have their foes. Leo can fend off the poachers easily, protecting his temporary home, but what will he do when a deadlier enemy comes searching for him?",
+    "upc": "82771403315100311",
     "isbn": null,
     "cover_path": "6742d15-c843c061997a62a2/cover.jpg",
     "preview_pages": [],
@@ -6098,9 +5842,15 @@
     ],
     "added_date": "2026-09-03",
     "metadata_source": {
-      "issue_number": "filename",
-      "series": "filename",
-      "title": "filename"
+      "issue_number": "comic_geeks",
+      "series": "comic_geeks",
+      "title": "filename",
+      "publisher": "comic_geeks",
+      "year": "comic_geeks",
+      "description": "comic_geeks",
+      "author": "comic_geeks",
+      "upc": "comic_geeks",
+      "cover_path": "comic_geeks"
     }
   },
   {
@@ -6109,11 +5859,11 @@
     "type": "comic",
     "series": "Teenage Mutant Ninja Turtles",
     "issue_number": "4",
-    "author": null,
-    "year": null,
-    "publisher": null,
-    "description": null,
-    "upc": null,
+    "author": "Jason Aaron",
+    "year": 2024,
+    "publisher": "IDW Publishing",
+    "description": "Chris Burnham returns to art duties this issue as we finally learn the fate of Donatello! Trapped in a mutant zoo and forced to fight rich men looking for a thrill, his mind is still broken since last we saw him. As mysterious forces gather against him, can Donnie gather himself to defeat these enemies and set himself free? Superstar writer Jason Aaron continues his exploration of the individual Teenage Mutant Ninja Turtles, setting the stage for their reunion.",
+    "upc": "82771403315100411",
     "isbn": null,
     "cover_path": "6994b46-6d63eef0dd580ef7/cover.jpg",
     "preview_pages": [],
@@ -6123,9 +5873,15 @@
     ],
     "added_date": "2026-09-03",
     "metadata_source": {
-      "issue_number": "filename",
-      "series": "filename",
-      "title": "filename"
+      "issue_number": "comic_geeks",
+      "series": "comic_geeks",
+      "title": "filename",
+      "publisher": "comic_geeks",
+      "year": "comic_geeks",
+      "description": "comic_geeks",
+      "author": "comic_geeks",
+      "upc": "comic_geeks",
+      "cover_path": "comic_geeks"
     }
   },
   {
@@ -6134,11 +5890,11 @@
     "type": "comic",
     "series": "Teenage Mutant Ninja Turtles",
     "issue_number": "5",
-    "author": null,
-    "year": null,
-    "publisher": null,
-    "description": null,
-    "upc": null,
+    "author": "Jason Aaron",
+    "year": 2024,
+    "publisher": "IDW Publishing",
+    "description": "What has been going on in New York while the Turtles have been scattered across the globe? A dangerous district attorney has come into power, and he's got a grudge against mutantkind. Backed by some powerful benefactors who have designs of their own for the city, he's doing everything he can to stoke hatred against the mutants. With the TMNT absent, someone needs to step in and stop this power grab-and figure out who is backing this nefarious new enemy.Enter Casey Jones! Jason Aaron completes his first story arc for Teenage Mutant Ninja Turtles, teaming with legendary artist Darick Robertson, co-creator of The Boys!",
+    "upc": "82771403315100511",
     "isbn": null,
     "cover_path": "5d47c20-c0bb0f082a75c766/cover.jpg",
     "preview_pages": [],
@@ -6148,9 +5904,15 @@
     ],
     "added_date": "2026-09-03",
     "metadata_source": {
-      "issue_number": "filename",
-      "series": "filename",
-      "title": "filename"
+      "issue_number": "comic_geeks",
+      "series": "comic_geeks",
+      "title": "filename",
+      "publisher": "comic_geeks",
+      "year": "comic_geeks",
+      "description": "comic_geeks",
+      "author": "comic_geeks",
+      "upc": "comic_geeks",
+      "cover_path": "comic_geeks"
     }
   },
   {
@@ -6159,11 +5921,11 @@
     "type": "comic",
     "series": "Teenage Mutant Ninja Turtles",
     "issue_number": "6",
-    "author": null,
-    "year": null,
-    "publisher": null,
-    "description": null,
-    "upc": null,
+    "author": "Jason Aaron",
+    "year": 2025,
+    "publisher": "IDW Publishing",
+    "description": "Superstar artist Juan Ferreyra (Batman & Robin, Green Arrow) makes his debut as TMNT's new ongoing artist! The Turtles are back together, on the run, and at one another's throats. Navigating a New York City that used to be their home but is now a hostile territory, the four brothers try to get things back to normal, but Donatello is deeply scarred following his captivity. Will the four brothers be able to rally? Or will they find themselves at the mercy of the Foot Clan?",
+    "upc": "82771403315100611",
     "isbn": null,
     "cover_path": "6f5a059-86c9a7fdc12824f8/cover.jpg",
     "preview_pages": [],
@@ -6173,9 +5935,15 @@
     ],
     "added_date": "2026-09-03",
     "metadata_source": {
-      "issue_number": "filename",
-      "series": "filename",
-      "title": "filename"
+      "issue_number": "comic_geeks",
+      "series": "comic_geeks",
+      "title": "filename",
+      "publisher": "comic_geeks",
+      "year": "comic_geeks",
+      "description": "comic_geeks",
+      "author": "comic_geeks",
+      "upc": "comic_geeks",
+      "cover_path": "comic_geeks"
     }
   },
   {
@@ -6184,11 +5952,11 @@
     "type": "comic",
     "series": "Teenage Mutant Ninja Turtles",
     "issue_number": "7",
-    "author": null,
-    "year": null,
-    "publisher": null,
-    "description": null,
-    "upc": null,
+    "author": "Jason Aaron",
+    "year": 2025,
+    "publisher": "IDW Publishing",
+    "description": "New series artist Juan Ferreyra joins writer Jason Aaron to turn the volume up to maximum with this explosive second arc of the all-new era of Teenage Mutant Ninja Turtles!",
+    "upc": "82771403315100711",
     "isbn": null,
     "cover_path": "6eed66d-e40e619abc594c09/cover.jpg",
     "preview_pages": [],
@@ -6198,9 +5966,15 @@
     ],
     "added_date": "2026-09-03",
     "metadata_source": {
-      "issue_number": "filename",
-      "series": "filename",
-      "title": "filename"
+      "issue_number": "comic_geeks",
+      "series": "comic_geeks",
+      "title": "filename",
+      "publisher": "comic_geeks",
+      "year": "comic_geeks",
+      "description": "comic_geeks",
+      "author": "comic_geeks",
+      "upc": "comic_geeks",
+      "cover_path": "comic_geeks"
     }
   },
   {
@@ -6209,11 +5983,11 @@
     "type": "comic",
     "series": "Teenage Mutant Ninja Turtles",
     "issue_number": "8",
-    "author": null,
+    "author": "Jason Aaron",
     "year": 2025,
-    "publisher": null,
-    "description": null,
-    "upc": null,
+    "publisher": "IDW Publishing",
+    "description": "Donnie's on the edge! Once the most reliable and risk averse of the TMNT, Donatello's mind is spinning out of control following his violent stay in captivity. Fortunately his brothers are there to protect him from the army of Foot Clan ninjas bent on destroying them all, but how can the Ninja Turtles save Donatello from the \"voice\" of their dead master Splinter that Donnie insists he's hearing in his head!?",
+    "upc": "82771403315100811",
     "isbn": null,
     "cover_path": "60b629e-a374f41bedd653d6/cover.jpg",
     "preview_pages": [],
@@ -6223,10 +5997,15 @@
     ],
     "added_date": "2026-09-03",
     "metadata_source": {
-      "issue_number": "filename",
-      "series": "comicinfo",
+      "issue_number": "comic_geeks",
+      "series": "comic_geeks",
       "title": "filename",
-      "year": "comicinfo"
+      "year": "comic_geeks",
+      "publisher": "comic_geeks",
+      "description": "comic_geeks",
+      "author": "comic_geeks",
+      "upc": "comic_geeks",
+      "cover_path": "comic_geeks"
     }
   },
   {
@@ -6235,11 +6014,11 @@
     "type": "comic",
     "series": "Teenage Mutant Ninja Turtles",
     "issue_number": "9",
-    "author": null,
+    "author": "Jason Aaron",
     "year": 2025,
-    "publisher": null,
-    "description": null,
-    "upc": null,
+    "publisher": "IDW Publishing",
+    "description": "Already weakened, weary, and a little deranged, poor Donatello has now been captured by the Foot Clan! The remaining Turtle boys make a plan for an all-out war against Karai, but are forced to think twice when they hear the voice of reason... coming from the body of a dead rat?",
+    "upc": "82771403315100911",
     "isbn": null,
     "cover_path": "622ce9e-5ea2f038787ec309/cover.jpg",
     "preview_pages": [],
@@ -6249,10 +6028,15 @@
     ],
     "added_date": "2026-09-03",
     "metadata_source": {
-      "issue_number": "filename",
-      "series": "comicinfo",
+      "issue_number": "comic_geeks",
+      "series": "comic_geeks",
       "title": "filename",
-      "year": "comicinfo"
+      "year": "comic_geeks",
+      "publisher": "comic_geeks",
+      "description": "comic_geeks",
+      "author": "comic_geeks",
+      "upc": "comic_geeks",
+      "cover_path": "comic_geeks"
     }
   },
   {
@@ -6316,24 +6100,28 @@
     "type": "comic",
     "series": "The Complete Maus",
     "issue_number": null,
-    "author": null,
+    "author": "Art Spiegelman",
     "year": 2003,
-    "publisher": null,
-    "description": null,
+    "publisher": "Penguin",
+    "description": "Combined for the first time here are Maus I: A Survivor's Tale and Maus II - the complete story of Vladek Spiegelman and his wife, living and surviving in Hitler's Europe. By addressing the horror of the Holocaust through cartoons, the author captures the everyday reality of fear and is able to explore the guilt, relief and extraordinary sensation of survival - and how the children of survivors are in their own way affected by the trials of their parents. A contemporary classic of immeasurable significance.",
     "upc": null,
     "isbn": null,
     "cover_path": "105efda8-f8afad89f3ad7fbe/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital",
       "print"
     ],
     "added_date": "2026-09-03",
     "metadata_source": {
-      "year": "filename",
+      "year": "comic_geeks",
       "series": "filename",
-      "title": "filename"
+      "title": "filename",
+      "publisher": "comic_geeks",
+      "description": "comic_geeks",
+      "author": "comic_geeks",
+      "cover_path": "comic_geeks"
     }
   },
   {
@@ -6350,7 +6138,7 @@
     "isbn": null,
     "cover_path": "upc-70985303032403411/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "print"
     ],
@@ -6378,7 +6166,7 @@
     "isbn": null,
     "cover_path": "upc-70985303032403511/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "print"
     ],
@@ -6406,7 +6194,7 @@
     "isbn": null,
     "cover_path": "upc-70985303032403611/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "print"
     ],
@@ -6434,7 +6222,7 @@
     "isbn": null,
     "cover_path": "upc-70985303032403711/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "print"
     ],
@@ -6462,7 +6250,7 @@
     "isbn": null,
     "cover_path": "upc-70985303032403811/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "print"
     ],
@@ -6490,7 +6278,7 @@
     "isbn": "9781534399723",
     "cover_path": "isbn-9781534399723/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "print"
     ],
@@ -6517,7 +6305,7 @@
     "isbn": "9781534332560",
     "cover_path": "isbn-9781534332560/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "print"
     ],
@@ -6563,23 +6351,27 @@
     "type": "comic",
     "series": "The Immortal Hulk Omnibus",
     "issue_number": null,
-    "author": null,
+    "author": "Al Ewing, Crystal Frasier, Bill Mantlo, Peter David, Alex Paknadel",
     "year": 2023,
-    "publisher": null,
-    "description": null,
+    "publisher": "Marvel Comics",
+    "description": "Is he man or monster\u2026or is he both? Find out as Al Ewing and Joe Bennett take Bruce Banner to hell and back in the complete, infernal saga of the Immortal Hulk! Every time Bruce dies, he rises again\u2026as the Hulk! And he is being hunted: by the government, by Alpha Flight, by the mysterious Shadow Base, even by the Avengers! But Bruce has even bigger problems. Something terrible has infected him. Something with unspeakable plans for humanity. And the answers lie beyond\u2026the Green Door! Featuring friends and foes both old and new as well as multiple Hulk personas, this horror reinvention of a Marvel icon is like no comic book you have ever read before!",
     "upc": null,
     "isbn": null,
     "cover_path": "bc9d8c2a-92f710a00ae17562/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
     "added_date": "2026-09-03",
     "metadata_source": {
-      "year": "filename",
+      "year": "comic_geeks",
       "series": "filename",
-      "title": "filename"
+      "title": "filename",
+      "publisher": "comic_geeks",
+      "description": "comic_geeks",
+      "author": "comic_geeks",
+      "cover_path": "comic_geeks"
     }
   },
   {
@@ -6615,10 +6407,10 @@
     "type": "comic",
     "series": "The Sandman Book",
     "issue_number": "01",
-    "author": null,
+    "author": "Neil Gaiman",
     "year": 2022,
-    "publisher": null,
-    "description": null,
+    "publisher": "DC Comics",
+    "description": "As the story begins, an occultist attempting to capture Death to bargain for eternal life traps her younger brother Dream instead. After his 70-year imprisonment and eventual escape, Dream, also known as Morpheus, goes on a quest for his lost objects of power. On his arduous journey, Morpheus encounters Lucifer, John Constantine, and an all-powerful madman.",
     "upc": null,
     "isbn": null,
     "cover_path": "7bfdd28a-9f67cd427cf37d90/cover.jpg",
@@ -6629,10 +6421,14 @@
     ],
     "added_date": "2026-09-03",
     "metadata_source": {
-      "year": "filename",
+      "year": "comic_geeks",
       "issue_number": "filename",
       "series": "filename",
-      "title": "filename"
+      "title": "filename",
+      "publisher": "comic_geeks",
+      "description": "comic_geeks",
+      "author": "comic_geeks",
+      "cover_path": "comic_geeks"
     }
   },
   {
@@ -6641,10 +6437,10 @@
     "type": "comic",
     "series": "The Sandman Book",
     "issue_number": "02",
-    "author": null,
+    "author": "Neil Gaiman",
     "year": 2022,
-    "publisher": null,
-    "description": null,
+    "publisher": "DC Comics",
+    "description": "Ten thousand years ago, Morpheus condemned a woman who loved him to Hell. Now the other members of his immortal family, the Endless, have convinced the Dream King that this was an injustice. To make it right, Morpheus must return to Hell to rescue his banished love\u2014and Hell\u2019s ruler, the fallen angel Lucifer, has already sworn to destroy him. Neil Gaiman\u2019s epic continues in The Sandman Book Two!",
     "upc": null,
     "isbn": null,
     "cover_path": "78836878-4aa6016071d7e76c/cover.jpg",
@@ -6655,10 +6451,14 @@
     ],
     "added_date": "2026-09-03",
     "metadata_source": {
-      "year": "filename",
+      "year": "comic_geeks",
       "issue_number": "filename",
       "series": "filename",
-      "title": "filename"
+      "title": "filename",
+      "publisher": "comic_geeks",
+      "description": "comic_geeks",
+      "author": "comic_geeks",
+      "cover_path": "comic_geeks"
     }
   },
   {
@@ -6667,10 +6467,10 @@
     "type": "comic",
     "series": "The Sandman Book",
     "issue_number": "03",
-    "author": null,
+    "author": "Neil Gaiman",
     "year": 2022,
-    "publisher": null,
-    "description": null,
+    "publisher": "DC Comics",
+    "description": "Centuries ago, one of the Endless gave up his duties and left his realm, never to be seen again. Now on a mission to find their missing sibling, Delirium and Dream encounter immortal humans and various deities as they try to locate the prodigal Destruction. But as their adventure draws Dream into a final, tragic confrontation with his son Orpheus, the eternal being learns the true meaning of fate and consequences. Neil Gaiman\u2019s epic continues in The Sandman Book Three!",
     "upc": null,
     "isbn": null,
     "cover_path": "8261f6ab-002a4bc723ff6f1c/cover.jpg",
@@ -6681,10 +6481,14 @@
     ],
     "added_date": "2026-09-03",
     "metadata_source": {
-      "year": "filename",
+      "year": "comic_geeks",
       "issue_number": "filename",
       "series": "filename",
-      "title": "filename"
+      "title": "filename",
+      "publisher": "comic_geeks",
+      "description": "comic_geeks",
+      "author": "comic_geeks",
+      "cover_path": "comic_geeks"
     }
   },
   {
@@ -6693,10 +6497,10 @@
     "type": "comic",
     "series": "The Sandman Book",
     "issue_number": "04",
-    "author": null,
+    "author": "Neil Gaiman",
     "year": 2022,
-    "publisher": null,
-    "description": null,
+    "publisher": "DC Comics",
+    "description": "In the climactic final volume, Dream becomes the target of the Furies\u2014unstoppable agents of vengeance. Dark forces are at work, and what they set in motion will demand a sacrifice greater than any the Dreaming has yet known. The thrilling conclusion of The Sandman weaves together threads and pieces building since the beginning of the series.",
     "upc": null,
     "isbn": null,
     "cover_path": "7fc3ac3a-d3c3f6d1d28c20df/cover.jpg",
@@ -6707,10 +6511,14 @@
     ],
     "added_date": "2026-09-03",
     "metadata_source": {
-      "year": "filename",
+      "year": "comic_geeks",
       "issue_number": "filename",
       "series": "filename",
-      "title": "filename"
+      "title": "filename",
+      "publisher": "comic_geeks",
+      "description": "comic_geeks",
+      "author": "comic_geeks",
+      "cover_path": "comic_geeks"
     }
   },
   {
@@ -6719,10 +6527,10 @@
     "type": "comic",
     "series": "The Sandman Book",
     "issue_number": "05",
-    "author": null,
+    "author": "Neil Gaiman",
     "year": 2023,
-    "publisher": null,
-    "description": null,
+    "publisher": "DC Comics",
+    "description": "This supplemental volume delves deeper into the lives of Morpheus and his kin, featuring the iconic meeting between Neil Gaiman\u2019s Sandman and the Golden Age Sandman, Wesley Dodds; a tale set in feudal Japan illustrated by acclaimed artist Yoshitaka Amano; and spotlight stories on each member of the Endless drawn by P. Craig Russell, Frank Quitely, Glenn Fabry, and others. Book Five collects Sandman Midnight Theatre #1, the prose",
     "upc": null,
     "isbn": null,
     "cover_path": "4eccfbbf-50498cd79dc8673a/cover.jpg",
@@ -6733,10 +6541,14 @@
     ],
     "added_date": "2026-09-03",
     "metadata_source": {
-      "year": "filename",
+      "year": "comic_geeks",
       "issue_number": "filename",
       "series": "filename",
-      "title": "filename"
+      "title": "filename",
+      "publisher": "comic_geeks",
+      "description": "comic_geeks",
+      "author": "comic_geeks",
+      "cover_path": "comic_geeks"
     }
   },
   {
@@ -6745,10 +6557,10 @@
     "type": "comic",
     "series": "The Sandman Book",
     "issue_number": "06",
-    "author": null,
+    "author": "Neil Gaiman, P. Craig Russell, Dan Watters, Kat Howard, Nalo Hopkinson, Karen Berger, Simon Spurrier",
     "year": 2023,
-    "publisher": null,
-    "description": null,
+    "publisher": "DC Comics",
+    "description": "From the imagination of New York Times bestselling author Neil Gaiman comes this final volume of stories that find him revisiting Morpheus, the Endless, the realm of the Dreaming, and beyond.",
     "upc": null,
     "isbn": null,
     "cover_path": "5c6b7b2a-910a8462d5917aea/cover.jpg",
@@ -6759,10 +6571,107 @@
     ],
     "added_date": "2026-09-03",
     "metadata_source": {
-      "year": "filename",
+      "year": "comic_geeks",
       "issue_number": "filename",
       "series": "filename",
-      "title": "filename"
+      "title": "filename",
+      "publisher": "comic_geeks",
+      "description": "comic_geeks",
+      "author": "comic_geeks",
+      "cover_path": "comic_geeks"
+    }
+  },
+  {
+    "id": "6ab0e21-2eb7855f7bf64dc8",
+    "title": "Universal Monsters - Frankenstein #1",
+    "type": "comic",
+    "series": "Universal Monsters: Frankenstein",
+    "issue_number": "1",
+    "author": "Michael Walsh, Alex Antone",
+    "year": 2024,
+    "publisher": "Image Comics",
+    "description": "A MODERN-DAY HORROR VISIONARY RESURRECTS ONE OF THE MOST ICONIC MONSTERSAward-winning creator MICHAEL WALSH (THE SILVER COIN) presents an electrifying new vision of the horror classic. Each issue of the limited series tells the shocking story behind one of the body parts used to create the unforgettable monster in the original film. In this first issue, Dr. Henry Frankenstein begins his unholy quest to create life by robbing the grave of a decorated police officer. But little does he know that the corpse has a son who is mourning a father \u2014 and that this young boy will forever change Frankenstein\u2019s life.",
+    "upc": "70985304062000111",
+    "isbn": null,
+    "cover_path": "6ab0e21-2eb7855f7bf64dc8/cover.jpg",
+    "preview_pages": [],
+    "status": "read",
+    "formats": [
+      "digital"
+    ],
+    "added_date": "2026-09-03",
+    "metadata_source": {
+      "year": "comic_geeks",
+      "issue_number": "comic_geeks",
+      "series": "comic_geeks",
+      "title": "filename",
+      "publisher": "comic_geeks",
+      "description": "comic_geeks",
+      "author": "comic_geeks",
+      "upc": "comic_geeks",
+      "cover_path": "comic_geeks"
+    }
+  },
+  {
+    "id": "7a0abb5-a456a713f8e3fc1a",
+    "title": "Universal Monsters - Frankenstein #2",
+    "type": "comic",
+    "series": "Universal Monsters: Frankenstein",
+    "issue_number": "2",
+    "author": "Michael Walsh, Alex Antone, James Harren",
+    "year": 2024,
+    "publisher": "Image Comics",
+    "description": "Dr. Frankenstein\u2019s assistant Fritz has one mission \u2014 find the supplies to make a new human being. However, a chance encounter between a police officer and a murderer may ruin even the best laid plans...",
+    "upc": "70985304062000211",
+    "isbn": null,
+    "cover_path": "7a0abb5-a456a713f8e3fc1a/cover.jpg",
+    "preview_pages": [],
+    "status": "read",
+    "formats": [
+      "digital"
+    ],
+    "added_date": "2026-09-03",
+    "metadata_source": {
+      "year": "comic_geeks",
+      "issue_number": "comic_geeks",
+      "series": "comic_geeks",
+      "title": "filename",
+      "publisher": "comic_geeks",
+      "description": "comic_geeks",
+      "author": "comic_geeks",
+      "upc": "comic_geeks",
+      "cover_path": "comic_geeks"
+    }
+  },
+  {
+    "id": "7c047b6-461e307ef8bc94be",
+    "title": "Universal Monsters - Frankenstein #3",
+    "type": "comic",
+    "series": "Universal Monsters: Frankenstein",
+    "issue_number": "3",
+    "author": "Michael Walsh, Alex Antone, Joshua Williamson",
+    "year": 2024,
+    "publisher": "Image Comics",
+    "description": "Elizabeth Lavenza discovers the truth about her fianc\u00e9 Dr. Henry Frankenstein \u2014 and his true intentions \u2014 after presenting him with the one gift he desires. But is it too late to save those she loves?",
+    "upc": "70985304062000311",
+    "isbn": null,
+    "cover_path": "7c047b6-461e307ef8bc94be/cover.jpg",
+    "preview_pages": [],
+    "status": "read",
+    "formats": [
+      "digital"
+    ],
+    "added_date": "2026-09-03",
+    "metadata_source": {
+      "year": "comic_geeks",
+      "issue_number": "comic_geeks",
+      "series": "comic_geeks",
+      "title": "filename",
+      "publisher": "comic_geeks",
+      "description": "comic_geeks",
+      "author": "comic_geeks",
+      "upc": "comic_geeks",
+      "cover_path": "comic_geeks"
     }
   },
   {
@@ -6779,7 +6688,7 @@
     "isbn": null,
     "cover_path": "158b6b9a-4e03b946243d3ae5/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -6806,7 +6715,7 @@
     "isbn": null,
     "cover_path": "20b6f09d-c198f3eb3ddd8a04/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
@@ -6852,23 +6761,29 @@
     "type": "comic",
     "series": "Wytches",
     "issue_number": "1",
-    "author": null,
-    "year": null,
-    "publisher": null,
-    "description": null,
-    "upc": null,
+    "author": "Scott Snyder",
+    "year": 2014,
+    "publisher": "Image Comics",
+    "description": "Across the globe, century after century, men and women were burned, drowned, hanged, tortured, imprisoned, persecuted, and murdered for witchcraft. None of them were witches. They died protecting a terrible and hidden truth: witches, real witches, are out there. They are ancient, elusive, and deadly creatures that are rarely seen and even more rarely survived. This October, superstar creators SCOTT SNYDER (SEVERED, Batman) and JOCK (SNAPSHOT, Batman) unveil WYTCHES, and introduce you to a world of unimaginable horror in a special EXTRA-SIZED FIRST ISSUE with 30 pages of story and no ads for just $2.99",
+    "upc": "70985301713400111",
     "isbn": null,
     "cover_path": "500ed09-8a55b6b405c4b8c7/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
     "added_date": "2026-09-03",
     "metadata_source": {
-      "issue_number": "filename",
-      "series": "filename",
-      "title": "filename"
+      "issue_number": "comic_geeks",
+      "series": "comic_geeks",
+      "title": "filename",
+      "publisher": "comic_geeks",
+      "year": "comic_geeks",
+      "description": "comic_geeks",
+      "author": "comic_geeks",
+      "upc": "comic_geeks",
+      "cover_path": "comic_geeks"
     }
   },
   {
@@ -6877,23 +6792,29 @@
     "type": "comic",
     "series": "Wytches",
     "issue_number": "2",
-    "author": null,
-    "year": null,
-    "publisher": null,
-    "description": null,
-    "upc": null,
+    "author": "Scott Snyder, Matt Hollingsworth",
+    "year": 2014,
+    "publisher": "Image Comics",
+    "description": "A busload of children disappears in the woods. A strange bite grows on a girl's neck. And the wytches are getting closer, creeping from the woods. Be there for the terrifying second chapter of the new smash hit, WYTCHES.",
+    "upc": "70985301713400211",
     "isbn": null,
     "cover_path": "48e7188-9f12ee1dfddf48a0/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
     "added_date": "2026-09-03",
     "metadata_source": {
-      "issue_number": "filename",
-      "series": "filename",
-      "title": "filename"
+      "issue_number": "comic_geeks",
+      "series": "comic_geeks",
+      "title": "filename",
+      "publisher": "comic_geeks",
+      "year": "comic_geeks",
+      "description": "comic_geeks",
+      "author": "comic_geeks",
+      "upc": "comic_geeks",
+      "cover_path": "comic_geeks"
     }
   },
   {
@@ -6902,23 +6823,29 @@
     "type": "comic",
     "series": "Wytches",
     "issue_number": "3",
-    "author": null,
-    "year": null,
-    "publisher": null,
-    "description": null,
-    "upc": null,
+    "author": "Scott Snyder, Matt Hollingsworth",
+    "year": 2014,
+    "publisher": "Image Comics",
+    "description": "A parent's worst nightmare: a beloved child lost in the woods. Behind the trees lurk horrors, and the brush conceals atrocity. No matter how desperate the search, understand that your prayers will fall on deaf ears. There is no escape from the Wytches.",
+    "upc": "70985301713400311",
     "isbn": null,
     "cover_path": "4a73c75-660bc04856788d8d/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
     "added_date": "2026-09-03",
     "metadata_source": {
-      "issue_number": "filename",
-      "series": "filename",
-      "title": "filename"
+      "issue_number": "comic_geeks",
+      "series": "comic_geeks",
+      "title": "filename",
+      "publisher": "comic_geeks",
+      "year": "comic_geeks",
+      "description": "comic_geeks",
+      "author": "comic_geeks",
+      "upc": "comic_geeks",
+      "cover_path": "comic_geeks"
     }
   },
   {
@@ -6927,23 +6854,29 @@
     "type": "comic",
     "series": "Wytches",
     "issue_number": "4",
-    "author": null,
-    "year": null,
-    "publisher": null,
-    "description": null,
-    "upc": null,
+    "author": "Scott Snyder, Jock, David Brothers",
+    "year": 2015,
+    "publisher": "Image Comics",
+    "description": "Now, with the true nature of the wytches revealed, Charlie descends into the Earth in a desperate race to save his daughter and his family from an inconceivable fate.",
+    "upc": "70985301713400411",
     "isbn": null,
     "cover_path": "3677f8b-d3632b85f02c921f/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
     "added_date": "2026-09-03",
     "metadata_source": {
-      "issue_number": "filename",
-      "series": "filename",
-      "title": "filename"
+      "issue_number": "comic_geeks",
+      "series": "comic_geeks",
+      "title": "filename",
+      "publisher": "comic_geeks",
+      "year": "comic_geeks",
+      "description": "comic_geeks",
+      "author": "comic_geeks",
+      "upc": "comic_geeks",
+      "cover_path": "comic_geeks"
     }
   },
   {
@@ -6952,23 +6885,29 @@
     "type": "comic",
     "series": "Wytches",
     "issue_number": "5",
-    "author": null,
-    "year": null,
-    "publisher": null,
-    "description": null,
-    "upc": null,
+    "author": "Scott Snyder, Jock",
+    "year": 2015,
+    "publisher": "Image Comics",
+    "description": "In the first half of the opening arc's two-part finale, Charlie descends into the wytches' burrow itself to save his daughter from an unspeakable death. But what horrors await him deep beneath the earth? And what secrets...?",
+    "upc": "70985301713400511",
     "isbn": null,
     "cover_path": "3deefe5-07ecdb86b27ff204/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
     "added_date": "2026-09-03",
     "metadata_source": {
-      "issue_number": "filename",
-      "series": "filename",
-      "title": "filename"
+      "issue_number": "comic_geeks",
+      "series": "comic_geeks",
+      "title": "filename",
+      "publisher": "comic_geeks",
+      "year": "comic_geeks",
+      "description": "comic_geeks",
+      "author": "comic_geeks",
+      "upc": "comic_geeks",
+      "cover_path": "comic_geeks"
     }
   },
   {
@@ -6977,23 +6916,29 @@
     "type": "comic",
     "series": "Wytches",
     "issue_number": "6",
-    "author": null,
-    "year": null,
-    "publisher": null,
-    "description": null,
-    "upc": null,
+    "author": "Scott Snyder",
+    "year": 2015,
+    "publisher": "Image Comics",
+    "description": "As Charlie struggles to save Sailor from the wytches' grasp, the monsters' true hold over the Rooks family is revealed in this, the harrowing ending to the series' first arc!",
+    "upc": "70985301713400611",
     "isbn": null,
     "cover_path": "543273f-1958aea8d8ff35db/cover.jpg",
     "preview_pages": [],
-    "status": "unread",
+    "status": "read",
     "formats": [
       "digital"
     ],
     "added_date": "2026-09-03",
     "metadata_source": {
-      "issue_number": "filename",
-      "series": "filename",
-      "title": "filename"
+      "issue_number": "comic_geeks",
+      "series": "comic_geeks",
+      "title": "filename",
+      "publisher": "comic_geeks",
+      "year": "comic_geeks",
+      "description": "comic_geeks",
+      "author": "comic_geeks",
+      "upc": "comic_geeks",
+      "cover_path": "comic_geeks"
     }
   },
   {
@@ -7002,10 +6947,10 @@
     "type": "comic",
     "series": "X-Men - Days of Future Past",
     "issue_number": null,
-    "author": null,
-    "year": null,
-    "publisher": null,
-    "description": null,
+    "author": "Chris Claremont",
+    "year": 2021,
+    "publisher": "Marvel Comics",
+    "description": "It was the best of times, it was the worst of times: Relive the legendary first journey into the dystopian future of 2013 - where Sentinels stalk the Earth, and the X-Men are humanity's only hope...until they die! Also featuring the first appearance of Alpha Flight, the return of the Wendigo, the history of the X-Men from Cyclops himself... and a demon for Christmas!?",
     "upc": null,
     "isbn": null,
     "cover_path": "141b3016-a96d3bca46dedade/cover.jpg",
@@ -7017,7 +6962,12 @@
     "added_date": "2026-09-03",
     "metadata_source": {
       "series": "filename",
-      "title": "filename"
+      "title": "filename",
+      "publisher": "comic_geeks",
+      "year": "comic_geeks",
+      "description": "comic_geeks",
+      "author": "comic_geeks",
+      "cover_path": "comic_geeks"
     }
   },
   {
@@ -7026,10 +6976,10 @@
     "type": "comic",
     "series": "X-Men - God Loves, Man Kills",
     "issue_number": "001",
-    "author": null,
-    "year": null,
-    "publisher": null,
-    "description": null,
+    "author": "Chris Claremont, John Rhett Thomas, Neal Adams, Brent Anderson",
+    "year": 2011,
+    "publisher": "Marvel Comics",
+    "description": "The Uncanny X-Men. Magneto, Master of Magnetism. The bitterest of enemies for years. Now, they must join forces against a new adversary who threatens them all and the entire world besides - in the name of God. The members of the Stryker?Crusade are poised to cleanse the earth, no matter how much blood stains their hands. With Professor X as their enemy and Magneto as their ally, the X-Men undergo an apocalyptic ordeal ordained by a minister gone mad! One of Chris Claremont's most powerful and influential stories, the partial basis for X2 is reprinted in softcover for the first time in years.",
     "upc": null,
     "isbn": null,
     "cover_path": "992f551-ed6e6f8e263489c1/cover.jpg",
@@ -7042,7 +6992,12 @@
     "metadata_source": {
       "issue_number": "filename",
       "series": "filename",
-      "title": "filename"
+      "title": "filename",
+      "publisher": "comic_geeks",
+      "year": "comic_geeks",
+      "description": "comic_geeks",
+      "author": "comic_geeks",
+      "cover_path": "comic_geeks"
     }
   },
   {
@@ -7071,84 +7026,6 @@
       "publisher": "comicinfo",
       "description": "comicinfo",
       "author": "comicinfo"
-    }
-  },
-  {
-    "id": "6ab0e21-2eb7855f7bf64dc8",
-    "title": "Universal Monsters - Frankenstein #1",
-    "type": "comic",
-    "series": "Universal Monsters - Frankenstein",
-    "issue_number": "001",
-    "author": null,
-    "year": 2024,
-    "publisher": null,
-    "description": null,
-    "upc": null,
-    "isbn": null,
-    "cover_path": "6ab0e21-2eb7855f7bf64dc8/cover.jpg",
-    "preview_pages": [],
-    "status": "unread",
-    "formats": [
-      "digital"
-    ],
-    "added_date": "2026-09-03",
-    "metadata_source": {
-      "year": "filename",
-      "issue_number": "filename",
-      "series": "filename",
-      "title": "filename"
-    }
-  },
-  {
-    "id": "7a0abb5-a456a713f8e3fc1a",
-    "title": "Universal Monsters - Frankenstein #2",
-    "type": "comic",
-    "series": "Universal Monsters - Frankenstein",
-    "issue_number": "002",
-    "author": null,
-    "year": 2024,
-    "publisher": null,
-    "description": null,
-    "upc": null,
-    "isbn": null,
-    "cover_path": "7a0abb5-a456a713f8e3fc1a/cover.jpg",
-    "preview_pages": [],
-    "status": "unread",
-    "formats": [
-      "digital"
-    ],
-    "added_date": "2026-09-03",
-    "metadata_source": {
-      "year": "filename",
-      "issue_number": "filename",
-      "series": "filename",
-      "title": "filename"
-    }
-  },
-  {
-    "id": "7c047b6-461e307ef8bc94be",
-    "title": "Universal Monsters - Frankenstein #3",
-    "type": "comic",
-    "series": "Universal Monsters - Frankenstein",
-    "issue_number": "003",
-    "author": null,
-    "year": 2024,
-    "publisher": null,
-    "description": null,
-    "upc": null,
-    "isbn": null,
-    "cover_path": "7c047b6-461e307ef8bc94be/cover.jpg",
-    "preview_pages": [],
-    "status": "unread",
-    "formats": [
-      "digital"
-    ],
-    "added_date": "2026-09-03",
-    "metadata_source": {
-      "year": "filename",
-      "issue_number": "filename",
-      "series": "filename",
-      "title": "filename"
     }
   }
 ]

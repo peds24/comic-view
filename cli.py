@@ -21,6 +21,7 @@ from library.physical_importer import count_rows, import_physical_xlsx
 from library.pull_calendar import fetch_pulled_items, load_state, save_state
 from library.pull_resolver import ResolveResult, resolve_and_add
 from library.scanner import list_archives, scan_roots
+from library.sheets_sync import sync_comics_to_sheet
 from library.store import load_library, merge_record, save_library
 from library.viewer_server import ViewerRequestHandler
 
@@ -376,6 +377,26 @@ def serve(config_path: str, port: int, comics_filename: str, manga_filename: str
             httpd.serve_forever()
         except KeyboardInterrupt:
             click.echo("\nStopped.")
+
+
+@main.command("sync-sheet")
+@click.option("--config", "config_path", default="config.yaml", help="Path to config.yaml")
+def sync_sheet_cmd(config_path: str) -> None:
+    """Pushes the current comics library to the configured Google Sheet
+    (full overwrite of the configured worksheet). Also the command to run
+    for the first-time OAuth consent flow. Unlike the automatic sync
+    add-comic/check-pulls trigger, errors here are not swallowed — this
+    command's whole purpose is the sync itself."""
+    config = load_config(config_path)
+    if not config.google_sheets.is_configured:
+        raise click.ClickException(
+            "google_sheets not configured — fill in config.yaml "
+            "(see docs/superpowers/specs/2026-09-07-google-sheets-sync-design.md)."
+        )
+    library_path = config.data_dir / "library_comics.json"
+    records = load_library(library_path)
+    sync_comics_to_sheet(records, config)
+    click.echo(f"Synced {len(records)} comic(s) to the '{config.google_sheets.worksheet_name}' worksheet.")
 
 
 if __name__ == "__main__":

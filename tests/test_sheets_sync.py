@@ -55,7 +55,7 @@ def test_comic_to_row_joins_multiple_formats():
 
 
 from library.config import Config, GoogleSheetsConfig, MetronConfig, GoogleBooksConfig, PullListConfig
-from library.sheets_sync import sync_comics_to_sheet
+from library.sheets_sync import sync_comics_to_sheet, _authorize
 
 
 class _FakeWorksheet:
@@ -124,3 +124,66 @@ def test_sync_comics_to_sheet_clears_and_writes_header_plus_rows(monkeypatch):
     assert worksheet.updated_with[2][1] == "Older"
     assert client._requested_key == "abc123"
     assert client._sheet._requested_name == "Comics"
+
+
+class _FakeExpiredCreds:
+    """A cached token that Credentials.from_authorized_user_file would
+    return for a token whose refresh_token has been revoked server-side."""
+
+    def __init__(self):
+        self.valid = False
+        self.expired = True
+        self.refresh_token = "some-refresh-token"
+
+    def refresh(self, request):
+        from google.auth.exceptions import RefreshError
+        raise RefreshError("invalid_grant: Token has been expired or revoked.")
+
+
+class _FakeFreshCreds:
+    """What the interactive consent flow's run_local_server returns."""
+
+    def __init__(self):
+        self.valid = True
+
+    def to_json(self):
+        return "{}"
+
+
+class _FakeFlow:
+    def __init__(self):
+        self.run_local_server_called_with = None
+
+    def run_local_server(self, port):
+        self.run_local_server_called_with = port
+        return _FakeFreshCreds()
+
+
+def test_authorize_falls_back_to_interactive_flow_when_refresh_fails(tmp_path, monkeypatch):
+    """Reproduces the bug: a stale/revoked cached token whose .refresh()
+    raises RefreshError must not propagate — it should fall through to
+    the interactive consent flow, per the spec's documented behavior."""
+    token_path = tmp_path / "token.json"
+    token_path.write_text("{}")  # just needs to exist; from_authorized_user_file is patched below
+    client_secret_path = tmp_path / "client_secret.json"
+    client_secret_path.write_text("{}")
+
+    monkeypatch.setattr(
+        "library.sheets_sync.Credentials.from_authorized_user_file",
+        lambda path, scopes: _FakeExpiredCreds(),
+    )
+    fake_flow = _FakeFlow()
+    monkeypatch.setattr(
+        "library.sheets_sync.InstalledAppFlow.from_client_secrets_file",
+        lambda path, scopes: fake_flow,
+    )
+    monkeypatch.setattr("library.sheets_sync.gspread.authorize", lambda creds: creds)
+
+    config = _config(token_path=str(token_path), client_secret_path=str(client_secret_path))
+
+    result = _authorize(config)
+
+    assert fake_flow.run_local_server_called_with == 0
+    assert result.valid is True
+    assert token_path.read_text() == "{}"
+    assert (token_path.stat().st_mode & 0o777) == 0o600

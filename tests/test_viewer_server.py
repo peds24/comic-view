@@ -7,7 +7,7 @@ import threading
 
 import pytest
 
-from library.config import Config, GoogleBooksConfig, MetronConfig
+from library.config import Config, GoogleBooksConfig, GoogleSheetsConfig, MetronConfig, PullListConfig
 from library.models import ComicRecord
 from library.store import load_library, save_library
 from library.viewer_server import ViewerRequestHandler
@@ -40,7 +40,10 @@ def server(tmp_path, monkeypatch):
         comics_path=comics_path,
         manga_path=manga_path,
         covers_dir=covers_dir,
-        config=Config(roots=[], metron=MetronConfig(), google_books=GoogleBooksConfig(), data_dir=tmp_path),
+        config=Config(
+            roots=[], metron=MetronConfig(), google_books=GoogleBooksConfig(), data_dir=tmp_path,
+            pull_list=PullListConfig(), google_sheets=GoogleSheetsConfig(),
+        ),
     )
     httpd = http.server.ThreadingHTTPServer(("127.0.0.1", 0), handler)
     thread = threading.Thread(target=httpd.serve_forever, daemon=True)

@@ -47,4 +47,27 @@ describe('computeCardTransform', () => {
     expect(computeCardTransform(0).zIndex).toBeGreaterThan(computeCardTransform(1).zIndex)
     expect(computeCardTransform(1).zIndex).toBeGreaterThan(computeCardTransform(3).zIndex)
   })
+
+  it('interpolates smoothly through fractional offsets, so a card crossing focus mid-glide never pops', () => {
+    // rotateY and scale must move monotonically toward their offset=0 values
+    // as a card approaches focus — no jump exactly at 0.
+    const far = computeCardTransform(1)
+    const near = computeCardTransform(0.3)
+    const focus = computeCardTransform(0)
+
+    expect(Math.abs(near.rotateY)).toBeLessThan(Math.abs(far.rotateY))
+    expect(Math.abs(near.rotateY)).toBeGreaterThan(0)
+    expect(near.scale).toBeLessThan(focus.scale)
+    expect(near.scale).toBeGreaterThan(far.scale)
+  })
+
+  it('matches the settled integer-offset values once a card is a full slot or more away', () => {
+    // The interpolation only affects the 0..1 range — beyond that it must
+    // reproduce exactly what the old step-function gave at integer offsets.
+    const at1 = computeCardTransform(1)
+    const at2 = computeCardTransform(2)
+    expect(at1.rotateY).toBe(-34)
+    expect(at2.rotateY).toBe(-34)
+    expect(at1.scale).toBeCloseTo(0.86)
+  })
 })
